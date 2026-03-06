@@ -265,9 +265,9 @@ function StatsBar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-primary-foreground/20">
           {STATS.map((stat, i) => (
-            <div key={i} className="py-5 px-6 text-center">
-              <div className="text-2xl md:text-3xl font-bold">{lang === "ru" ? stat.valueRu : stat.valueEn}</div>
-              <div className="text-sm text-primary-foreground/75 mt-0.5">{lang === "ru" ? stat.labelRu : stat.labelEn}</div>
+            <div key={i} className="py-8 px-8 text-center">
+              <div className="text-3xl md:text-4xl font-extrabold tracking-tight">{lang === "ru" ? stat.valueRu : stat.valueEn}</div>
+              <div className="text-sm text-primary-foreground/75 mt-1">{lang === "ru" ? stat.labelRu : stat.labelEn}</div>
             </div>
           ))}
         </div>
@@ -280,24 +280,24 @@ function PopularToursSection({ tours }: { tours: Tour[] }) {
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-10">
+    <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="flex items-end justify-between mb-14">
         <div>
-          <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-2">{t("Лучшие предложения", "Top Offers")}</p>
-          <h2 className="text-3xl md:text-4xl font-bold">{t("Популярные туры", "Popular Tours")}</h2>
+          <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Лучшие предложения", "Top Offers")}</p>
+          <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Популярные туры", "Popular Tours")}</h2>
         </div>
         <Link href="/tours">
-          <Button variant="outline" className="hidden md:flex items-center gap-2 rounded-full px-6">
+          <Button variant="outline" className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold">
             {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4" />
           </Button>
         </Link>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
         {tours.slice(0, 8).map(tour => <TourCard key={tour.id} tour={tour} />)}
       </div>
-      <div className="mt-8 flex justify-center md:hidden">
+      <div className="mt-10 flex justify-center md:hidden">
         <Link href="/tours">
-          <Button variant="outline" className="rounded-full px-8">
+          <Button variant="outline" className="rounded-full px-8 py-5">
             {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         </Link>
@@ -310,22 +310,22 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
-    <section className="py-16 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20">
+    <section className="py-24 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex items-end justify-between mb-14">
           <div>
-            <p className="text-orange-500 font-semibold text-sm uppercase tracking-widest mb-2 flex items-center gap-1.5">
+            <p className="text-orange-500 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center gap-1.5">
               <Flame className="h-4 w-4" /> {t("Акции", "Special Deals")}
             </p>
-            <h2 className="text-3xl md:text-4xl font-bold">{t("Горящие туры", "Hot Deals")}</h2>
+            <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Горящие туры", "Hot Deals")}</h2>
           </div>
           <Link href="/promotions">
-            <Button variant="outline" className="hidden md:flex items-center gap-2 rounded-full px-6">
+            <Button variant="outline" className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold">
               {t("Все акции", "All Deals")} <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
           {tours.slice(0, 4).map(tour => <TourCard key={tour.id} tour={tour} />)}
         </div>
       </div>
@@ -432,15 +432,15 @@ function countryFlag(code: string): string {
 function DestinationsSection() {
   const { t, lang } = useI18n();
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div className="text-center mb-12">
-        <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-2">{t("Исследуйте", "Explore")}</p>
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("Направления мечты", "Dream Destinations")}</h2>
-        <p className="text-muted-foreground max-w-xl mx-auto">
+    <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="text-center mb-16">
+        <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Исследуйте", "Explore")}</p>
+        <h2 className="text-3xl md:text-5xl font-bold mb-5 leading-tight">{t("Направления мечты", "Dream Destinations")}</h2>
+        <p className="text-muted-foreground max-w-xl mx-auto text-base leading-relaxed">
           {t("Откройте для себя самые красивые уголки планеты с нашими эксклюзивными турами", "Discover the most beautiful corners of the planet with our exclusive tours")}
         </p>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
         {DESTINATIONS.map(dest => (
           <DestinationCard key={dest.id} dest={dest} lang={lang} />
         ))}
@@ -453,19 +453,19 @@ function PromoBanner({ banners }: { banners: any[] }) {
   const { t, lang } = useI18n();
   const banner = banners[0];
   if (!banner) return (
-    <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-4">
-      <div className="relative rounded-3xl overflow-hidden h-56 md:h-72 bg-gradient-to-r from-primary via-blue-600 to-cyan-500 shadow-xl">
+    <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-8">
+      <div className="relative rounded-3xl overflow-hidden h-64 md:h-80 bg-gradient-to-r from-primary via-blue-600 to-cyan-500 shadow-2xl">
         <div className="absolute inset-0 opacity-20">
           <img src="/images/tour-maldives.png" alt="" className="w-full h-full object-cover" />
         </div>
-        <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between px-8 md:px-14 py-8 gap-6">
+        <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between px-10 md:px-16 py-10 gap-6">
           <div className="text-white text-center md:text-left">
-            <Badge className="bg-white/20 text-white border-white/30 mb-3">🔥 {t("Специальное предложение", "Special Offer")}</Badge>
+            <Badge className="bg-white/20 text-white border-white/30 mb-4">🔥 {t("Специальное предложение", "Special Offer")}</Badge>
             <h3 className="text-2xl md:text-4xl font-bold mb-2">{t("Скидки до 30% на летние туры", "Up to 30% off summer tours")}</h3>
-            <p className="text-white/80 text-sm md:text-base">{t("Успейте забронировать по лучшим ценам", "Book now at the best prices")}</p>
+            <p className="text-white/80 text-sm md:text-base mt-2">{t("Успейте забронировать по лучшим ценам", "Book now at the best prices")}</p>
           </div>
           <Link href="/promotions" className="shrink-0">
-            <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-bold px-8 rounded-xl shadow-lg">
+            <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-bold px-10 py-6 rounded-xl shadow-lg text-base">
               {t("Смотреть акции", "View Offers")}
             </Button>
           </Link>
@@ -475,18 +475,18 @@ function PromoBanner({ banners }: { banners: any[] }) {
   );
 
   return (
-    <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-4">
-      <div className="relative rounded-3xl overflow-hidden h-56 md:h-72 shadow-xl">
+    <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-8">
+      <div className="relative rounded-3xl overflow-hidden h-64 md:h-80 shadow-2xl">
         <img src={banner.imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
-        <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between px-8 md:px-14 py-8 gap-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-transparent" />
+        <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between px-10 md:px-16 py-10 gap-6">
           <div className="text-white text-center md:text-left">
-            <Badge className="bg-white/20 text-white border-white/30 mb-3">🔥 {t("Специальное предложение", "Special Offer")}</Badge>
+            <Badge className="bg-white/20 text-white border-white/30 mb-4">🔥 {t("Специальное предложение", "Special Offer")}</Badge>
             <h3 className="text-2xl md:text-4xl font-bold mb-2">{lang === "ru" ? banner.titleRu : (banner.titleEn || banner.titleRu)}</h3>
-            {banner.subtitleRu && <p className="text-white/80 text-sm md:text-base">{lang === "ru" ? banner.subtitleRu : (banner.subtitleEn || banner.subtitleRu)}</p>}
+            {banner.subtitleRu && <p className="text-white/80 text-sm md:text-base mt-2">{lang === "ru" ? banner.subtitleRu : (banner.subtitleEn || banner.subtitleRu)}</p>}
           </div>
           <Link href={banner.linkUrl || "/promotions"} className="shrink-0">
-            <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-bold px-8 rounded-xl shadow-lg">
+            <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-bold px-10 py-6 rounded-xl shadow-lg text-base">
               {t("Смотреть", "View")} <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>
@@ -520,16 +520,16 @@ function ReviewsSection() {
   const rev = reviews[idx];
 
   return (
-    <section className="py-16 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900/50 dark:to-blue-950/30">
+    <section className="py-24 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900/50 dark:to-blue-950/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-2">{t("Отзывы", "Testimonials")}</p>
-          <h2 className="text-3xl md:text-4xl font-bold">{t("Что говорят наши клиенты", "What Our Clients Say")}</h2>
+        <div className="text-center mb-16">
+          <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Отзывы", "Testimonials")}</p>
+          <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Что говорят наши клиенты", "What Our Clients Say")}</h2>
         </div>
 
         <div className="max-w-3xl mx-auto">
           <div className={`transition-all duration-200 ${animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}>
-            <div className="bg-white dark:bg-card rounded-3xl shadow-xl p-8 md:p-12 relative">
+            <div className="bg-white dark:bg-card rounded-3xl shadow-xl p-10 md:p-16 relative">
               <Quote className="h-10 w-10 text-primary/20 absolute top-8 left-8" />
               <div className="flex justify-center mb-6">
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -586,16 +586,16 @@ function WhyUsSection() {
     { icon: "🌍", titleRu: "Любое направление", titleEn: "Any Destination", descRu: "Более 120 направлений по всему миру", descEn: "Over 120 destinations worldwide" },
   ];
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div className="text-center mb-12">
-        <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-2">{t("Наши преимущества", "Our Advantages")}</p>
-        <h2 className="text-3xl md:text-4xl font-bold">{t("Почему выбирают нас", "Why Choose Us")}</h2>
+    <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="text-center mb-16">
+        <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Наши преимущества", "Our Advantages")}</p>
+        <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Почему выбирают нас", "Why Choose Us")}</h2>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
         {items.map((item, i) => (
-          <div key={i} className="group bg-card border border-card-border rounded-2xl p-6 text-center hover:border-primary/40 hover:shadow-lg transition-all duration-300">
-            <div className="text-4xl mb-4">{item.icon}</div>
-            <h3 className="font-bold text-lg mb-2">{t(item.titleRu, item.titleEn)}</h3>
+          <div key={i} className="group bg-card border border-card-border rounded-2xl p-8 text-center hover:border-primary/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div className="text-5xl mb-5">{item.icon}</div>
+            <h3 className="font-bold text-lg mb-3">{t(item.titleRu, item.titleEn)}</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">{t(item.descRu, item.descEn)}</p>
           </div>
         ))}
@@ -624,10 +624,10 @@ export default function Home() {
       <StatsBar />
 
       {isLoading ? (
-        <div className="max-w-7xl mx-auto px-4 py-16 space-y-8">
-          <Skeleton className="h-8 w-64 mb-4" />
-          <div className="grid grid-cols-4 gap-5">
-            {[1,2,3,4].map(i => <Skeleton key={i} className="h-72 rounded-2xl" />)}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-10">
+          <Skeleton className="h-9 w-72 mb-6" />
+          <div className="grid grid-cols-4 gap-7">
+            {[1,2,3,4].map(i => <Skeleton key={i} className="h-80 rounded-2xl" />)}
           </div>
         </div>
       ) : (
