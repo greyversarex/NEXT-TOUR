@@ -338,31 +338,95 @@ function DestinationCard({ dest, lang }: { dest: typeof DESTINATIONS[0]; lang: s
   const tags = lang === "ru" ? dest.tagsRu : dest.tagsEn;
   return (
     <Link href={`/tours`}>
-      <div className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500" data-testid={`card-destination-${dest.id}`}>
+      <div
+        className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer
+          shadow-md hover:shadow-[0_20px_60px_-10px_rgba(0,0,0,0.35)]
+          hover:-translate-y-1.5
+          transition-all duration-500 ease-out"
+        data-testid={`card-destination-${dest.id}`}
+      >
+        {/* Image with zoom */}
         <img
           src={dest.image}
           alt={name}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          className="absolute inset-0 w-full h-full object-cover
+            transition-transform duration-700 ease-out
+            group-hover:scale-[1.09]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-5">
-          <h3 className="text-white text-xl font-bold mb-2">{name}</h3>
-          <div className="flex flex-wrap gap-1.5">
+
+        {/* Base gradient — always visible, darkens bottom */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 transition-opacity duration-500" />
+
+        {/* Hover overlay — adds top darkening for polish */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+        {/* Sheen flash */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{ background: "linear-gradient(135deg, transparent 35%, rgba(255,255,255,0.07) 55%, transparent 75%)" }}
+        />
+
+        {/* Country flag badge */}
+        <div className="absolute top-3.5 left-3.5 z-10">
+          <span className="text-2xl drop-shadow-md">{countryFlag(dest.country)}</span>
+        </div>
+
+        {/* Arrow CTA — top right, scale-in on hover */}
+        <div className="absolute top-3.5 right-3.5 z-10
+          scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100
+          transition-all duration-300 ease-out">
+          <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+            <ArrowRight className="h-4 w-4 text-primary" />
+          </div>
+        </div>
+
+        {/* Text — slides up slightly on hover */}
+        <div className="absolute bottom-0 left-0 right-0 p-5 z-10
+          translate-y-1 group-hover:translate-y-0
+          transition-transform duration-400 ease-out">
+
+          {/* Destination name */}
+          <h3
+            className="text-white font-extrabold leading-tight mb-2.5"
+            style={{
+              fontSize: "clamp(1.25rem, 3vw, 1.75rem)",
+              textShadow: "0 2px 16px rgba(0,0,0,0.5)",
+            }}
+          >
+            {name}
+          </h3>
+
+          {/* Tags as bullet-separated inline text */}
+          <p className="text-white/75 text-xs font-medium tracking-wide mb-2.5 group-hover:text-white/90 transition-colors duration-300">
+            {tags.join(" • ")}
+          </p>
+
+          {/* Pill tags — hidden, expand in on hover */}
+          <div className="flex flex-wrap gap-1.5
+            max-h-0 overflow-hidden group-hover:max-h-12
+            transition-all duration-400 ease-out">
             {tags.map((tag, i) => (
-              <span key={i} className="text-xs text-white/90 bg-white/15 backdrop-blur-sm rounded-full px-2.5 py-0.5 border border-white/20">
+              <span
+                key={i}
+                className="text-[11px] text-white/95 bg-white/20 backdrop-blur-sm
+                  rounded-full px-2.5 py-0.5 border border-white/25 font-medium
+                  opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{ transitionDelay: `${i * 60}ms` }}
+              >
                 {tag}
               </span>
             ))}
           </div>
         </div>
-        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="bg-white rounded-full p-2 shadow-lg">
-            <ArrowRight className="h-4 w-4 text-primary" />
-          </div>
-        </div>
       </div>
     </Link>
   );
+}
+
+function countryFlag(code: string): string {
+  return code
+    .toUpperCase()
+    .replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0)));
 }
 
 function DestinationsSection() {
