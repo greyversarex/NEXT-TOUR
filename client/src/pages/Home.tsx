@@ -9,7 +9,7 @@ import TourCard from "@/components/TourCard";
 import { useI18n } from "@/lib/i18n";
 import {
   Search, Star, ChevronLeft, ChevronRight, MapPin, Clock,
-  Users, Calendar, ArrowRight, Quote, Sparkles, Flame, TrendingUp
+  Users, Calendar, ArrowRight, Quote, Sparkles, Flame, TrendingUp, ChevronDown
 } from "lucide-react";
 import type { Tour } from "@shared/schema";
 
@@ -76,6 +76,44 @@ const STATS = [
   { valueRu: "15 лет", valueEn: "15 years", labelRu: "на рынке", labelEn: "of experience" },
   { valueRu: "4.9 ★", valueEn: "4.9 ★", labelRu: "средняя оценка", labelEn: "average rating" },
 ];
+
+function Reveal({
+  children,
+  delay = 0,
+  y = 28,
+  className = "",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  y?: number;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.unobserve(el); } },
+      { threshold: 0.08, rootMargin: "0px 0px -48px 0px" }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "none" : `translateY(${y}px)`,
+        transition: `opacity 0.75s cubic-bezier(0.22,1,0.36,1) ${delay}ms, transform 0.75s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 function CinematicHero() {
   const { t, lang } = useI18n();
@@ -228,6 +266,13 @@ function CinematicHero() {
         </div>
       </div>
 
+      {/* Scroll indicator */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/50 pointer-events-none"
+        style={{ animation: "heroPulseGlow 3s ease-in-out infinite, heroFadeInUp 1s ease 1.8s both" }}>
+        <span className="text-[10px] uppercase tracking-[0.25em] font-medium">Scroll</span>
+        <ChevronDown className="h-5 w-5 animate-bounce" />
+      </div>
+
       {/* Slide controls */}
       {heroImages.length > 1 && (
         <>
@@ -292,7 +337,7 @@ function PopularToursSection({ tours }: { tours: Tour[] }) {
       <div className="depth-blob w-72 h-72 bg-primary/20 bottom-0 -right-24" style={{ opacity: 0.10 }} />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-end justify-between mb-14">
+        <Reveal className="flex items-end justify-between mb-14">
           <div>
             <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Лучшие предложения", "Top Offers")}</p>
             <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Популярные туры", "Popular Tours")}</h2>
@@ -302,9 +347,13 @@ function PopularToursSection({ tours }: { tours: Tour[] }) {
               {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
-        </div>
+        </Reveal>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
-          {tours.slice(0, 8).map(tour => <TourCard key={tour.id} tour={tour} />)}
+          {tours.slice(0, 8).map((tour, i) => (
+            <Reveal key={tour.id} delay={i * 80} y={20}>
+              <TourCard tour={tour} />
+            </Reveal>
+          ))}
         </div>
         <div className="mt-10 flex justify-center md:hidden">
           <Link href="/tours">
@@ -329,7 +378,7 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
       <div className="depth-blob w-64 h-64 bg-amber-200 bottom-0 left-0" style={{ opacity: 0.10 }} />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-end justify-between mb-14">
+        <Reveal className="flex items-end justify-between mb-14">
           <div>
             <p className="text-orange-500 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center gap-1.5">
               <Flame className="h-4 w-4" /> {t("Акции", "Special Deals")}
@@ -341,25 +390,34 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
               {t("Все акции", "All Deals")} <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
-        </div>
+        </Reveal>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
-          {tours.slice(0, 4).map(tour => <TourCard key={tour.id} tour={tour} />)}
+          {tours.slice(0, 4).map((tour, i) => (
+            <Reveal key={tour.id} delay={i * 90} y={20}>
+              <TourCard tour={tour} />
+            </Reveal>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-function DestinationCard({ dest, lang }: { dest: typeof DESTINATIONS[0]; lang: string }) {
+function DestinationCard({ dest, lang, aspectClass = "aspect-[3/4]" }: {
+  dest: typeof DESTINATIONS[0];
+  lang: string;
+  aspectClass?: string;
+}) {
   const name = lang === "ru" ? dest.nameRu : dest.nameEn;
   const tags = lang === "ru" ? dest.tagsRu : dest.tagsEn;
   return (
-    <Link href={`/tours`}>
+    <Link href={`/tours`} className="block h-full">
       <div
-        className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer
+        className={`group relative rounded-2xl overflow-hidden cursor-pointer h-full
+          ${aspectClass}
           shadow-md hover:shadow-[0_20px_60px_-10px_rgba(0,0,0,0.35)]
           hover:-translate-y-1.5
-          transition-all duration-500 ease-out"
+          transition-all duration-500 ease-out`}
         data-testid={`card-destination-${dest.id}`}
       >
         {/* Image with zoom */}
@@ -450,17 +508,34 @@ function DestinationsSection() {
   const { t, lang } = useI18n();
   return (
     <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div className="text-center mb-16">
+      <Reveal className="text-center mb-16">
         <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Исследуйте", "Explore")}</p>
         <h2 className="text-3xl md:text-5xl font-bold mb-5 leading-tight">{t("Направления мечты", "Dream Destinations")}</h2>
         <p className="text-muted-foreground max-w-xl mx-auto text-base leading-relaxed">
           {t("Откройте для себя самые красивые уголки планеты с нашими эксклюзивными турами", "Discover the most beautiful corners of the planet with our exclusive tours")}
         </p>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
-        {DESTINATIONS.map(dest => (
-          <DestinationCard key={dest.id} dest={dest} lang={lang} />
-        ))}
+      </Reveal>
+
+      {/* Editorial magazine grid — mobile: 2-col / desktop: 3-col asymmetric */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6 md:[grid-template-rows:auto_auto_auto]">
+        {DESTINATIONS.map((dest, i) => {
+          let wrapClass = "";
+          let aspect = "aspect-[3/4]";
+
+          if (i === 0) {
+            wrapClass = "col-span-2 md:col-span-2";
+            aspect = "aspect-[4/3] md:aspect-[16/9]";
+          } else if (i === DESTINATIONS.length - 1) {
+            wrapClass = "col-span-2 md:col-span-3";
+            aspect = "aspect-[2/1] md:aspect-[21/9]";
+          }
+
+          return (
+            <Reveal key={dest.id} delay={i * 80} y={20} className={wrapClass}>
+              <DestinationCard dest={dest} lang={lang} aspectClass={aspect} />
+            </Reveal>
+          );
+        })}
       </div>
     </section>
   );
@@ -543,10 +618,10 @@ function ReviewsSection() {
       <div className="depth-blob w-64 h-64 bg-indigo-200 bottom-0 -left-16" style={{ opacity: 0.10 }} />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        <Reveal className="text-center mb-16">
           <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Отзывы", "Testimonials")}</p>
           <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Что говорят наши клиенты", "What Our Clients Say")}</h2>
-        </div>
+        </Reveal>
 
         <div className="max-w-3xl mx-auto">
           <div className={`transition-all duration-200 ${animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}>
@@ -612,24 +687,25 @@ function WhyUsSection() {
       <div className="depth-blob w-72 h-72 bg-primary/10 top-0 left-1/2 -translate-x-1/2" style={{ opacity: 0.15 }} />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        <Reveal className="text-center mb-16">
           <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Наши преимущества", "Our Advantages")}</p>
           <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Почему выбирают нас", "Why Choose Us")}</h2>
-        </div>
+        </Reveal>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
           {items.map((item, i) => (
-            <div
-              key={i}
-              className="group bg-white dark:bg-card border border-card-border rounded-2xl p-8 text-center
-                depth-card
-                hover:border-primary/30 hover:-translate-y-1.5
-                transition-all duration-300"
-              style={{ transitionTimingFunction: "ease-out" }}
-            >
-              <div className="text-5xl mb-5 group-hover:scale-110 transition-transform duration-300">{item.icon}</div>
-              <h3 className="font-bold text-lg mb-3 group-hover:text-primary transition-colors duration-200">{t(item.titleRu, item.titleEn)}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{t(item.descRu, item.descEn)}</p>
-            </div>
+            <Reveal key={i} delay={i * 100} y={20}>
+              <div
+                className="group bg-white dark:bg-card border border-card-border rounded-2xl p-8 text-center
+                  depth-card h-full
+                  hover:border-primary/30 hover:-translate-y-1.5
+                  transition-all duration-300"
+                style={{ transitionTimingFunction: "ease-out" }}
+              >
+                <div className="text-5xl mb-5 group-hover:scale-110 transition-transform duration-300">{item.icon}</div>
+                <h3 className="font-bold text-lg mb-3 group-hover:text-primary transition-colors duration-200">{t(item.titleRu, item.titleEn)}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{t(item.descRu, item.descEn)}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </div>
