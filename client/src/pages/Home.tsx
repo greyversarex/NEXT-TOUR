@@ -261,8 +261,13 @@ function CinematicHero() {
 function StatsBar() {
   const { t, lang } = useI18n();
   return (
-    <div className="bg-primary text-primary-foreground">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div
+      className="text-primary-foreground relative overflow-hidden"
+      style={{ background: "linear-gradient(135deg, hsl(210 85% 38%) 0%, hsl(210 85% 45%) 45%, hsl(220 80% 52%) 100%)" }}
+    >
+      {/* Decorative orb */}
+      <div className="depth-blob w-64 h-64 bg-white/10 -top-16 -right-16" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-primary-foreground/20">
           {STATS.map((stat, i) => (
             <div key={i} className="py-8 px-8 text-center">
@@ -280,27 +285,34 @@ function PopularToursSection({ tours }: { tours: Tour[] }) {
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div className="flex items-end justify-between mb-14">
-        <div>
-          <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Лучшие предложения", "Top Offers")}</p>
-          <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Популярные туры", "Popular Tours")}</h2>
+    <section className="py-24 relative overflow-hidden">
+      {/* Layered background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white via-blue-50/30 to-white pointer-events-none" />
+      <div className="depth-blob w-96 h-96 bg-blue-200 top-0 -left-32" style={{ opacity: 0.12 }} />
+      <div className="depth-blob w-72 h-72 bg-primary/20 bottom-0 -right-24" style={{ opacity: 0.10 }} />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-end justify-between mb-14">
+          <div>
+            <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Лучшие предложения", "Top Offers")}</p>
+            <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Популярные туры", "Popular Tours")}</h2>
+          </div>
+          <Link href="/tours">
+            <Button variant="outline" className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold shadow-sm">
+              {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
-        <Link href="/tours">
-          <Button variant="outline" className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold">
-            {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4" />
-          </Button>
-        </Link>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
-        {tours.slice(0, 8).map(tour => <TourCard key={tour.id} tour={tour} />)}
-      </div>
-      <div className="mt-10 flex justify-center md:hidden">
-        <Link href="/tours">
-          <Button variant="outline" className="rounded-full px-8 py-5">
-            {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4 ml-2" />
-          </Button>
-        </Link>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
+          {tours.slice(0, 8).map(tour => <TourCard key={tour.id} tour={tour} />)}
+        </div>
+        <div className="mt-10 flex justify-center md:hidden">
+          <Link href="/tours">
+            <Button variant="outline" className="rounded-full px-8 py-5">
+              {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -310,8 +322,13 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
-    <section className="py-24 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-24 relative overflow-hidden section-surface">
+      {/* Warm tinted background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-amber-50/60 to-yellow-50/30 dark:from-orange-950/20 dark:to-amber-950/20 pointer-events-none" />
+      <div className="depth-blob w-80 h-80 bg-orange-300 -top-20 right-0" style={{ opacity: 0.13 }} />
+      <div className="depth-blob w-64 h-64 bg-amber-200 bottom-0 left-0" style={{ opacity: 0.10 }} />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between mb-14">
           <div>
             <p className="text-orange-500 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center gap-1.5">
@@ -320,7 +337,7 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
             <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Горящие туры", "Hot Deals")}</h2>
           </div>
           <Link href="/promotions">
-            <Button variant="outline" className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold">
+            <Button variant="outline" className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold shadow-sm">
               {t("Все акции", "All Deals")} <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
@@ -520,8 +537,12 @@ function ReviewsSection() {
   const rev = reviews[idx];
 
   return (
-    <section className="py-24 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900/50 dark:to-blue-950/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-24 relative overflow-hidden section-surface">
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50/30 dark:from-slate-900/50 dark:to-blue-950/30 pointer-events-none" />
+      <div className="depth-blob w-80 h-80 bg-blue-200 top-0 right-0" style={{ opacity: 0.12 }} />
+      <div className="depth-blob w-64 h-64 bg-indigo-200 bottom-0 -left-16" style={{ opacity: 0.10 }} />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Отзывы", "Testimonials")}</p>
           <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Что говорят наши клиенты", "What Our Clients Say")}</h2>
@@ -529,7 +550,7 @@ function ReviewsSection() {
 
         <div className="max-w-3xl mx-auto">
           <div className={`transition-all duration-200 ${animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}>
-            <div className="bg-white dark:bg-card rounded-3xl shadow-xl p-10 md:p-16 relative">
+            <div className="bg-white dark:bg-card rounded-3xl p-10 md:p-16 relative depth-card" style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.9) inset" }}>
               <Quote className="h-10 w-10 text-primary/20 absolute top-8 left-8" />
               <div className="flex justify-center mb-6">
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -586,19 +607,31 @@ function WhyUsSection() {
     { icon: "🌍", titleRu: "Любое направление", titleEn: "Any Destination", descRu: "Более 120 направлений по всему миру", descEn: "Over 120 destinations worldwide" },
   ];
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div className="text-center mb-16">
-        <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Наши преимущества", "Our Advantages")}</p>
-        <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Почему выбирают нас", "Why Choose Us")}</h2>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
-        {items.map((item, i) => (
-          <div key={i} className="group bg-card border border-card-border rounded-2xl p-8 text-center hover:border-primary/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-            <div className="text-5xl mb-5">{item.icon}</div>
-            <h3 className="font-bold text-lg mb-3">{t(item.titleRu, item.titleEn)}</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">{t(item.descRu, item.descEn)}</p>
-          </div>
-        ))}
+    <section className="py-24 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-white to-slate-50/60 dark:from-background dark:to-background pointer-events-none" />
+      <div className="depth-blob w-72 h-72 bg-primary/10 top-0 left-1/2 -translate-x-1/2" style={{ opacity: 0.15 }} />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Наши преимущества", "Our Advantages")}</p>
+          <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Почему выбирают нас", "Why Choose Us")}</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
+          {items.map((item, i) => (
+            <div
+              key={i}
+              className="group bg-white dark:bg-card border border-card-border rounded-2xl p-8 text-center
+                depth-card
+                hover:border-primary/30 hover:-translate-y-1.5
+                transition-all duration-300"
+              style={{ transitionTimingFunction: "ease-out" }}
+            >
+              <div className="text-5xl mb-5 group-hover:scale-110 transition-transform duration-300">{item.icon}</div>
+              <h3 className="font-bold text-lg mb-3 group-hover:text-primary transition-colors duration-200">{t(item.titleRu, item.titleEn)}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t(item.descRu, item.descEn)}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
