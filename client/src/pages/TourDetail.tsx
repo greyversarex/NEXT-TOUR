@@ -7,17 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Clock, MapPin, Star, Heart, Users, CheckCircle,
-  XCircle, ChevronLeft, ChevronRight, Calendar, Tag
+  XCircle, ChevronLeft, ChevronRight, Calendar, Tag, Loader2
 } from "lucide-react";
 import AuthModal from "@/components/AuthModal";
 import TourCard from "@/components/TourCard";
@@ -34,6 +32,7 @@ export default function TourDetail() {
   const [currentImg, setCurrentImg] = useState(0);
   const [authOpen, setAuthOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [sidebarOptions, setSidebarOptions] = useState<string[]>([]);
 
   const { data, isLoading } = useQuery<any>({
     queryKey: [`/api/tours/${id}/full`],
@@ -302,16 +301,42 @@ export default function TourDetail() {
 
               {options.length > 0 && (
                 <div className="mb-4">
-                  <p className="text-sm font-medium mb-2">{t("Дополнительно:", "Add-ons:")}</p>
-                  {options.map((opt: any) => (
-                    <div key={opt.id} className="flex justify-between text-sm py-1">
-                      <span className="flex items-center gap-1.5">
-                        <Tag className="h-3.5 w-3.5 text-muted-foreground" />
-                        {lang === "ru" ? opt.nameRu : opt.nameEn}
-                      </span>
-                      <span className="text-primary font-medium">+${Number(opt.price).toFixed(0)}</span>
-                    </div>
-                  ))}
+                  <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                    <Tag className="h-3.5 w-3.5 text-primary" />
+                    {t("Дополнительно:", "Add-ons:")}
+                  </p>
+                  <div className="space-y-2 rounded-lg border border-border p-3 bg-muted/30">
+                    {options.map((opt: any) => {
+                      const checked = sidebarOptions.includes(opt.id);
+                      return (
+                        <label
+                          key={opt.id}
+                          className={`flex items-center justify-between gap-2 cursor-pointer rounded-md px-2 py-1.5 transition-colors ${checked ? "bg-primary/10" : "hover:bg-muted"}`}
+                          data-testid={`checkbox-addon-${opt.id}`}
+                        >
+                          <span className="flex items-center gap-2 text-sm">
+                            <Checkbox
+                              checked={checked}
+                              onCheckedChange={v =>
+                                setSidebarOptions(prev =>
+                                  v ? [...prev, opt.id] : prev.filter(x => x !== opt.id)
+                                )
+                              }
+                            />
+                            {lang === "ru" ? opt.nameRu : opt.nameEn}
+                          </span>
+                          <span className={`text-xs font-semibold shrink-0 ${checked ? "text-primary" : "text-muted-foreground"}`}>
+                            +${Number(opt.price).toFixed(0)}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {sidebarOptions.length > 0 && (
+                    <p className="text-xs text-primary font-medium mt-2 text-right">
+                      +${options.filter((o: any) => sidebarOptions.includes(o.id)).reduce((s: number, o: any) => s + Number(o.price), 0).toFixed(0)} {t("доп. опции", "add-ons")}
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -346,6 +371,7 @@ export default function TourDetail() {
           tour={tour}
           dates={dates}
           options={options}
+          preselectedOptions={sidebarOptions}
           onClose={() => setBookingOpen(false)}
         />
       )}
@@ -371,31 +397,72 @@ function ReviewForm({ tourId }: { tourId: string }) {
     },
   });
 
+  const ratingLabels = [
+    t("Ужасно", "Terrible"),
+    t("Плохо", "Bad"),
+    t("Нормально", "Okay"),
+    t("Хорошо", "Good"),
+    t("Отлично", "Excellent"),
+  ];
+
   return (
-    <form onSubmit={e => { e.preventDefault(); mutation.mutate({ tourId, rating, textRu: text }); }} className="space-y-3">
-      <div className="flex gap-1">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <button key={i} type="button" onClick={() => setRating(i + 1)}>
-            <Star className={`h-6 w-6 cursor-pointer ${i < rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`} />
-          </button>
-        ))}
+    <form onSubmit={e => { e.preventDefault(); mutation.mutate({ tourId, rating, textRu: text }); }} className="bg-muted/30 rounded-xl border border-border p-4 space-y-4">
+      <div>
+        <p className="text-sm font-medium mb-2">{t("Ваша оценка", "Your rating")}</p>
+        <div className="flex items-center gap-1">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <button key={i} type="button" onClick={() => setRating(i + 1)} className="transition-transform hover:scale-110">
+              <Star className={`h-7 w-7 cursor-pointer transition-colors ${i < rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground hover:text-yellow-300"}`} />
+            </button>
+          ))}
+          <span className="ml-2 text-sm font-medium text-muted-foreground">{ratingLabels[rating - 1]}</span>
+        </div>
       </div>
-      <textarea
-        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[80px] resize-none focus:outline-none focus:ring-2 focus:ring-ring"
-        placeholder={t("Ваш отзыв...", "Your review...")}
-        value={text}
-        onChange={e => setText(e.target.value)}
-        required
-        data-testid="input-review-text"
-      />
-      <Button type="submit" size="sm" disabled={mutation.isPending} data-testid="button-review-submit">
-        {t("Отправить", "Submit")}
+      <div>
+        <p className="text-sm font-medium mb-2">{t("Ваш отзыв", "Your review")}</p>
+        <textarea
+          className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
+          placeholder={t("Расскажите о впечатлениях от тура...", "Share your experience with this tour...")}
+          value={text}
+          onChange={e => setText(e.target.value)}
+          required
+          data-testid="input-review-text"
+        />
+      </div>
+      <Button type="submit" className="h-10 px-6" disabled={mutation.isPending} data-testid="button-review-submit">
+        {mutation.isPending ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />{t("Отправка...", "Sending...")}</> : t("Отправить отзыв", "Submit Review")}
       </Button>
     </form>
   );
 }
 
-function BookingModal({ tour, dates, options, onClose }: any) {
+function CounterField({ label, subLabel, value, min, max, onChange }: { label: string; subLabel?: string; value: number; min: number; max: number; onChange: (v: number) => void }) {
+  return (
+    <div className="flex items-center justify-between py-2">
+      <div>
+        <p className="text-sm font-medium">{label}</p>
+        {subLabel && <p className="text-xs text-muted-foreground">{subLabel}</p>}
+      </div>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => onChange(Math.max(min, value - 1))}
+          disabled={value <= min}
+          className="w-8 h-8 rounded-full border-2 border-border flex items-center justify-center text-lg font-bold transition-colors hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed"
+        >−</button>
+        <span className="w-6 text-center font-semibold text-base">{value}</span>
+        <button
+          type="button"
+          onClick={() => onChange(Math.min(max, value + 1))}
+          disabled={value >= max}
+          className="w-8 h-8 rounded-full border-2 border-border flex items-center justify-center text-lg font-bold transition-colors hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed"
+        >+</button>
+      </div>
+    </div>
+  );
+}
+
+function BookingModal({ tour, dates, options, preselectedOptions = [], onClose }: any) {
   const { t, lang } = useI18n();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -404,14 +471,15 @@ function BookingModal({ tour, dates, options, onClose }: any) {
   const [selectedDateId, setSelectedDateId] = useState(dates[0]?.id || "");
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(preselectedOptions);
   const [paymentType, setPaymentType] = useState<"prepay" | "full">("full");
 
   const basePrice = Number(tour.basePrice) * (1 - tour.discountPercent / 100);
-  const optionsPrice = options
+  const optionsTotal = options
     .filter((o: any) => selectedOptions.includes(o.id))
     .reduce((sum: number, o: any) => sum + Number(o.price), 0);
-  const totalPrice = (basePrice + optionsPrice) * (adults + children * 0.5);
+  const travelers = adults + children * 0.5;
+  const totalPrice = (basePrice + optionsTotal) * travelers;
   const toPay = paymentType === "prepay" ? totalPrice * 0.3 : totalPrice;
 
   const mutation = useMutation({
@@ -436,118 +504,164 @@ function BookingModal({ tour, dates, options, onClose }: any) {
     });
   };
 
+  const selectedDate = dates.find((d: any) => d.id === selectedDateId);
+
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{t("Бронирование тура", "Book Tour")}</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {dates.length > 0 && (
-            <div>
-              <Label>{t("Выберите дату", "Select Date")}</Label>
-              <Select value={selectedDateId} onValueChange={setSelectedDateId}>
-                <SelectTrigger className="mt-1" data-testid="select-booking-date">
-                  <SelectValue placeholder={t("Выберите дату", "Select date")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {dates.map((d: any) => (
-                    <SelectItem key={d.id} value={d.id}>
-                      {format(new Date(d.startDate), "dd.MM.yyyy")} – {format(new Date(d.endDate), "dd.MM.yyyy")}
-                      {" "}({d.maxPeople - d.bookedCount} {t("мест", "spots")})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+      <DialogContent className="sm:max-w-xl p-0 overflow-hidden max-h-[90vh] flex flex-col">
+        <div className="bg-gradient-to-r from-primary to-primary/80 px-6 py-5 text-primary-foreground shrink-0">
+          <DialogTitle className="text-lg font-bold text-white">{t("Бронирование тура", "Book Tour")}</DialogTitle>
+          <p className="text-sm text-white/80 mt-0.5 truncate">{lang === "ru" ? tour.titleRu : tour.titleEn}</p>
+        </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>{t("Взрослые", "Adults")}</Label>
-              <Select value={String(adults)} onValueChange={v => setAdults(Number(v))}>
-                <SelectTrigger className="mt-1" data-testid="select-adults">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {[1,2,3,4,5,6,7,8,9,10].map(n => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>{t("Дети", "Children")}</Label>
-              <Select value={String(children)} onValueChange={v => setChildren(Number(v))}>
-                <SelectTrigger className="mt-1" data-testid="select-children">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {[0,1,2,3,4,5].map(n => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+        <form onSubmit={handleSubmit} className="overflow-y-auto flex-1">
+          <div className="px-6 py-4 space-y-5">
 
-          {options.length > 0 && (
+            {dates.length > 0 && (
+              <div>
+                <p className="text-sm font-semibold mb-2 flex items-center gap-1.5">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  {t("Выберите дату", "Select Date")}
+                </p>
+                <Select value={selectedDateId} onValueChange={setSelectedDateId}>
+                  <SelectTrigger data-testid="select-booking-date" className="h-11">
+                    <SelectValue placeholder={t("Выберите дату", "Select date")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {dates.map((d: any) => (
+                      <SelectItem key={d.id} value={d.id}>
+                        {format(new Date(d.startDate), "dd.MM.yyyy")} – {format(new Date(d.endDate), "dd.MM.yyyy")}
+                        {"  "}({d.maxPeople - d.bookedCount} {t("мест", "spots")})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedDate && (
+                  <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    {tour.duration} {t("дней", "days")} · {t("Свободно:", "Available:")} {selectedDate.maxPeople - selectedDate.bookedCount} {t("мест", "spots")}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="rounded-xl border border-border divide-y divide-border">
+              <div className="px-4">
+                <p className="text-sm font-semibold pt-3 pb-1 flex items-center gap-1.5">
+                  <Users className="h-4 w-4 text-primary" />
+                  {t("Туристы", "Travelers")}
+                </p>
+                <CounterField
+                  label={t("Взрослые", "Adults")}
+                  value={adults}
+                  min={1}
+                  max={10}
+                  onChange={setAdults}
+                />
+              </div>
+              <div className="px-4 pb-2">
+                <CounterField
+                  label={t("Дети", "Children")}
+                  subLabel={t("до 12 лет — 50% цены", "under 12 — 50% price")}
+                  value={children}
+                  min={0}
+                  max={6}
+                  onChange={setChildren}
+                />
+              </div>
+            </div>
+
+            {options.length > 0 && (
+              <div>
+                <p className="text-sm font-semibold mb-2 flex items-center gap-1.5">
+                  <Tag className="h-4 w-4 text-primary" />
+                  {t("Дополнительные опции", "Add-ons")}
+                </p>
+                <div className="rounded-xl border border-border divide-y divide-border overflow-hidden">
+                  {options.map((opt: any) => {
+                    const checked = selectedOptions.includes(opt.id);
+                    return (
+                      <label
+                        key={opt.id}
+                        className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${checked ? "bg-primary/8" : "hover:bg-muted/60"}`}
+                        data-testid={`modal-addon-${opt.id}`}
+                      >
+                        <Checkbox
+                          checked={checked}
+                          onCheckedChange={v => setSelectedOptions(prev =>
+                            v ? [...prev, opt.id] : prev.filter(id => id !== opt.id)
+                          )}
+                        />
+                        <span className="flex-1 text-sm">{lang === "ru" ? opt.nameRu : opt.nameEn}</span>
+                        <span className={`text-sm font-semibold ${checked ? "text-primary" : "text-muted-foreground"}`}>
+                          +${Number(opt.price).toFixed(0)}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div>
-              <Label className="mb-2 block">{t("Дополнительные опции", "Add-ons")}</Label>
-              <div className="space-y-2">
-                {options.map((opt: any) => (
-                  <div key={opt.id} className="flex items-center gap-2">
-                    <Checkbox
-                      id={`opt-${opt.id}`}
-                      checked={selectedOptions.includes(opt.id)}
-                      onCheckedChange={v => setSelectedOptions(prev =>
-                        v ? [...prev, opt.id] : prev.filter(id => id !== opt.id)
-                      )}
-                    />
-                    <label htmlFor={`opt-${opt.id}`} className="text-sm flex-1 cursor-pointer">
-                      {lang === "ru" ? opt.nameRu : opt.nameEn}
-                    </label>
-                    <span className="text-sm text-primary font-medium">+${Number(opt.price).toFixed(0)}</span>
-                  </div>
+              <p className="text-sm font-semibold mb-3">{t("Способ оплаты", "Payment Option")}</p>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { value: "prepay", label: t("Предоплата", "Deposit"), sub: "30%", amount: totalPrice * 0.3 },
+                  { value: "full", label: t("Полная оплата", "Full Payment"), sub: "100%", amount: totalPrice },
+                ].map(opt => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setPaymentType(opt.value as any)}
+                    className={`rounded-xl border-2 px-4 py-3 text-left transition-all ${paymentType === opt.value
+                      ? "border-primary bg-primary/8 shadow-sm"
+                      : "border-border hover:border-primary/50"}`}
+                    data-testid={`payment-option-${opt.value}`}
+                  >
+                    <div className="text-xs text-muted-foreground mb-0.5">{opt.label}</div>
+                    <div className={`text-lg font-bold ${paymentType === opt.value ? "text-primary" : ""}`}>
+                      ${opt.amount.toFixed(0)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">{opt.sub} {t("от суммы", "of total")}</div>
+                  </button>
                 ))}
               </div>
             </div>
-          )}
-
-          <div>
-            <Label className="mb-2 block">{t("Тип оплаты", "Payment Type")}</Label>
-            <RadioGroup value={paymentType} onValueChange={v => setPaymentType(v as any)}>
-              <div className="flex items-center gap-2">
-                <RadioGroupItem value="prepay" id="prepay" />
-                <label htmlFor="prepay" className="text-sm cursor-pointer">
-                  {t("Предоплата 30%", "Deposit 30%")} — ${(totalPrice * 0.3).toFixed(0)}
-                </label>
-              </div>
-              <div className="flex items-center gap-2">
-                <RadioGroupItem value="full" id="full" />
-                <label htmlFor="full" className="text-sm cursor-pointer">
-                  {t("Полная оплата 100%", "Full payment 100%")} — ${totalPrice.toFixed(0)}
-                </label>
-              </div>
-            </RadioGroup>
           </div>
 
-          <div className="border-t border-border pt-4">
-            <div className="flex justify-between text-sm mb-1">
-              <span>{t("Базовая цена:", "Base price:")} {adults + children * 0.5} × ${(Number(tour.basePrice) * (1 - tour.discountPercent / 100)).toFixed(0)}</span>
-              <span>${(basePrice * (adults + children * 0.5)).toFixed(0)}</span>
-            </div>
-            {optionsPrice > 0 && (
-              <div className="flex justify-between text-sm mb-1">
-                <span>{t("Опции:", "Add-ons:")}</span>
-                <span>+${(optionsPrice * (adults + children * 0.5)).toFixed(0)}</span>
+          <div className="px-6 pb-6">
+            <div className="rounded-xl bg-muted/50 border border-border p-4 mb-4 space-y-1.5">
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>{t("Базовая цена", "Base price")} × {travelers}</span>
+                <span>${(basePrice * travelers).toFixed(0)}</span>
               </div>
-            )}
-            <div className="flex justify-between font-bold text-base mt-2">
-              <span>{t("К оплате сейчас:", "To pay now:")}</span>
-              <span className="text-primary">${toPay.toFixed(0)}</span>
+              {optionsTotal > 0 && (
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>{t("Дополнительные опции", "Add-ons")} × {travelers}</span>
+                  <span>+${(optionsTotal * travelers).toFixed(0)}</span>
+                </div>
+              )}
+              {paymentType === "prepay" && (
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>{t("Полная стоимость", "Full amount")}</span>
+                  <span>${totalPrice.toFixed(0)}</span>
+                </div>
+              )}
+              <div className="flex justify-between items-center pt-2 border-t border-border">
+                <span className="font-semibold">{t("К оплате сейчас", "To pay now")}</span>
+                <span className="text-xl font-bold text-primary">${toPay.toFixed(0)}</span>
+              </div>
             </div>
-          </div>
 
-          <Button type="submit" className="w-full" disabled={mutation.isPending} data-testid="button-confirm-booking">
-            {mutation.isPending ? t("Создание...", "Creating...") : t("Подтвердить бронирование", "Confirm Booking")}
-          </Button>
+            <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={mutation.isPending} data-testid="button-confirm-booking">
+              {mutation.isPending ? (
+                <><Loader2 className="h-4 w-4 animate-spin mr-2" />{t("Создание...", "Creating...")}</>
+              ) : (
+                t("Подтвердить бронирование", "Confirm Booking")
+              )}
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
