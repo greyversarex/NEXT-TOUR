@@ -71,8 +71,8 @@ export default function Header() {
                   <span
                     className={`relative px-3.5 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ${
                       isActive(link.href)
-                        ? "text-blue-700 dark:text-blue-400 font-semibold"
-                        : "text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/40"
+                        ? "text-blue-900 dark:text-blue-300 font-bold"
+                        : "text-blue-800 dark:text-blue-300 font-semibold hover:text-blue-950 dark:hover:text-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950/40"
                     }`}
                     data-testid={`link-nav-${link.href.replace("/", "") || "home"}`}
                   >
@@ -189,8 +189,8 @@ export default function Header() {
                   <span
                     className={`block px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 ${
                       isActive(link.href)
-                        ? "text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 font-semibold"
-                        : "text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/40"
+                        ? "text-blue-900 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 font-bold"
+                        : "text-blue-800 dark:text-blue-300 font-semibold hover:text-blue-950 dark:hover:text-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950/40"
                     }`}
                     onClick={() => setMenuOpen(false)}
                   >
