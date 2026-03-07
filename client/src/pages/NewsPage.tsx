@@ -80,18 +80,24 @@ export function NewsDetail() {
       <Link href="/news">
         <span className="text-sm text-muted-foreground hover:text-primary cursor-pointer mb-6 inline-block">← {lang === "ru" ? "Все новости" : "All News"}</span>
       </Link>
-      {item.imageUrl && (
-        <div className="aspect-video rounded-xl overflow-hidden mb-6">
-          <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
+
+      {/* Image + content card */}
+      <div className="rounded-3xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-card-border">
+        {item.imageUrl && (
+          <div className="aspect-video w-full overflow-hidden">
+            <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
+          </div>
+        )}
+        <div className="bg-card p-6 sm:p-8">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+            <Calendar className="h-4 w-4" />
+            {format(new Date(item.publishedAt), "dd MMMM yyyy")}
+          </div>
+          <h1 className="text-3xl font-bold mb-6">{lang === "ru" ? item.titleRu : item.titleEn}</h1>
+          <div className="text-foreground/80 leading-relaxed whitespace-pre-line">
+            {lang === "ru" ? item.contentRu : item.contentEn}
+          </div>
         </div>
-      )}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-        <Calendar className="h-4 w-4" />
-        {format(new Date(item.publishedAt), "dd MMMM yyyy")}
-      </div>
-      <h1 className="text-3xl font-bold mb-6">{lang === "ru" ? item.titleRu : item.titleEn}</h1>
-      <div className="prose prose-sm max-w-none text-foreground/80 leading-relaxed whitespace-pre-line">
-        {lang === "ru" ? item.contentRu : item.contentEn}
       </div>
     </div>
   );
