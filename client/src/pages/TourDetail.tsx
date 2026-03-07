@@ -148,7 +148,7 @@ export default function TourDetail() {
       </div>
 
       {/* Content card — connects to gallery above */}
-      <div className="bg-white/76 dark:bg-black/50 backdrop-blur-xl rounded-b-3xl shadow-[0_12px_48px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.90)] border border-white/60 dark:border-white/10 border-t-0 mb-10">
+      <div className="bg-white/91 dark:bg-slate-900/88 backdrop-blur-2xl rounded-b-3xl shadow-[0_12px_48px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.95)] border border-white/70 dark:border-white/10 border-t-0 mb-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
           {/* Main Content */}
           <div className="lg:col-span-2 p-6 md:p-8 border-r border-border/30">
@@ -338,7 +338,7 @@ export default function TourDetail() {
                 )}
               </div>
 
-              <div className="bg-white/85 dark:bg-black/60 backdrop-blur-sm p-5">
+              <div className="bg-white/95 dark:bg-slate-900/90 p-5">
                 {dates.length > 0 ? (
                   <div className="space-y-2 mb-5">
                     <p className="text-sm font-semibold flex items-center gap-1.5 mb-3">

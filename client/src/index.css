@@ -545,6 +545,7 @@ button.bg-secondary:active {
 [role="tab"] {
   transition: all 0.20s cubic-bezier(0.22,1,0.36,1) !important;
   font-weight: 500;
+  color: hsl(var(--foreground)) !important;
 }
 [role="tab"]:hover:not([data-state="active"]) {
   background: rgba(14,118,222,0.10) !important;
