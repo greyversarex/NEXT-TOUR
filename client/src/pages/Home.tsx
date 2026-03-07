@@ -429,45 +429,60 @@ function SearchSection() {
   );
 }
 
-function TourScrollFeed({ tours, accentColor = "cyan" }: { tours: Tour[]; accentColor?: string }) {
+function TourScrollFeed({ tours }: { tours: Tour[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (dir: "left" | "right") => {
     const el = scrollRef.current;
     if (!el) return;
-    el.scrollBy({ left: dir === "left" ? -580 : 580, behavior: "smooth" });
+    el.scrollBy({ left: dir === "left" ? -600 : 600, behavior: "smooth" });
   };
 
-  return (
-    <div className="relative group">
-      <button
-        onClick={() => scroll("left")}
-        className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white border border-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-xl"
-        aria-label="Scroll left"
-      >
-        <ChevronLeft className="h-5 w-5" />
-      </button>
+  const half = Math.ceil(tours.length / 2);
+  const row1 = tours.slice(0, half);
+  const row2 = tours.slice(half);
 
-      <div ref={scrollRef} className="feed-scroll overflow-x-auto pb-3">
-        <div
-          className="grid grid-rows-2 grid-flow-col gap-5"
-          style={{ gridAutoColumns: "272px" }}
+  return (
+    <div>
+      <div className="flex justify-end gap-2 mb-4">
+        <button
+          onClick={() => scroll("left")}
+          className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 text-white border border-white/30 backdrop-blur-sm flex items-center justify-center transition-all duration-200 shadow-lg"
+          aria-label="Scroll left"
+          data-testid="button-scroll-left"
         >
-          {tours.map(tour => (
-            <div key={tour.id} className="w-[272px]">
-              <TourCard tour={tour} />
-            </div>
-          ))}
-        </div>
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => scroll("right")}
+          className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 text-white border border-white/30 backdrop-blur-sm flex items-center justify-center transition-all duration-200 shadow-lg"
+          aria-label="Scroll right"
+          data-testid="button-scroll-right"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
       </div>
 
-      <button
-        onClick={() => scroll("right")}
-        className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white border border-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-xl"
-        aria-label="Scroll right"
-      >
-        <ChevronRight className="h-5 w-5" />
-      </button>
+      <div ref={scrollRef} className="feed-scroll overflow-x-auto pb-3">
+        <div className="flex flex-col gap-5" style={{ width: `${half * 272 + (half - 1) * 20}px` }}>
+          <div className="flex gap-5">
+            {row1.map(tour => (
+              <div key={tour.id} className="w-[272px] flex-shrink-0">
+                <TourCard tour={tour} />
+              </div>
+            ))}
+          </div>
+          {row2.length > 0 && (
+            <div className="flex gap-5">
+              {row2.map(tour => (
+                <div key={tour.id} className="w-[272px] flex-shrink-0">
+                  <TourCard tour={tour} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -491,7 +506,7 @@ function PopularToursSection({ tours }: { tours: Tour[] }) {
             </Button>
           </Link>
         </Reveal>
-        <TourScrollFeed tours={tours} accentColor="cyan" />
+        <TourScrollFeed tours={tours} />
         <div className="mt-10 flex justify-center md:hidden">
           <Link href="/tours">
             <Button className="rounded-full px-8 py-5 bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm">
@@ -523,7 +538,7 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
             </Button>
           </Link>
         </Reveal>
-        <TourScrollFeed tours={tours} accentColor="orange" />
+        <TourScrollFeed tours={tours} />
       </div>
     </section>
   );
