@@ -72,7 +72,7 @@ export default function Header() {
                     className={`relative px-3.5 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ${
                       isActive(link.href)
                         ? "text-primary font-semibold"
-                        : "text-primary/60 hover:text-primary hover:bg-primary/8"
+                        : "text-primary hover:text-primary hover:bg-primary/10"
                     }`}
                     data-testid={`link-nav-${link.href.replace("/", "") || "home"}`}
                   >
@@ -190,7 +190,7 @@ export default function Header() {
                     className={`block px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 ${
                       isActive(link.href)
                         ? "text-primary bg-primary/8 font-semibold"
-                        : "text-primary/60 hover:text-primary hover:bg-primary/8"
+                        : "text-primary hover:text-primary hover:bg-primary/10"
                     }`}
                     onClick={() => setMenuOpen(false)}
                   >
