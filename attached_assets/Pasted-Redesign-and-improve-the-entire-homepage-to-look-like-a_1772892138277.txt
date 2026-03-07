@@ -1,0 +1,102 @@
+Redesign and improve the entire homepage to look like a premium modern travel platform.
+
+The current structure is good but the design needs to feel more cinematic, luxurious and visually impressive.
+
+GLOBAL DESIGN IMPROVEMENTS
+
+• Use a modern premium travel design style
+• Add more visual depth with soft shadows and layered UI
+• Use smooth animations and transitions
+• Increase spacing between sections for a more spacious layout
+• Use subtle background gradients instead of flat white backgrounds
+• Improve typography hierarchy (bigger headings, clearer contrast)
+• Make the whole site feel more immersive and emotional
+
+HERO SECTION
+
+Transform the hero section into a cinematic travel hero.
+
+• Add a dark gradient overlay over the hero image for better text contrast
+• Increase the hero title size significantly
+• Improve subtitle readability
+• Add smooth fade-in animation for hero text
+• Add subtle parallax effect to the hero background
+• Improve the search bar with a glassmorphism style (blurred translucent background)
+• Add soft shadows and rounded corners to the search bar
+
+STATISTICS SECTION
+
+Replace the current flat blue strip with modern statistic cards.
+
+• Each stat should be in its own card
+• Use icons
+• Add soft shadow and rounded corners
+• Add hover elevation effect
+
+TOUR CARDS (POPULAR TOURS AND HOT DEALS)
+
+Make tour cards more interactive and premium.
+
+• Add hover animation with slight image zoom
+• Add stronger shadow when hovering
+• Add smooth transition animation
+• Make discount badges more visually appealing
+• Improve spacing inside the card
+• Make price more prominent
+• Add subtle gradient overlay on card images
+
+DESTINATIONS SECTION
+
+Enhance destination cards (Maldives, Japan, Italy, Turkey, Greece, UAE).
+
+• Add gradient overlay on destination images
+• Increase destination title size
+• Add small tags under destination names like:
+  Beaches • Culture • Islands • Mountains
+• Add hover zoom effect on images
+• Add smooth card hover elevation
+
+PROMOTIONAL BANNER
+
+Improve the promotional banner section.
+
+• Add stronger gradient overlay for text contrast
+• Increase banner text size
+• Use bold typography for the discount message
+• Add subtle animation or hover highlight
+
+ADVANTAGES SECTION (WHY CHOOSE US)
+
+Improve the advantage cards.
+
+• Add icons with modern style
+• Add soft shadow and hover elevation
+• Increase spacing inside the cards
+• Improve typography
+
+TESTIMONIALS SECTION
+
+Improve the testimonial design.
+
+• Increase padding around testimonial content
+• Make text easier to read
+• Add soft card shadow
+• Add smooth slider animation
+• Improve visual hierarchy between quote and author
+
+SCROLL ANIMATIONS
+
+Add subtle scroll reveal animations across the page.
+
+• Sections should fade in and slightly slide up when entering the viewport
+• Keep animations smooth and subtle
+
+GENERAL UI POLISH
+
+• Increase spacing between all sections
+• Use consistent border radius
+• Use modern shadows and layered design
+• Improve button styling with hover animation
+• Ensure the whole page feels premium, modern and visually inspiring
+
+The final result should feel like a high-end travel website with strong visuals, cinematic atmosphere and modern UI interactions.
