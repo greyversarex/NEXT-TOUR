@@ -26,30 +26,11 @@ export default function ToursAdmin() {
   const queryClient = useQueryClient();
   const [editTour, setEditTour] = useState<Partial<Tour> | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [manageTour, setManageTour] = useState<Tour | null>(null);
 
   const { data: tours = [] } = useQuery<Tour[]>({ queryKey: ["/api/tours"] });
   const { data: countries = [] } = useQuery<Country[]>({ queryKey: ["/api/countries"] });
   const { data: categories = [] } = useQuery<any[]>({ queryKey: ["/api/categories"] });
   const { data: cities = [] } = useQuery<any[]>({ queryKey: ["/api/cities"] });
-
-  const saveMutation = useMutation({
-    mutationFn: (data: any) => editTour?.id
-      ? apiRequest("PUT", `/api/tours/${editTour.id}`, data)
-      : apiRequest("POST", "/api/tours", data),
-    onSuccess: async (res: any) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/tours"] });
-      if (!editTour?.id) {
-        const created = await res.json();
-        toast({ title: t("Тур создан!", "Tour created!"), description: t("Теперь вы можете добавить даты, опции и программу.", "You can now add dates, options and itinerary.") });
-        setEditTour(created);
-      } else {
-        toast({ title: t("Сохранено", "Saved") });
-        setShowForm(false);
-        setEditTour(null);
-      }
-    },
-  });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => apiRequest("DELETE", `/api/tours/${id}`, {}),
@@ -90,9 +71,6 @@ export default function ToursAdmin() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <Button variant="ghost" size="icon" title={t("Даты / Опции / Программа", "Dates / Options / Itinerary")} onClick={() => setManageTour(tour)} data-testid={`button-manage-tour-${tour.id}`}>
-                    <CalendarDays className="h-4 w-4 text-primary" />
-                  </Button>
                   <Link href={`/tours/${tour.id}`}>
                     <Button variant="ghost" size="icon" title="View"><Eye className="h-4 w-4" /></Button>
                   </Link>
@@ -115,21 +93,21 @@ export default function ToursAdmin() {
           countries={countries}
           categories={categories}
           cities={cities}
-          onSave={saveMutation.mutate}
+          onSaved={() => { setShowForm(false); setEditTour(null); }}
           onClose={() => { setShowForm(false); setEditTour(null); }}
-          isSaving={saveMutation.isPending}
         />
-      )}
-
-      {manageTour && (
-        <TourSubManager tour={manageTour} onClose={() => setManageTour(null)} />
       )}
     </AdminLayout>
   );
 }
 
-function TourForm({ tour, countries, categories, cities, onSave, onClose, isSaving }: any) {
+function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any) {
   const { t, lang } = useI18n();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const isEdit = !!tour.id;
+
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     titleRu: tour.titleRu || "",
     titleEn: tour.titleEn || "",
@@ -152,122 +130,46 @@ function TourForm({ tour, countries, categories, cities, onSave, onClose, isSavi
     notIncludedEn: tour.notIncludedEn || "",
   });
 
-  const set = (key: string, val: any) => setForm(p => ({ ...p, [key]: val }));
-  const isEdit = !!tour.id;
+  const [localDates, setLocalDates] = useState<any[]>([]);
+  const [localOptions, setLocalOptions] = useState<any[]>([]);
+  const [localItinerary, setLocalItinerary] = useState<any[]>([]);
 
-  const basicFields = (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label>{t("Название (RU)", "Title (RU)")}</Label>
-          <Input value={form.titleRu} onChange={e => set("titleRu", e.target.value)} required className="mt-1" />
-        </div>
-        <div>
-          <Label>{t("Название (EN)", "Title (EN)")}</Label>
-          <Input value={form.titleEn} onChange={e => set("titleEn", e.target.value)} required className="mt-1" />
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label>{t("Описание (RU)", "Description (RU)")}</Label>
-          <Textarea value={form.descriptionRu} onChange={e => set("descriptionRu", e.target.value)} className="mt-1 min-h-[80px]" required />
-        </div>
-        <div>
-          <Label>{t("Описание (EN)", "Description (EN)")}</Label>
-          <Textarea value={form.descriptionEn} onChange={e => set("descriptionEn", e.target.value)} className="mt-1 min-h-[80px]" required />
-        </div>
-      </div>
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <Label>{t("Страна", "Country")}</Label>
-          <Select value={form.countryId} onValueChange={v => set("countryId", v)}>
-            <SelectTrigger className="mt-1"><SelectValue placeholder={t("Выберите", "Select")} /></SelectTrigger>
-            <SelectContent>
-              {countries.map((c: any) => <SelectItem key={c.id} value={c.id}>{lang === "ru" ? c.nameRu : c.nameEn}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label>{t("Город", "City")}</Label>
-          <Select value={form.cityId} onValueChange={v => set("cityId", v)}>
-            <SelectTrigger className="mt-1"><SelectValue placeholder={t("Выберите", "Select")} /></SelectTrigger>
-            <SelectContent>
-              {cities.filter((c: any) => !form.countryId || c.countryId === form.countryId).map((c: any) => (
-                <SelectItem key={c.id} value={c.id}>{lang === "ru" ? c.nameRu : c.nameEn}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label>{t("Категория", "Category")}</Label>
-          <Select value={form.categoryId} onValueChange={v => set("categoryId", v)}>
-            <SelectTrigger className="mt-1"><SelectValue placeholder={t("Выберите", "Select")} /></SelectTrigger>
-            <SelectContent>
-              {categories.map((c: any) => <SelectItem key={c.id} value={c.id}>{lang === "ru" ? c.nameRu : c.nameEn}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <Label>{t("Длительность (дней)", "Duration (days)")}</Label>
-          <Input type="number" value={form.duration} onChange={e => set("duration", Number(e.target.value))} className="mt-1" min={1} />
-        </div>
-        <div>
-          <Label>{t("Цена ($)", "Price ($)")}</Label>
-          <Input type="number" value={form.basePrice} onChange={e => set("basePrice", e.target.value)} className="mt-1" min={0} />
-        </div>
-        <div>
-          <Label>{t("Скидка (%)", "Discount (%)")}</Label>
-          <Input type="number" value={form.discountPercent} onChange={e => set("discountPercent", Number(e.target.value))} className="mt-1" min={0} max={100} />
-        </div>
-      </div>
-      <div>
-        <Label>{t("Главное фото", "Main Image")}</Label>
-        <div className="mt-1"><ImageUpload value={form.mainImage} onChange={v => set("mainImage", v)} /></div>
-      </div>
-      <div>
-        <Label>{t("Ссылка на карту (iframe URL)", "Map URL (iframe)")}</Label>
-        <Input value={form.mapUrl} onChange={e => set("mapUrl", e.target.value)} className="mt-1" placeholder="https://www.google.com/maps/embed?..." />
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label>{t("Включено (RU)", "Included (RU)")}</Label>
-          <Textarea value={form.includedRu} onChange={e => set("includedRu", e.target.value)} className="mt-1" placeholder={t("Каждый пункт на новой строке", "One item per line")} />
-        </div>
-        <div>
-          <Label>{t("Включено (EN)", "Included (EN)")}</Label>
-          <Textarea value={form.includedEn} onChange={e => set("includedEn", e.target.value)} className="mt-1" placeholder="One item per line" />
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label>{t("Не включено (RU)", "Not Included (RU)")}</Label>
-          <Textarea value={form.notIncludedRu} onChange={e => set("notIncludedRu", e.target.value)} className="mt-1" placeholder={t("Каждый пункт на новой строке", "One item per line")} />
-        </div>
-        <div>
-          <Label>{t("Не включено (EN)", "Not Included (EN)")}</Label>
-          <Textarea value={form.notIncludedEn} onChange={e => set("notIncludedEn", e.target.value)} className="mt-1" placeholder="One item per line" />
-        </div>
-      </div>
-      <div className="flex gap-6">
-        <div className="flex items-center gap-2">
-          <Switch checked={form.isHot} onCheckedChange={v => set("isHot", v)} id="isHot" />
-          <Label htmlFor="isHot">{t("Горящий", "Hot Deal")}</Label>
-        </div>
-        <div className="flex items-center gap-2">
-          <Switch checked={form.isFeatured} onCheckedChange={v => set("isFeatured", v)} id="isFeatured" />
-          <Label htmlFor="isFeatured">{t("Рекомендуемый", "Featured")}</Label>
-        </div>
-        <div className="flex items-center gap-2">
-          <Switch checked={form.isActive} onCheckedChange={v => set("isActive", v)} id="isActive" />
-          <Label htmlFor="isActive">{t("Активный", "Active")}</Label>
-        </div>
-      </div>
-      <div className="flex gap-3 pt-2">
-        <Button type="submit" disabled={isSaving}>{isSaving ? t("Сохранение...", "Saving...") : t("Сохранить", "Save")}</Button>
-        <Button type="button" variant="outline" onClick={onClose}>{t("Отмена", "Cancel")}</Button>
-      </div>
+  const set = (key: string, val: any) => setForm(p => ({ ...p, [key]: val }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const res = await apiRequest(
+        isEdit ? "PUT" : "POST",
+        isEdit ? `/api/tours/${tour.id}` : "/api/tours",
+        form
+      );
+      const saved = await res.json();
+      const tourId = saved.id;
+      if (!isEdit && (localDates.length || localOptions.length || localItinerary.length)) {
+        await Promise.all([
+          ...localDates.map(d => apiRequest("POST", `/api/tours/${tourId}/dates`, { ...d, tourId })),
+          ...localOptions.map(o => apiRequest("POST", `/api/tours/${tourId}/options`, { ...o, tourId })),
+          ...localItinerary.map(i => apiRequest("POST", `/api/tours/${tourId}/itinerary`, { ...i, tourId })),
+        ]);
+      }
+      queryClient.invalidateQueries({ queryKey: ["/api/tours"] });
+      toast({ title: t("Сохранено", "Saved") });
+      onSaved();
+    } catch (err: any) {
+      toast({ title: t("Ошибка", "Error"), description: err.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const saveBtn = (
+    <div className="flex gap-3 pt-2 border-t mt-4">
+      <Button type="submit" form="tour-form" disabled={saving}>
+        {saving ? t("Сохранение...", "Saving...") : t("Сохранить тур", "Save Tour")}
+      </Button>
+      <Button type="button" variant="outline" onClick={onClose}>{t("Отмена", "Cancel")}</Button>
     </div>
   );
 
@@ -278,69 +180,208 @@ function TourForm({ tour, countries, categories, cities, onSave, onClose, isSavi
           <DialogTitle>{isEdit ? t("Редактировать тур", "Edit Tour") : t("Новый тур", "New Tour")}</DialogTitle>
         </DialogHeader>
 
-        {isEdit ? (
-          <Tabs defaultValue="info">
-            <TabsList className="w-full mb-2">
-              <TabsTrigger value="info" className="flex-1">{t("Основное", "Info")}</TabsTrigger>
-              <TabsTrigger value="dates" className="flex-1 gap-1"><CalendarDays className="h-3.5 w-3.5" />{t("Даты", "Dates")}</TabsTrigger>
-              <TabsTrigger value="options" className="flex-1 gap-1"><ListChecks className="h-3.5 w-3.5" />{t("Опции", "Options")}</TabsTrigger>
-              <TabsTrigger value="itinerary" className="flex-1 gap-1"><Route className="h-3.5 w-3.5" />{t("Программа", "Itinerary")}</TabsTrigger>
-            </TabsList>
-            <TabsContent value="info">
-              <form onSubmit={e => { e.preventDefault(); onSave(form); }}>
-                {basicFields}
-              </form>
-            </TabsContent>
-            <TabsContent value="dates" className="pt-2">
-              <DatesManager tourId={tour.id} />
-            </TabsContent>
-            <TabsContent value="options" className="pt-2">
-              <OptionsManager tourId={tour.id} />
-            </TabsContent>
-            <TabsContent value="itinerary" className="pt-2">
-              <ItineraryManager tourId={tour.id} />
-            </TabsContent>
-          </Tabs>
-        ) : (
-          <form onSubmit={e => { e.preventDefault(); onSave(form); }}>
-            {basicFields}
-          </form>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function TourSubManager({ tour, onClose }: { tour: Tour; onClose: () => void }) {
-  const { t, lang } = useI18n();
-  return (
-    <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <span>{lang === "ru" ? tour.titleRu : tour.titleEn}</span>
-          </DialogTitle>
-        </DialogHeader>
-        <Tabs defaultValue="dates">
-          <TabsList className="w-full">
-            <TabsTrigger value="dates" className="flex-1 gap-1.5"><CalendarDays className="h-4 w-4" />{t("Даты", "Dates")}</TabsTrigger>
-            <TabsTrigger value="options" className="flex-1 gap-1.5"><ListChecks className="h-4 w-4" />{t("Опции", "Options")}</TabsTrigger>
-            <TabsTrigger value="itinerary" className="flex-1 gap-1.5"><Route className="h-4 w-4" />{t("Программа", "Itinerary")}</TabsTrigger>
+        <Tabs defaultValue="info">
+          <TabsList className="w-full mb-2">
+            <TabsTrigger value="info" className="flex-1">{t("Основное", "Info")}</TabsTrigger>
+            <TabsTrigger value="dates" className="flex-1 gap-1"><CalendarDays className="h-3.5 w-3.5" />{t("Даты", "Dates")}</TabsTrigger>
+            <TabsTrigger value="options" className="flex-1 gap-1"><ListChecks className="h-3.5 w-3.5" />{t("Опции", "Options")}</TabsTrigger>
+            <TabsTrigger value="itinerary" className="flex-1 gap-1"><Route className="h-3.5 w-3.5" />{t("Программа", "Itinerary")}</TabsTrigger>
           </TabsList>
-          <TabsContent value="dates" className="pt-4">
-            <DatesManager tourId={tour.id} />
-          </TabsContent>
-          <TabsContent value="options" className="pt-4">
-            <OptionsManager tourId={tour.id} />
-          </TabsContent>
-          <TabsContent value="itinerary" className="pt-4">
-            <ItineraryManager tourId={tour.id} />
-          </TabsContent>
+
+          <form id="tour-form" onSubmit={handleSubmit}>
+            <TabsContent value="info">
+              <div className="space-y-4 pt-1">
+                <div className="grid grid-cols-2 gap-4">
+                  <div><Label>{t("Название (RU)", "Title (RU)")}</Label><Input value={form.titleRu} onChange={e => set("titleRu", e.target.value)} required className="mt-1" /></div>
+                  <div><Label>{t("Название (EN)", "Title (EN)")}</Label><Input value={form.titleEn} onChange={e => set("titleEn", e.target.value)} required className="mt-1" /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><Label>{t("Описание (RU)", "Description (RU)")}</Label><Textarea value={form.descriptionRu} onChange={e => set("descriptionRu", e.target.value)} className="mt-1 min-h-[80px]" required /></div>
+                  <div><Label>{t("Описание (EN)", "Description (EN)")}</Label><Textarea value={form.descriptionEn} onChange={e => set("descriptionEn", e.target.value)} className="mt-1 min-h-[80px]" required /></div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label>{t("Страна", "Country")}</Label>
+                    <Select value={form.countryId} onValueChange={v => set("countryId", v)}>
+                      <SelectTrigger className="mt-1"><SelectValue placeholder={t("Выберите", "Select")} /></SelectTrigger>
+                      <SelectContent>{countries.map((c: any) => <SelectItem key={c.id} value={c.id}>{lang === "ru" ? c.nameRu : c.nameEn}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>{t("Город", "City")}</Label>
+                    <Select value={form.cityId} onValueChange={v => set("cityId", v)}>
+                      <SelectTrigger className="mt-1"><SelectValue placeholder={t("Выберите", "Select")} /></SelectTrigger>
+                      <SelectContent>{cities.filter((c: any) => !form.countryId || c.countryId === form.countryId).map((c: any) => <SelectItem key={c.id} value={c.id}>{lang === "ru" ? c.nameRu : c.nameEn}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>{t("Категория", "Category")}</Label>
+                    <Select value={form.categoryId} onValueChange={v => set("categoryId", v)}>
+                      <SelectTrigger className="mt-1"><SelectValue placeholder={t("Выберите", "Select")} /></SelectTrigger>
+                      <SelectContent>{categories.map((c: any) => <SelectItem key={c.id} value={c.id}>{lang === "ru" ? c.nameRu : c.nameEn}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div><Label>{t("Длительность (дней)", "Duration (days)")}</Label><Input type="number" value={form.duration} onChange={e => set("duration", Number(e.target.value))} className="mt-1" min={1} /></div>
+                  <div><Label>{t("Цена ($)", "Price ($)")}</Label><Input type="number" value={form.basePrice} onChange={e => set("basePrice", e.target.value)} className="mt-1" min={0} /></div>
+                  <div><Label>{t("Скидка (%)", "Discount (%)")}</Label><Input type="number" value={form.discountPercent} onChange={e => set("discountPercent", Number(e.target.value))} className="mt-1" min={0} max={100} /></div>
+                </div>
+                <div><Label>{t("Главное фото", "Main Image")}</Label><div className="mt-1"><ImageUpload value={form.mainImage} onChange={v => set("mainImage", v)} /></div></div>
+                <div><Label>{t("Ссылка на карту (iframe URL)", "Map URL (iframe)")}</Label><Input value={form.mapUrl} onChange={e => set("mapUrl", e.target.value)} className="mt-1" placeholder="https://www.google.com/maps/embed?..." /></div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><Label>{t("Включено (RU)", "Included (RU)")}</Label><Textarea value={form.includedRu} onChange={e => set("includedRu", e.target.value)} className="mt-1" placeholder={t("Каждый пункт на новой строке", "One item per line")} /></div>
+                  <div><Label>{t("Включено (EN)", "Included (EN)")}</Label><Textarea value={form.includedEn} onChange={e => set("includedEn", e.target.value)} className="mt-1" placeholder="One item per line" /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><Label>{t("Не включено (RU)", "Not Included (RU)")}</Label><Textarea value={form.notIncludedRu} onChange={e => set("notIncludedRu", e.target.value)} className="mt-1" placeholder={t("Каждый пункт на новой строке", "One item per line")} /></div>
+                  <div><Label>{t("Не включено (EN)", "Not Included (EN)")}</Label><Textarea value={form.notIncludedEn} onChange={e => set("notIncludedEn", e.target.value)} className="mt-1" placeholder="One item per line" /></div>
+                </div>
+                <div className="flex gap-6">
+                  <div className="flex items-center gap-2"><Switch checked={form.isHot} onCheckedChange={v => set("isHot", v)} id="isHot" /><Label htmlFor="isHot">{t("Горящий", "Hot Deal")}</Label></div>
+                  <div className="flex items-center gap-2"><Switch checked={form.isFeatured} onCheckedChange={v => set("isFeatured", v)} id="isFeatured" /><Label htmlFor="isFeatured">{t("Рекомендуемый", "Featured")}</Label></div>
+                  <div className="flex items-center gap-2"><Switch checked={form.isActive} onCheckedChange={v => set("isActive", v)} id="isActive" /><Label htmlFor="isActive">{t("Активный", "Active")}</Label></div>
+                </div>
+              </div>
+              {saveBtn}
+            </TabsContent>
+
+            <TabsContent value="dates" className="pt-2">
+              {isEdit
+                ? <DatesManager tourId={tour.id} />
+                : <LocalDatesManager dates={localDates} setDates={setLocalDates} />}
+              {saveBtn}
+            </TabsContent>
+
+            <TabsContent value="options" className="pt-2">
+              {isEdit
+                ? <OptionsManager tourId={tour.id} />
+                : <LocalOptionsManager options={localOptions} setOptions={setLocalOptions} />}
+              {saveBtn}
+            </TabsContent>
+
+            <TabsContent value="itinerary" className="pt-2">
+              {isEdit
+                ? <ItineraryManager tourId={tour.id} />
+                : <LocalItineraryManager items={localItinerary} setItems={setLocalItinerary} />}
+              {saveBtn}
+            </TabsContent>
+          </form>
         </Tabs>
       </DialogContent>
     </Dialog>
   );
 }
+
+function LocalDatesManager({ dates, setDates }: { dates: any[]; setDates: (d: any[]) => void }) {
+  const { t } = useI18n();
+  const [form, setForm] = useState({ startDate: "", endDate: "", maxPeople: 20 });
+  const add = () => {
+    if (!form.startDate || !form.endDate) return;
+    setDates([...dates, { ...form, id: crypto.randomUUID() }]);
+    setForm({ startDate: "", endDate: "", maxPeople: 20 });
+  };
+  return (
+    <div className="space-y-4">
+      <div className="border rounded-xl p-4 space-y-3 bg-muted/30">
+        <p className="text-sm font-semibold">{t("Новая дата", "New Date")}</p>
+        <div className="grid grid-cols-3 gap-3">
+          <div><Label className="text-xs">{t("Начало", "Start")}</Label><Input type="date" value={form.startDate} onChange={e => setForm(p => ({ ...p, startDate: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Конец", "End")}</Label><Input type="date" value={form.endDate} onChange={e => setForm(p => ({ ...p, endDate: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Макс. мест", "Max spots")}</Label><Input type="number" value={form.maxPeople} onChange={e => setForm(p => ({ ...p, maxPeople: Number(e.target.value) }))} className="mt-1 h-9 text-sm" min={1} /></div>
+        </div>
+        <Button type="button" size="sm" onClick={add}>{t("Добавить", "Add")}</Button>
+      </div>
+      {dates.length === 0 ? <p className="text-sm text-muted-foreground text-center py-4">{t("Нет дат", "No dates yet")}</p> : (
+        <div className="space-y-2">
+          {dates.map((d: any) => (
+            <div key={d.id} className="flex items-center justify-between p-3 border rounded-lg">
+              <p className="text-sm font-medium">{d.startDate} — {d.endDate} · {t("Мест:", "Spots:")} {d.maxPeople}</p>
+              <Button type="button" variant="ghost" size="icon" className="text-destructive" onClick={() => setDates(dates.filter((x: any) => x.id !== d.id))}><Trash2 className="h-3.5 w-3.5" /></Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LocalOptionsManager({ options, setOptions }: { options: any[]; setOptions: (o: any[]) => void }) {
+  const { t, lang } = useI18n();
+  const [form, setForm] = useState({ nameRu: "", nameEn: "", price: 0 });
+  const add = () => {
+    if (!form.nameRu) return;
+    setOptions([...options, { ...form, id: crypto.randomUUID() }]);
+    setForm({ nameRu: "", nameEn: "", price: 0 });
+  };
+  return (
+    <div className="space-y-4">
+      <div className="border rounded-xl p-4 space-y-3 bg-muted/30">
+        <p className="text-sm font-semibold">{t("Новая опция", "New Option")}</p>
+        <div className="grid grid-cols-3 gap-3">
+          <div><Label className="text-xs">{t("Название (RU)", "Name (RU)")}</Label><Input value={form.nameRu} onChange={e => setForm(p => ({ ...p, nameRu: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Название (EN)", "Name (EN)")}</Label><Input value={form.nameEn} onChange={e => setForm(p => ({ ...p, nameEn: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Цена ($)", "Price ($)")}</Label><Input type="number" value={form.price} onChange={e => setForm(p => ({ ...p, price: Number(e.target.value) }))} className="mt-1 h-9 text-sm" min={0} /></div>
+        </div>
+        <Button type="button" size="sm" onClick={add}>{t("Добавить", "Add")}</Button>
+      </div>
+      {options.length === 0 ? <p className="text-sm text-muted-foreground text-center py-4">{t("Нет опций", "No options yet")}</p> : (
+        <div className="space-y-2">
+          {options.map((o: any) => (
+            <div key={o.id} className="flex items-center justify-between p-3 border rounded-lg">
+              <div><p className="text-sm font-medium">{lang === "ru" ? o.nameRu : o.nameEn}</p><p className="text-xs text-muted-foreground">+${o.price}</p></div>
+              <Button type="button" variant="ghost" size="icon" className="text-destructive" onClick={() => setOptions(options.filter((x: any) => x.id !== o.id))}><Trash2 className="h-3.5 w-3.5" /></Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LocalItineraryManager({ items, setItems }: { items: any[]; setItems: (i: any[]) => void }) {
+  const { t, lang } = useI18n();
+  const [form, setForm] = useState({ dayNumber: 1, titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationHours: "" as any });
+  const add = () => {
+    if (!form.titleRu) return;
+    setItems([...items, { ...form, durationHours: form.durationHours ? Number(form.durationHours) : null, id: crypto.randomUUID() }]);
+    setForm({ dayNumber: items.length + 2, titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationHours: "" });
+  };
+  return (
+    <div className="space-y-4">
+      <div className="border rounded-xl p-4 space-y-3 bg-muted/30">
+        <p className="text-sm font-semibold">{t("Добавить день", "Add Day")}</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div><Label className="text-xs">{t("День №", "Day #")}</Label><Input type="number" value={form.dayNumber} onChange={e => setForm(p => ({ ...p, dayNumber: Number(e.target.value) }))} className="mt-1 h-9 text-sm" min={1} /></div>
+          <div><Label className="text-xs">{t("Часов", "Hours")}</Label><Input type="number" value={form.durationHours} onChange={e => setForm(p => ({ ...p, durationHours: e.target.value }))} className="mt-1 h-9 text-sm" min={1} placeholder="—" /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><Label className="text-xs">{t("Заголовок (RU)", "Title (RU)")}</Label><Input value={form.titleRu} onChange={e => setForm(p => ({ ...p, titleRu: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Заголовок (EN)", "Title (EN)")}</Label><Input value={form.titleEn} onChange={e => setForm(p => ({ ...p, titleEn: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><Label className="text-xs">{t("Описание (RU)", "Desc (RU)")}</Label><Textarea value={form.descriptionRu} onChange={e => setForm(p => ({ ...p, descriptionRu: e.target.value }))} className="mt-1 text-sm min-h-[60px]" /></div>
+          <div><Label className="text-xs">{t("Описание (EN)", "Desc (EN)")}</Label><Textarea value={form.descriptionEn} onChange={e => setForm(p => ({ ...p, descriptionEn: e.target.value }))} className="mt-1 text-sm min-h-[60px]" /></div>
+        </div>
+        <Button type="button" size="sm" onClick={add}>{t("Добавить", "Add")}</Button>
+      </div>
+      {items.length === 0 ? <p className="text-sm text-muted-foreground text-center py-4">{t("Программа не добавлена", "No itinerary yet")}</p> : (
+        <div className="space-y-2">
+          {items.map((item: any) => (
+            <div key={item.id} className="flex items-start justify-between p-3 border rounded-lg gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold">{t("День", "Day")} {item.dayNumber}: {lang === "ru" ? item.titleRu : item.titleEn}</p>
+                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{lang === "ru" ? item.descriptionRu : item.descriptionEn}</p>
+              </div>
+              <Button type="button" variant="ghost" size="icon" className="text-destructive shrink-0" onClick={() => setItems(items.filter((x: any) => x.id !== item.id))}><Trash2 className="h-3.5 w-3.5" /></Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 function DatesManager({ tourId }: { tourId: string }) {
   const { t } = useI18n();
