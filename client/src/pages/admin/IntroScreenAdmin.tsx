@@ -52,6 +52,14 @@ export default function IntroScreenAdmin() {
 
   const set = (key: string, val: any) => setForm(p => ({ ...p, [key]: val }));
 
+  const handleVideoUpload = (url: string) => {
+    const updated = { ...form, videoUrl: url };
+    setForm(updated);
+    if (url.startsWith("/uploads/")) {
+      saveMutation.mutate(updated);
+    }
+  };
+
   if (isLoading) return <AdminLayout title={t("Вступительный экран", "Intro Screen")}><div className="h-40 animate-pulse bg-muted rounded-xl" /></AdminLayout>;
 
   return (
@@ -98,7 +106,7 @@ export default function IntroScreenAdmin() {
             <div>
               <Label>{t("Видео (URL)", "Video (URL)")}</Label>
               <p className="text-xs text-muted-foreground mb-1">{t("Поддерживается MP4 и GIF — загрузите файл или вставьте ссылку", "Supports MP4 and GIF — upload a file or paste a link")}</p>
-              <ImageUpload value={form.videoUrl} onChange={v => set("videoUrl", v)} placeholder="https://... или /uploads/animation.gif" />
+              <ImageUpload value={form.videoUrl} onChange={handleVideoUpload} placeholder="https://... или /uploads/animation.gif" />
             </div>
 
             <div className="pt-2">
