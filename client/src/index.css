@@ -322,11 +322,25 @@ html {
 
 /* ── Page & Depth Foundations ──────────────────────────────────── */
 body {
-  background: linear-gradient(180deg, #f0f5ff 0%, #ffffff 12%, #ffffff 100%);
+  background-image:
+    linear-gradient(rgba(180,210,255,0.18), rgba(220,240,255,0.12)),
+    url('/images/bg-nature.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center top;
+  background-repeat: no-repeat;
 }
 
-.dark body, .dark {
-  background: hsl(var(--background));
+.dark body {
+  background-image:
+    linear-gradient(rgba(10,20,40,0.72), rgba(10,20,40,0.72)),
+    url('/images/bg-nature.jpg');
+}
+
+/* Floating content panel — solid white card over nature background */
+.page-panel {
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(1px);
 }
 
 /* Soft layered card — ring + elevated shadow */

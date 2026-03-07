@@ -354,10 +354,9 @@ function PopularToursSection({ tours }: { tours: Tour[] }) {
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
-    <section className="pt-28 pb-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-50/60 via-white to-white pointer-events-none" />
-      <div className="depth-blob w-96 h-96 bg-blue-200 top-0 -left-32" style={{ opacity: 0.12 }} />
-      <div className="depth-blob w-72 h-72 bg-primary/20 bottom-0 -right-24" style={{ opacity: 0.10 }} />
+    <section className="pt-28 pb-24 relative overflow-hidden page-panel">
+      <div className="depth-blob w-96 h-96 bg-blue-200 top-0 -left-32" style={{ opacity: 0.06 }} />
+      <div className="depth-blob w-72 h-72 bg-primary/15 bottom-0 -right-24" style={{ opacity: 0.06 }} />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="flex items-end justify-between mb-14">
@@ -396,10 +395,9 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
-    <section className="py-24 relative overflow-hidden section-surface">
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-amber-50/60 to-yellow-50/30 dark:from-orange-950/20 dark:to-amber-950/20 pointer-events-none" />
-      <div className="depth-blob w-80 h-80 bg-orange-300 -top-20 right-0" style={{ opacity: 0.13 }} />
-      <div className="depth-blob w-64 h-64 bg-amber-200 bottom-0 left-0" style={{ opacity: 0.10 }} />
+    <section className="py-24 relative overflow-hidden page-panel">
+      <div className="depth-blob w-80 h-80 bg-orange-200 -top-20 right-0" style={{ opacity: 0.10 }} />
+      <div className="depth-blob w-64 h-64 bg-amber-100 bottom-0 left-0" style={{ opacity: 0.08 }} />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="flex items-end justify-between mb-14">
@@ -617,10 +615,9 @@ function ReviewsSection() {
   const rev = reviews[idx];
 
   return (
-    <section className="py-24 relative overflow-hidden section-surface">
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/40 to-indigo-50/30 dark:from-slate-900/50 dark:to-blue-950/30 pointer-events-none" />
-      <div className="depth-blob w-80 h-80 bg-blue-200 top-0 right-0" style={{ opacity: 0.12 }} />
-      <div className="depth-blob w-64 h-64 bg-indigo-200 bottom-0 -left-16" style={{ opacity: 0.10 }} />
+    <section className="py-24 relative overflow-hidden page-panel">
+      <div className="depth-blob w-80 h-80 bg-blue-100 top-0 right-0" style={{ opacity: 0.08 }} />
+      <div className="depth-blob w-64 h-64 bg-indigo-100 bottom-0 -left-16" style={{ opacity: 0.07 }} />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="text-center mb-16">
@@ -752,9 +749,8 @@ function WhyUsSection() {
   ];
 
   return (
-    <section className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-white to-slate-50/60 dark:from-background dark:to-background pointer-events-none" />
-      <div className="depth-blob w-72 h-72 bg-primary/10 top-0 left-1/2 -translate-x-1/2" style={{ opacity: 0.15 }} />
+    <section className="py-24 relative overflow-hidden page-panel">
+      <div className="depth-blob w-72 h-72 bg-primary/10 top-0 left-1/2 -translate-x-1/2" style={{ opacity: 0.08 }} />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="text-center mb-16">
@@ -819,8 +815,12 @@ export default function Home() {
       ) : (
         <>
           <PopularToursSection tours={popularTours} />
+          {/* Nature gap */}
+          <div className="py-8 md:py-12" />
           <DestinationsSection />
           <PromoBanner banners={banners} />
+          {/* Nature gap */}
+          <div className="py-6 md:py-10" />
           <HotToursSection tours={hotTours} />
           <WhyUsSection />
           <ReviewsSection />
