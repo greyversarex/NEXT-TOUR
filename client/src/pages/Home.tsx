@@ -141,11 +141,7 @@ function Reveal({
 
 function CinematicHero() {
   const { t, lang } = useI18n();
-  const [, setLocation] = useLocation();
   const [current, setCurrent] = useState(0);
-  const [destination, setDestination] = useState("");
-  const [travelers, setTravelers] = useState(2);
-  const [travelersOpen, setTravelersOpen] = useState(false);
   const { data: slides = [] } = useQuery<any[]>({ queryKey: ["/api/hero-slides?active=true"] });
 
   const heroImages = slides.length > 0
@@ -156,13 +152,6 @@ function CinematicHero() {
     const timer = setInterval(() => setCurrent(c => (c + 1) % heroImages.length), 6000);
     return () => clearInterval(timer);
   }, [heroImages.length]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    if (destination.trim()) params.set("search", destination.trim());
-    setLocation(`/tours${params.toString() ? `?${params}` : ""}`);
-  };
 
   const slide = slides[current];
   const slideTitle = slide ? (lang === "ru" ? slide.titleRu : slide.titleEn) : null;
@@ -221,66 +210,6 @@ function CinematicHero() {
         </div>
       </div>
 
-      {/* Search bar — always anchored to bottom of hero */}
-      <div className="absolute bottom-20 left-0 right-0 px-4 z-10">
-        <form onSubmit={handleSearch} className="hero-fade-in-up-4 hero-glass-glow relative max-w-3xl mx-auto">
-          <div
-            className="flex flex-col md:flex-row rounded-2xl overflow-hidden md:overflow-visible border border-white/25 shadow-2xl"
-            style={{
-              background: "rgba(255,255,255,0.12)",
-              backdropFilter: "blur(24px) saturate(180%)",
-              WebkitBackdropFilter: "blur(24px) saturate(180%)",
-            }}
-          >
-            <div className="relative flex-1 border-b md:border-b-0 md:border-r border-white/20">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60 pointer-events-none" />
-              <input
-                type="text"
-                placeholder={t("Куда хотите поехать?", "Where do you want to go?")}
-                value={destination}
-                onChange={e => setDestination(e.target.value)}
-                className="w-full bg-transparent pl-12 pr-5 py-4 text-white placeholder:text-white/55 focus:outline-none text-base"
-                data-testid="input-hero-search"
-              />
-            </div>
-
-            <div className="relative border-b md:border-b-0 md:border-r border-white/20">
-              <button
-                type="button"
-                onClick={() => setTravelersOpen(!travelersOpen)}
-                className="flex items-center gap-2.5 px-5 py-4 text-white hover:bg-white/10 transition-colors text-base w-full md:w-auto whitespace-nowrap"
-                data-testid="button-travelers-picker"
-              >
-                <Users className="h-5 w-5 text-white/60 shrink-0" />
-                <span>{travelers} {t("туристов", "travelers")}</span>
-              </button>
-              {travelersOpen && (
-                <div className="absolute bottom-full mb-3 left-0 md:left-1/2 md:-translate-x-1/2 bg-white rounded-2xl shadow-2xl p-5 z-50 min-w-[220px]">
-                  <p className="text-sm font-semibold text-foreground mb-4 text-center">{t("Количество туристов", "Number of travelers")}</p>
-                  <div className="flex items-center justify-center gap-5">
-                    <button type="button" onClick={() => setTravelers(v => Math.max(1, v - 1))}
-                      className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-xl font-bold text-gray-600 hover:border-primary hover:text-primary transition-colors">−</button>
-                    <span className="text-2xl font-bold text-foreground w-8 text-center">{travelers}</span>
-                    <button type="button" onClick={() => setTravelers(v => Math.min(20, v + 1))}
-                      className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-xl font-bold text-gray-600 hover:border-primary hover:text-primary transition-colors">+</button>
-                  </div>
-                  <button type="button" onClick={() => setTravelersOpen(false)}
-                    className="mt-4 w-full text-center text-sm text-primary font-semibold">{t("Готово", "Done")}</button>
-                </div>
-              )}
-            </div>
-
-            <Button
-              type="submit"
-              className="rounded-none md:rounded-2xl px-8 py-4 text-base font-bold h-auto shrink-0"
-              data-testid="button-hero-search-submit"
-            >
-              <Search className="h-5 w-5 mr-2" />
-              {t("Найти", "Search")}
-            </Button>
-          </div>
-        </form>
-      </div>
 
       {/* Slide controls */}
       {heroImages.length > 1 && (
@@ -312,33 +241,82 @@ function CinematicHero() {
   );
 }
 
-function StatsBar() {
-  const { t, lang } = useI18n();
+function SearchSection() {
+  const { t } = useI18n();
+  const [, setLocation] = useLocation();
+  const [destination, setDestination] = useState("");
+  const [travelers, setTravelers] = useState(2);
+  const [travelersOpen, setTravelersOpen] = useState(false);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (destination.trim()) params.set("search", destination.trim());
+    if (travelers > 1) params.set("travelers", String(travelers));
+    setLocation(`/tours${params.toString() ? `?${params}` : ""}`);
+  };
+
   return (
-    <div className="relative -mt-16 z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-0">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {STATS.map((stat, i) => (
-          <Reveal key={i} delay={i * 80} y={16}>
-            <div
-              className={`group bg-gradient-to-br ${stat.bgLight} dark:from-card dark:to-card
-                border border-white/80 dark:border-card-border
-                rounded-2xl p-5 text-center
-                shadow-[0_8px_32px_rgba(0,0,0,0.12)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.18)]
-                hover:-translate-y-1.5 transition-all duration-300 cursor-default`}
-            >
-              <div className={`inline-flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br ${stat.color} shadow-md mb-3 group-hover:scale-110 transition-transform duration-300`}>
-                <stat.Icon className="h-5 w-5 text-white" />
-              </div>
-              <div className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground">
-                {lang === "ru" ? stat.valueRu : stat.valueEn}
-              </div>
-              <div className="text-xs text-muted-foreground mt-1 font-medium">
-                {lang === "ru" ? stat.labelRu : stat.labelEn}
-              </div>
+    <div className="relative -mt-8 z-20 max-w-3xl mx-auto px-4 sm:px-6 pb-4">
+      <Reveal y={12}>
+        <form onSubmit={handleSearch}>
+          <div
+            className="flex flex-col md:flex-row rounded-2xl overflow-hidden md:overflow-visible shadow-2xl border border-white/20"
+            style={{
+              background: "rgba(10,10,20,0.75)",
+              backdropFilter: "blur(28px) saturate(180%)",
+              WebkitBackdropFilter: "blur(28px) saturate(180%)",
+            }}
+          >
+            <div className="relative flex-1 border-b md:border-b-0 md:border-r border-white/15">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50 pointer-events-none" />
+              <input
+                type="text"
+                placeholder={t("Куда хотите поехать?", "Where do you want to go?")}
+                value={destination}
+                onChange={e => setDestination(e.target.value)}
+                className="w-full bg-transparent pl-12 pr-5 py-5 text-white placeholder:text-white/45 focus:outline-none text-base"
+                data-testid="input-hero-search"
+              />
             </div>
-          </Reveal>
-        ))}
-      </div>
+
+            <div className="relative border-b md:border-b-0 md:border-r border-white/15">
+              <button
+                type="button"
+                onClick={() => setTravelersOpen(!travelersOpen)}
+                className="flex items-center gap-2.5 px-5 py-5 text-white hover:bg-white/10 transition-colors text-base w-full md:w-auto whitespace-nowrap"
+                data-testid="button-travelers-picker"
+              >
+                <Users className="h-5 w-5 text-white/50 shrink-0" />
+                <span>{travelers} {t("туристов", "travelers")}</span>
+              </button>
+              {travelersOpen && (
+                <div className="absolute top-full mt-2 left-0 md:left-1/2 md:-translate-x-1/2 bg-white rounded-2xl shadow-2xl p-5 z-50 min-w-[220px]">
+                  <p className="text-sm font-semibold text-foreground mb-4 text-center">{t("Количество туристов", "Number of travelers")}</p>
+                  <div className="flex items-center justify-center gap-5">
+                    <button type="button" onClick={() => setTravelers(v => Math.max(1, v - 1))}
+                      className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-xl font-bold text-gray-600 hover:border-primary hover:text-primary transition-colors">−</button>
+                    <span className="text-2xl font-bold text-foreground w-8 text-center">{travelers}</span>
+                    <button type="button" onClick={() => setTravelers(v => Math.min(20, v + 1))}
+                      className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-xl font-bold text-gray-600 hover:border-primary hover:text-primary transition-colors">+</button>
+                  </div>
+                  <button type="button" onClick={() => setTravelersOpen(false)}
+                    className="mt-4 w-full text-center text-sm text-primary font-semibold">{t("Готово", "Done")}</button>
+                </div>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              className="rounded-none md:rounded-r-2xl px-8 py-5 text-base font-bold h-auto shrink-0"
+              data-testid="button-hero-search-submit"
+            >
+              <Search className="h-5 w-5 mr-2" />
+              {t("Найти тур", "Find Tour")}
+            </Button>
+          </div>
+        </form>
+      </Reveal>
     </div>
   );
 }
@@ -797,7 +775,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <CinematicHero />
-      <StatsBar />
+      <SearchSection />
 
       {isLoading ? (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 space-y-10">
