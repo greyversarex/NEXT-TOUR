@@ -153,15 +153,13 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                         onChange={e => setLoginData(p => ({ ...p, password: e.target.value }))}
                         required
                       />
-                      <Button
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors bg-transparent border-0 p-0 cursor-pointer"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
+                      </button>
                     </div>
                   </div>
                   <Button type="submit" className="w-full mt-2 h-11 text-base font-semibold" disabled={loading} data-testid="button-login-submit">
@@ -235,15 +233,13 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                         required
                         minLength={6}
                       />
-                      <Button
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors bg-transparent border-0 p-0 cursor-pointer"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
+                      </button>
                     </div>
                   </div>
                   <Button type="submit" className="w-full mt-2 h-11 text-base font-semibold" disabled={loading} data-testid="button-register-submit">
