@@ -354,20 +354,19 @@ function PopularToursSection({ tours }: { tours: Tour[] }) {
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
-    <section className="pt-28 pb-24 relative overflow-hidden page-panel">
-      <div className="depth-blob w-96 h-96 bg-blue-200 top-0 -left-32" style={{ opacity: 0.06 }} />
-      <div className="depth-blob w-72 h-72 bg-primary/15 bottom-0 -right-24" style={{ opacity: 0.06 }} />
+    <section className="pt-28 pb-24 relative overflow-hidden">
+      <div className="absolute inset-0 bg-black/30 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="flex items-end justify-between mb-14">
           <div>
-            <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3 flex items-center gap-1.5">
+            <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
               <TrendingUp className="h-3.5 w-3.5" /> {t("Лучшие предложения", "Top Offers")}
             </p>
-            <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Популярные туры", "Popular Tours")}</h2>
+            <h2 className="text-3xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Популярные туры", "Popular Tours")}</h2>
           </div>
           <Link href="/tours">
-            <Button variant="outline" className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+            <Button className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm hover:-translate-y-0.5 transition-all duration-200 shadow-lg">
               {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
@@ -381,7 +380,7 @@ function PopularToursSection({ tours }: { tours: Tour[] }) {
         </div>
         <div className="mt-10 flex justify-center md:hidden">
           <Link href="/tours">
-            <Button variant="outline" className="rounded-full px-8 py-5">
+            <Button className="rounded-full px-8 py-5 bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm">
               {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>
@@ -395,20 +394,19 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
-    <section className="py-24 relative overflow-hidden page-panel">
-      <div className="depth-blob w-80 h-80 bg-orange-200 -top-20 right-0" style={{ opacity: 0.10 }} />
-      <div className="depth-blob w-64 h-64 bg-amber-100 bottom-0 left-0" style={{ opacity: 0.08 }} />
+    <section className="py-24 relative overflow-hidden">
+      <div className="absolute inset-0 bg-black/30 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="flex items-end justify-between mb-14">
           <div>
-            <p className="text-orange-500 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center gap-1.5">
+            <p className="text-orange-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
               <Flame className="h-4 w-4" /> {t("Акции", "Special Deals")}
             </p>
-            <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Горящие туры", "Hot Deals")}</h2>
+            <h2 className="text-3xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Горящие туры", "Hot Deals")}</h2>
           </div>
           <Link href="/promotions">
-            <Button variant="outline" className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+            <Button className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm hover:-translate-y-0.5 transition-all duration-200 shadow-lg">
               {t("Все акции", "All Deals")} <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
@@ -501,13 +499,15 @@ function countryFlag(code: string): string {
 function DestinationsSection() {
   const { t, lang } = useI18n();
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section className="py-24 relative overflow-hidden">
+      <div className="absolute inset-0 bg-black/25 pointer-events-none" />
+      <div className="relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <Reveal className="text-center mb-16">
-        <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5">
+        <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
           <MapPin className="h-3.5 w-3.5" /> {t("Исследуйте", "Explore")}
         </p>
-        <h2 className="text-3xl md:text-5xl font-bold mb-5 leading-tight">{t("Направления мечты", "Dream Destinations")}</h2>
-        <p className="text-muted-foreground max-w-xl mx-auto text-base leading-relaxed">
+        <h2 className="text-3xl md:text-5xl font-bold mb-5 leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Направления мечты", "Dream Destinations")}</h2>
+        <p className="text-white/70 max-w-xl mx-auto text-base leading-relaxed" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.4)" }}>
           {t("Откройте для себя самые красивые уголки планеты с нашими эксклюзивными турами", "Discover the most beautiful corners of the planet with our exclusive tours")}
         </p>
       </Reveal>
@@ -531,6 +531,7 @@ function DestinationsSection() {
             </Reveal>
           );
         })}
+      </div>
       </div>
     </section>
   );
@@ -615,16 +616,15 @@ function ReviewsSection() {
   const rev = reviews[idx];
 
   return (
-    <section className="py-24 relative overflow-hidden page-panel">
-      <div className="depth-blob w-80 h-80 bg-blue-100 top-0 right-0" style={{ opacity: 0.08 }} />
-      <div className="depth-blob w-64 h-64 bg-indigo-100 bottom-0 -left-16" style={{ opacity: 0.07 }} />
+    <section className="py-24 relative overflow-hidden">
+      <div className="absolute inset-0 bg-black/30 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="text-center mb-16">
-          <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5">
+          <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
             <ThumbsUp className="h-3.5 w-3.5" /> {t("Отзывы", "Testimonials")}
           </p>
-          <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Что говорят наши клиенты", "What Our Clients Say")}</h2>
+          <h2 className="text-3xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Что говорят наши клиенты", "What Our Clients Say")}</h2>
         </Reveal>
 
         <div className="max-w-3xl mx-auto">
@@ -749,32 +749,33 @@ function WhyUsSection() {
   ];
 
   return (
-    <section className="py-24 relative overflow-hidden page-panel">
-      <div className="depth-blob w-72 h-72 bg-primary/10 top-0 left-1/2 -translate-x-1/2" style={{ opacity: 0.08 }} />
+    <section className="py-24 relative overflow-hidden">
+      <div className="absolute inset-0 bg-black/30 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="text-center mb-16">
-          <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Наши преимущества", "Our Advantages")}</p>
-          <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Почему выбирают нас", "Why Choose Us")}</h2>
+          <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>{t("Наши преимущества", "Our Advantages")}</p>
+          <h2 className="text-3xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Почему выбирают нас", "Why Choose Us")}</h2>
         </Reveal>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
           {items.map((item, i) => (
             <Reveal key={i} delay={i * 100} y={20}>
               <div
-                className={`group bg-gradient-to-br ${item.bg} border border-white/80 dark:border-card-border
+                className={`group bg-black/30 backdrop-blur-sm border border-white/20
                   rounded-2xl p-8 text-center h-full
-                  shadow-[0_2px_16px_rgba(0,0,0,0.06)]
-                  hover:shadow-[0_16px_48px_rgba(0,0,0,0.14)]
+                  shadow-[0_2px_16px_rgba(0,0,0,0.20)]
+                  hover:shadow-[0_16px_48px_rgba(0,0,0,0.35)]
+                  hover:bg-black/40 hover:border-white/30
                   hover:-translate-y-2
                   transition-all duration-300 ease-out`}
               >
                 <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${item.gradient} shadow-lg mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
                   <item.Icon className="h-7 w-7 text-white" />
                 </div>
-                <h3 className="font-bold text-lg mb-3 group-hover:text-primary transition-colors duration-200">
+                <h3 className="font-bold text-lg mb-3 text-white group-hover:text-cyan-200 transition-colors duration-200">
                   {t(item.titleRu, item.titleEn)}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm text-white/65 leading-relaxed">
                   {t(item.descRu, item.descEn)}
                 </p>
               </div>
