@@ -410,3 +410,258 @@ body {
 .hero-glass-glow {
   animation: heroPulseGlow 4s ease-in-out 2s infinite;
 }
+
+/* ════════════════════════════════════════════════════════════════
+   ── Rich Buttons, Tabs & Toggles  ──────────────────────────────
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── PRIMARY button ──────────────────────────────────────────── */
+[data-slot="button"].bg-primary,
+[data-slot="button"][class*="bg-primary"]:not([class*="bg-primary/"]) {
+  background-image: linear-gradient(160deg,
+    hsl(210 92% 54%) 0%,
+    hsl(210 85% 45%) 45%,
+    hsl(195 90% 40%) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.28),
+    inset 0 -1px 0 rgba(0,0,0,0.18),
+    0 4px 14px -2px rgba(14,118,222,0.40),
+    0 1px 3px rgba(0,0,0,0.14);
+  border: 1px solid rgba(14,118,222,0.55);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.20);
+  transition: all 0.18s cubic-bezier(0.22,1,0.36,1);
+}
+[data-slot="button"].bg-primary:hover,
+[data-slot="button"][class*="bg-primary"]:not([class*="bg-primary/"]):hover {
+  background-image: linear-gradient(160deg,
+    hsl(210 96% 60%) 0%,
+    hsl(210 88% 50%) 45%,
+    hsl(195 94% 46%) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.32),
+    inset 0 -1px 0 rgba(0,0,0,0.16),
+    0 8px 24px -4px rgba(14,118,222,0.50),
+    0 2px 6px rgba(0,0,0,0.14);
+  transform: translateY(-1px);
+}
+[data-slot="button"].bg-primary:active,
+[data-slot="button"][class*="bg-primary"]:not([class*="bg-primary/"]):active {
+  background-image: linear-gradient(160deg,
+    hsl(210 85% 42%) 0%,
+    hsl(195 88% 38%) 100%);
+  box-shadow:
+    inset 0 2px 4px rgba(0,0,0,0.22),
+    0 1px 2px rgba(0,0,0,0.12);
+  transform: translateY(1px);
+}
+
+/* ── DESTRUCTIVE button ──────────────────────────────────────── */
+[data-slot="button"].bg-destructive {
+  background-image: linear-gradient(160deg,
+    hsl(0 90% 52%) 0%,
+    hsl(0 84% 42%) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    inset 0 -1px 0 rgba(0,0,0,0.18),
+    0 4px 14px -2px rgba(220,38,38,0.38),
+    0 1px 3px rgba(0,0,0,0.14);
+  border: 1px solid rgba(185,28,28,0.50);
+}
+[data-slot="button"].bg-destructive:hover {
+  background-image: linear-gradient(160deg,
+    hsl(0 96% 58%) 0%,
+    hsl(0 88% 48%) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.28),
+    0 8px 24px -4px rgba(220,38,38,0.48),
+    0 2px 6px rgba(0,0,0,0.14);
+  transform: translateY(-1px);
+}
+
+/* ── SECONDARY button ────────────────────────────────────────── */
+[data-slot="button"].bg-secondary {
+  background-image: linear-gradient(160deg,
+    hsl(210 8% 95%) 0%,
+    hsl(210 6% 88%) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.90),
+    inset 0 -1px 0 rgba(0,0,0,0.06),
+    0 1px 3px rgba(0,0,0,0.10),
+    0 2px 8px -2px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.10);
+  transition: all 0.18s cubic-bezier(0.22,1,0.36,1);
+}
+[data-slot="button"].bg-secondary:hover {
+  background-image: linear-gradient(160deg,
+    hsl(210 10% 98%) 0%,
+    hsl(210 8% 92%) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    0 3px 10px -2px rgba(0,0,0,0.14),
+    0 1px 3px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+[data-slot="button"].bg-secondary:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.10);
+}
+.dark [data-slot="button"].bg-secondary {
+  background-image: linear-gradient(160deg,
+    hsl(210 8% 22%) 0%,
+    hsl(210 6% 17%) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    inset 0 -1px 0 rgba(0,0,0,0.22),
+    0 2px 8px -2px rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.dark [data-slot="button"].bg-secondary:hover {
+  background-image: linear-gradient(160deg,
+    hsl(210 10% 26%) 0%,
+    hsl(210 8% 21%) 100%);
+}
+
+/* ── OUTLINE button ──────────────────────────────────────────── */
+[data-slot="button"].border.bg-background {
+  background-image: linear-gradient(160deg,
+    rgba(255,255,255,0.95) 0%,
+    rgba(248,250,252,0.95) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,1),
+    0 1px 3px rgba(0,0,0,0.08),
+    0 2px 8px -2px rgba(0,0,0,0.06);
+  transition: all 0.18s cubic-bezier(0.22,1,0.36,1);
+}
+[data-slot="button"].border.bg-background:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,1),
+    0 3px 12px -2px rgba(14,118,222,0.20),
+    0 1px 4px rgba(0,0,0,0.08);
+  border-color: hsl(var(--primary) / 0.5);
+  transform: translateY(-1px);
+}
+.dark [data-slot="button"].border.bg-background {
+  background-image: linear-gradient(160deg,
+    rgba(255,255,255,0.06) 0%,
+    rgba(255,255,255,0.02) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.10),
+    0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* ── GHOST button ────────────────────────────────────────────── */
+[data-slot="button"]:where([class*="hover\:bg-accent"]) {
+  transition: all 0.15s ease;
+}
+[data-slot="button"]:where([class*="hover\:bg-accent"]):hover {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+}
+
+/* ── TABS LIST ───────────────────────────────────────────────── */
+[data-slot="tabs-list"] {
+  background: linear-gradient(135deg,
+    rgba(210, 230, 255, 0.55) 0%,
+    rgba(230, 240, 255, 0.40) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.80),
+    inset 0 -1px 0 rgba(0,0,0,0.05),
+    0 1px 4px rgba(0,0,0,0.08);
+  border: 1px solid rgba(14,118,222,0.12);
+  backdrop-filter: blur(8px);
+}
+.dark [data-slot="tabs-list"] {
+  background: linear-gradient(135deg,
+    rgba(30, 60, 100, 0.45) 0%,
+    rgba(20, 40, 80, 0.35) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    inset 0 -1px 0 rgba(0,0,0,0.25),
+    0 2px 8px rgba(0,0,0,0.30);
+  border: 1px solid rgba(255,255,255,0.07);
+}
+
+/* ── TABS TRIGGER (inactive) ─────────────────────────────────── */
+[data-slot="tabs-trigger"] {
+  transition: all 0.20s cubic-bezier(0.22,1,0.36,1);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+[data-slot="tabs-trigger"]:hover:not([data-state="active"]) {
+  background: rgba(14,118,222,0.08);
+  color: hsl(var(--primary));
+}
+
+/* ── TABS TRIGGER (active) ───────────────────────────────────── */
+[data-slot="tabs-trigger"][data-state="active"] {
+  background-image: linear-gradient(150deg,
+    hsl(210 92% 54%) 0%,
+    hsl(210 85% 45%) 50%,
+    hsl(195 88% 42%) 100%) !important;
+  color: white !important;
+  font-weight: 600;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.28),
+    inset 0 -1px 0 rgba(0,0,0,0.16),
+    0 3px 10px -2px rgba(14,118,222,0.45),
+    0 1px 3px rgba(0,0,0,0.14) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+  border: 1px solid rgba(14,118,222,0.45) !important;
+}
+
+/* ── BADGE (default / primary) ───────────────────────────────── */
+[data-slot="badge"]:where(.bg-primary,[class*="from-primary"],[class*="from-blue"],[class*="from-cyan"]) {
+  box-shadow: 0 1px 4px rgba(14,118,222,0.30), inset 0 1px 0 rgba(255,255,255,0.20);
+}
+
+/* ── SELECT TRIGGER ──────────────────────────────────────────── */
+[data-slot="select-trigger"] {
+  background-image: linear-gradient(160deg,
+    rgba(255,255,255,0.95) 0%,
+    rgba(248,250,252,0.95) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,1),
+    0 1px 3px rgba(0,0,0,0.08);
+  transition: all 0.18s ease;
+}
+[data-slot="select-trigger"]:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,1),
+    0 2px 8px -1px rgba(14,118,222,0.18),
+    0 1px 3px rgba(0,0,0,0.08);
+  border-color: hsl(var(--primary) / 0.4);
+}
+.dark [data-slot="select-trigger"] {
+  background-image: linear-gradient(160deg,
+    rgba(255,255,255,0.06) 0%,
+    rgba(255,255,255,0.02) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.07),
+    0 1px 4px rgba(0,0,0,0.25);
+}
+
+/* ── CHECKBOX ────────────────────────────────────────────────── */
+[data-slot="checkbox"][data-state="checked"] {
+  background-image: linear-gradient(135deg,
+    hsl(210 92% 54%) 0%,
+    hsl(195 88% 42%) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.24),
+    0 2px 6px rgba(14,118,222,0.35);
+  border-color: hsl(210 85% 42%) !important;
+}
+
+/* ── SWITCH ──────────────────────────────────────────────────── */
+[data-slot="switch"][data-state="checked"] {
+  background-image: linear-gradient(135deg,
+    hsl(210 92% 56%) 0%,
+    hsl(195 88% 44%) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.20),
+    0 2px 8px rgba(14,118,222,0.35);
+}
+
+/* ── SCROLL ANIMATION keyframe ───────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
