@@ -1,6 +1,5 @@
 import { Link } from "wouter";
-import { Badge } from "@/components/ui/badge";
-import { Clock, Heart, ArrowRight, Star, MapPin } from "lucide-react";
+import { Clock, Heart, ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -46,43 +45,45 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
   return (
     <Link href={`/tours/${tour.id}`}>
       <div
-        className="group relative rounded-2xl overflow-hidden bg-white dark:bg-card border border-gray-100 dark:border-card-border cursor-pointer h-full flex flex-col
-          shadow-[0_2px_12px_rgba(0,0,0,0.06)]
-          hover:shadow-[0_24px_64px_-12px_rgba(0,0,0,0.22)]
-          hover:-translate-y-2
-          transition-all duration-400 ease-out"
+        className="group relative rounded-2xl overflow-hidden bg-white dark:bg-card border border-transparent cursor-pointer h-full flex flex-col
+          shadow-[0_2px_16px_rgba(0,0,0,0.07)]
+          hover:shadow-[0_32px_80px_-8px_rgba(0,0,0,0.30)]
+          hover:-translate-y-2.5
+          hover:border-primary/20
+          transition-all duration-500"
         data-testid={`card-tour-${tour.id}`}
       >
-        {/* Top accent bar */}
+        {/* Top accent bar — slides in on hover */}
         <div className="absolute top-0 left-0 right-0 h-[3px] z-20 overflow-hidden rounded-t-2xl">
-          <div className="h-full bg-gradient-to-r from-primary via-cyan-400 to-primary/50 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out" />
+          <div className="h-full bg-gradient-to-r from-primary via-cyan-400 to-sky-300 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
         </div>
 
-        {/* Image area */}
-        <div className="relative overflow-hidden" style={{ aspectRatio: "4/3" }}>
+        {/* ── IMAGE ─────────────────────────────────────────── */}
+        {/* 16:10 ratio — wider & more cinematic than 4:3 */}
+        <div className="relative overflow-hidden" style={{ aspectRatio: "16/10" }}>
           <img
             src={tour.mainImage || "/images/hero-banner.png"}
             alt={title}
-            className="w-full h-full object-cover transition-transform duration-600 ease-out group-hover:scale-[1.08]"
+            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.12]"
           />
 
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent transition-opacity duration-400 group-hover:opacity-90" />
+          {/* Persistent bottom fade for text legibility */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
-          {/* Sheen flash */}
+          {/* Hover brightening sheen */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-            style={{ background: "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.09) 50%, transparent 70%)" }}
+            className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-600"
+            style={{ background: "linear-gradient(135deg, transparent 20%, rgba(255,255,255,0.07) 50%, transparent 80%)" }}
           />
 
-          {/* Discount & hot badges */}
+          {/* ── Badges top-left ── */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
             {tour.discountPercent > 0 && (
               <div
-                className="flex items-center gap-1 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-xl shadow-lg"
+                className="flex items-center gap-1 bg-gradient-to-r from-red-500 to-rose-600 text-white text-xs font-bold px-2.5 py-1 rounded-xl shadow-lg"
                 data-testid={`badge-discount-${tour.id}`}
               >
-                <span>-{tour.discountPercent}%</span>
+                -{tour.discountPercent}%
               </div>
             )}
             {tour.isHot && (
@@ -92,11 +93,11 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
             )}
           </div>
 
-          {/* Favorite button */}
+          {/* ── Favorite button top-right ── */}
           {user && (
             <button
               onClick={handleFavorite}
-              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-black/30 backdrop-blur-sm
+              className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center
                 hover:bg-black/55 hover:scale-110 active:scale-95
                 transition-all duration-200"
               data-testid={`button-fav-${tour.id}`}
@@ -105,24 +106,24 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
             </button>
           )}
 
-          {/* Duration — bottom left */}
-          <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5 bg-black/35 backdrop-blur-sm text-white text-xs rounded-full px-2.5 py-1">
+          {/* ── Duration pill — bottom-left ── */}
+          <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold rounded-full px-2.5 py-1">
             <Clock className="h-3 w-3 opacity-80" />
-            <span className="font-semibold">{tour.duration} {t("дн.", "days")}</span>
+            {tour.duration} {t("дн.", "d.")}
           </div>
 
-          {/* "View tour" pill — slides up on hover */}
-          <div className="absolute bottom-0 inset-x-0 z-10 flex items-center justify-center pb-4 pt-8
-            opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0
-            transition-all duration-300 ease-out pointer-events-none">
-            <span className="flex items-center gap-1.5 text-white text-sm font-semibold
-              bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
+          {/* ── "View tour" CTA — floats up on hover ── */}
+          <div className="absolute bottom-0 inset-x-0 z-10 flex items-center justify-center pb-5
+            opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0
+            transition-all duration-300 pointer-events-none">
+            <span className="flex items-center gap-1.5 text-white text-sm font-bold
+              bg-white/20 backdrop-blur-sm px-5 py-2 rounded-full border border-white/30 shadow-lg">
               {t("Смотреть тур", "View Tour")} <ArrowRight className="h-3.5 w-3.5" />
             </span>
           </div>
         </div>
 
-        {/* Text content */}
+        {/* ── TEXT CONTENT ──────────────────────────────────── */}
         <div className="p-5 flex flex-col flex-1">
           <h3
             className="font-bold text-base leading-snug mb-1.5 line-clamp-2 group-hover:text-primary transition-colors duration-200"
@@ -134,30 +135,38 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
             {description}
           </p>
 
-          {/* Price row */}
-          <div className="flex items-end justify-between border-t border-gray-100 dark:border-card-border pt-4 mt-auto">
-            <div>
-              <p className="text-[11px] text-muted-foreground mb-0.5 uppercase tracking-wide font-medium">{t("от", "from")}</p>
-              <div className="flex items-baseline gap-2">
+          {/* ── Price row ── */}
+          <div className="flex items-end justify-between pt-4 mt-auto border-t border-border/50">
+            {/* Price block — elevated on hover */}
+            <div className="flex flex-col">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-0.5">
+                {t("от", "from")}
+              </p>
+              <div className="flex items-baseline gap-1.5">
                 {tour.discountPercent > 0 && (
-                  <span className="text-sm text-muted-foreground line-through">
+                  <span className="text-sm text-muted-foreground/70 line-through font-medium">
                     ${price.toFixed(0)}
                   </span>
                 )}
                 <span
-                  className="text-2xl font-extrabold text-primary leading-none"
+                  className="text-3xl font-extrabold leading-none bg-gradient-to-br from-primary to-cyan-500 bg-clip-text text-transparent
+                    transition-all duration-300"
                   data-testid={`text-tour-price-${tour.id}`}
                 >
                   ${discountedPrice.toFixed(0)}
                 </span>
-                <span className="text-xs text-muted-foreground">/ {t("чел.", "p.")}</span>
+                <span className="text-xs text-muted-foreground font-medium">
+                  / {t("чел.", "p.")}
+                </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-1 text-primary text-sm font-semibold
-              opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0
-              transition-all duration-250 ease-out">
-              {t("Подробнее", "Details")} <ArrowRight className="h-4 w-4" />
+            {/* Arrow — slides in on hover */}
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-primary/8 text-primary
+              group-hover:bg-primary group-hover:text-white
+              opacity-0 translate-x-1 group-hover:opacity-100 group-hover:translate-x-0
+              transition-all duration-300">
+              <ArrowRight className="h-4 w-4" />
             </div>
           </div>
         </div>
