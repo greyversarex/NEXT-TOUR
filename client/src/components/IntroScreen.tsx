@@ -89,67 +89,79 @@ export default function IntroScreen() {
 
   if (!visible) return null;
 
+  const hasMedia = !!intro?.videoUrl;
+
   return (
     <div
       style={{
         position: "fixed", inset: 0, zIndex: 9999,
         opacity: hiding ? 0 : 1,
         transition: "opacity 0.9s cubic-bezier(0.4,0,0.2,1)",
-        background: "linear-gradient(135deg, #020d1f 0%, #0b1f3a 45%, #0d2847 70%, #051020 100%)",
+        background: hasMedia
+          ? "#000"
+          : "linear-gradient(135deg, #020d1f 0%, #0b1f3a 45%, #0d2847 70%, #051020 100%)",
         overflow: "hidden",
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
       }}
     >
-      {intro?.videoUrl ? (
-        intro.videoUrl.toLowerCase().endsWith(".gif") ? (
+      {hasMedia ? (
+        intro!.videoUrl!.toLowerCase().endsWith(".gif") ? (
           <img
-            src={intro.videoUrl}
+            src={intro!.videoUrl!}
             alt=""
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.28 }}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
           <video
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.25 }}
-            autoPlay muted loop playsInline src={intro.videoUrl}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+            autoPlay muted loop playsInline src={intro!.videoUrl!}
           />
         )
       ) : null}
 
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-        {particles.map(p => (
-          <div
-            key={p.id}
-            style={{
-              position: "absolute",
-              left: `${p.x}%`,
-              top: `${p.y}%`,
-              width: `${p.size}px`,
-              height: `${p.size}px`,
-              borderRadius: "50%",
-              background: p.size > 2 ? "#60a5fa" : "#ffffff",
-              opacity: p.opacity,
-              animation: `float-star ${p.duration}s ${p.delay}s ease-in-out infinite alternate`,
-              boxShadow: p.size > 1.8 ? `0 0 ${p.size * 3}px ${p.size}px rgba(96,165,250,0.4)` : "none",
-            }}
-          />
-        ))}
-        <div style={{
-          position: "absolute", top: "15%", right: "12%",
-          width: 180, height: 180, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)",
-          animation: "pulse-glow 4s ease-in-out infinite",
-        }} />
-        <div style={{
-          position: "absolute", bottom: "20%", left: "8%",
-          width: 120, height: 120, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)",
-          animation: "pulse-glow 5s 1s ease-in-out infinite",
-        }} />
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "radial-gradient(ellipse at 50% 50%, rgba(59,130,246,0.06) 0%, transparent 65%)",
-        }} />
-      </div>
+      {/* Dark overlay for text readability — only when media is present */}
+      {hasMedia && (
+        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.52)", zIndex: 1 }} />
+      )}
+
+      {/* Stars and glow orbs — only without media */}
+      {!hasMedia && (
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+          {particles.map(p => (
+            <div
+              key={p.id}
+              style={{
+                position: "absolute",
+                left: `${p.x}%`,
+                top: `${p.y}%`,
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                borderRadius: "50%",
+                background: p.size > 2 ? "#60a5fa" : "#ffffff",
+                opacity: p.opacity,
+                animation: `float-star ${p.duration}s ${p.delay}s ease-in-out infinite alternate`,
+                boxShadow: p.size > 1.8 ? `0 0 ${p.size * 3}px ${p.size}px rgba(96,165,250,0.4)` : "none",
+              }}
+            />
+          ))}
+          <div style={{
+            position: "absolute", top: "15%", right: "12%",
+            width: 180, height: 180, borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)",
+            animation: "pulse-glow 4s ease-in-out infinite",
+          }} />
+          <div style={{
+            position: "absolute", bottom: "20%", left: "8%",
+            width: 120, height: 120, borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)",
+            animation: "pulse-glow 5s 1s ease-in-out infinite",
+          }} />
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "radial-gradient(ellipse at 50% 50%, rgba(59,130,246,0.06) 0%, transparent 65%)",
+          }} />
+        </div>
+      )}
 
       <div style={{ position: "relative", zIndex: 10, textAlign: "center", padding: "0 24px", maxWidth: 680 }}>
 
@@ -255,7 +267,7 @@ export default function IntroScreen() {
       </div>
 
       <div style={{
-        position: "absolute", bottom: 0, left: 0, right: 0, height: 3,
+        position: "absolute", bottom: 0, left: 0, right: 0, height: 3, zIndex: 11,
         background: "rgba(255,255,255,0.08)",
       }}>
         <div style={{
