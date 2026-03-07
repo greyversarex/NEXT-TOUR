@@ -1,0 +1,143 @@
+Create a powerful travel search system for the website.
+
+The search system should feel modern, simple for users, and suitable for a premium travel booking platform.
+
+MAIN SEARCH BAR (HOMEPAGE)
+
+Improve the hero search bar and make it the main tour search tool.
+
+The search bar should include the following fields:
+
+1. Destination field
+Placeholder: "Where do you want to go?"
+
+This field must support smart search and autocomplete.
+
+Users should be able to type:
+• country
+• city
+• tour name
+
+When typing, show suggestions like:
+Thailand
+Phuket
+Italy
+Dubai
+
+2. Dates selector
+
+Add a calendar date picker where users can choose:
+• start date
+• end date
+
+If no date is selected, show tours for all available dates.
+
+3. Travelers selector
+
+Dropdown selector with:
+1 traveler
+2 travelers
+3 travelers
+4+ travelers
+
+4. Search button
+
+Large CTA button labeled:
+Search Tours
+
+The search bar should have:
+• glassmorphism style
+• rounded corners
+• soft shadow
+• smooth hover animations
+
+SEARCH RESULTS PAGE
+
+When a user searches, redirect them to a results page.
+
+Page layout:
+
+LEFT SIDE – FILTER PANEL
+
+Create a filter sidebar with the following filters:
+
+• Country
+• City
+• Price range slider
+• Duration of tour
+• Tour category
+• Discount tours only
+
+Price filter example:
+$500 – $3000
+
+Duration filter example:
+3–5 days
+6–8 days
+9–14 days
+
+Categories example:
+Beach
+Excursion
+Mountain
+Exotic
+
+RIGHT SIDE – TOUR RESULTS
+
+Display results in a responsive grid of tour cards.
+
+Each card must contain:
+• destination image
+• tour name
+• short description (2 lines)
+• duration
+• price
+• discount badge if applicable
+
+Cards should include:
+• hover zoom effect on image
+• soft shadow
+• rounded corners
+• smooth animation
+
+RESULTS HEADER
+
+Above the results show:
+
+Number of results found
+
+Example:
+24 tours found
+
+Also add sorting options:
+
+Sort by:
+• Price
+• Newest
+• Popular
+
+EMPTY STATE
+
+If no tours match the search:
+
+Show a friendly message:
+
+"No tours found for your search. Try adjusting filters."
+
+DESIGN REQUIREMENTS
+
+The search system must feel:
+
+• fast
+• simple
+• modern
+• visually clean
+
+Use:
+• smooth animations
+• modern UI components
+• soft shadows
+• spacious layout
+• consistent styling with the rest of the site
+
+The final experience should feel like a professional travel booking platform.

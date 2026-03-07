@@ -1,17 +1,20 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import TourCard from "@/components/TourCard";
 import { useI18n } from "@/lib/i18n";
+import { format } from "date-fns";
 import {
   Search, Star, ChevronLeft, ChevronRight, MapPin, Clock,
-  Users, ArrowRight, Quote, Flame,
+  Users, ArrowRight, Quote, Flame, CalendarDays, ChevronDown,
   Award, Globe, Shield, Gem, ThumbsUp, TrendingUp
 } from "lucide-react";
-import type { Tour } from "@shared/schema";
+import type { Tour, Country, City } from "@shared/schema";
 
 const DESTINATIONS = [
   {
@@ -241,78 +244,244 @@ function CinematicHero() {
   );
 }
 
-function SearchSection() {
-  const { t } = useI18n();
-  const [, setLocation] = useLocation();
-  const [destination, setDestination] = useState("");
-  const [travelers, setTravelers] = useState(2);
-  const [travelersOpen, setTravelersOpen] = useState(false);
+const TRAVELER_OPTIONS = [
+  { value: "1", labelRu: "1 турист", labelEn: "1 traveler" },
+  { value: "2", labelRu: "2 туриста", labelEn: "2 travelers" },
+  { value: "3", labelRu: "3 туриста", labelEn: "3 travelers" },
+  { value: "4+", labelRu: "4+ туристов", labelEn: "4+ travelers" },
+];
 
-  const handleSearch = (e: React.FormEvent) => {
+function SearchSection() {
+  const { t, lang } = useI18n();
+  const [, setLocation] = useLocation();
+
+  const [destination, setDestination] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [travelers, setTravelers] = useState("2");
+  const [travelersOpen, setTravelersOpen] = useState(false);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>();
+  const [dateTo, setDateTo] = useState<Date | undefined>();
+  const [dateOpen, setDateOpen] = useState(false);
+  const [pickingDate, setPickingDate] = useState<"from" | "to">("from");
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const travelersRef = useRef<HTMLDivElement>(null);
+
+  const { data: countries = [] } = useQuery<Country[]>({ queryKey: ["/api/countries"] });
+  const { data: cities = [] } = useQuery<City[]>({ queryKey: ["/api/cities"] });
+  const { data: tours = [] } = useQuery<Tour[]>({ queryKey: ["/api/tours"] });
+
+  const suggestions = useMemo(() => {
+    if (!destination.trim()) return [];
+    const q = destination.toLowerCase();
+    const results: { label: string; sub: string; type: string }[] = [];
+
+    countries.forEach(c => {
+      const name = lang === "ru" ? c.nameRu : c.nameEn;
+      if (name.toLowerCase().includes(q)) results.push({ label: name, sub: t("Страна", "Country"), type: "country" });
+    });
+
+    cities.forEach(c => {
+      const name = lang === "ru" ? c.nameRu : c.nameEn;
+      if (name.toLowerCase().includes(q)) results.push({ label: name, sub: t("Город", "City"), type: "city" });
+    });
+
+    tours.forEach(tour => {
+      const name = lang === "ru" ? tour.titleRu : tour.titleEn;
+      if (name.toLowerCase().includes(q)) results.push({ label: name, sub: t("Тур", "Tour"), type: "tour" });
+    });
+
+    return results.slice(0, 6);
+  }, [destination, countries, cities, tours, lang]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target as Node) &&
+        !inputRef.current?.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+      if (travelersRef.current && !travelersRef.current.contains(e.target as Node)) {
+        setTravelersOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const handleSearch = (e: React.FormEvent, overrideDest?: string) => {
     e.preventDefault();
+    const q = (overrideDest ?? destination).trim();
     const params = new URLSearchParams();
-    if (destination.trim()) params.set("search", destination.trim());
-    if (travelers > 1) params.set("travelers", String(travelers));
+    if (q) params.set("search", q);
     setLocation(`/tours${params.toString() ? `?${params}` : ""}`);
+    setShowSuggestions(false);
+  };
+
+  const formatDateRange = () => {
+    if (dateFrom && dateTo) return `${format(dateFrom, "dd.MM")} – ${format(dateTo, "dd.MM")}`;
+    if (dateFrom) return format(dateFrom, "dd MMM");
+    return t("Выбрать даты", "Select dates");
+  };
+
+  const handleCalendarSelect = (date: Date | undefined) => {
+    if (!date) return;
+    if (pickingDate === "from") {
+      setDateFrom(date);
+      setDateTo(undefined);
+      setPickingDate("to");
+    } else {
+      if (dateFrom && date < dateFrom) {
+        setDateFrom(date);
+        setDateTo(undefined);
+        setPickingDate("to");
+      } else {
+        setDateTo(date);
+        setDateOpen(false);
+        setPickingDate("from");
+      }
+    }
   };
 
   return (
-    <div className="relative -mt-8 z-20 max-w-3xl mx-auto px-4 sm:px-6 pb-4">
+    <div className="relative -mt-8 z-20 max-w-4xl mx-auto px-4 sm:px-6 pb-4">
       <Reveal y={12}>
         <form onSubmit={handleSearch}>
           <div
-            className="flex flex-col md:flex-row rounded-2xl overflow-hidden md:overflow-visible shadow-2xl border border-white/20"
+            className="flex flex-col md:flex-row rounded-2xl overflow-visible shadow-2xl border border-white/20"
             style={{
-              background: "rgba(10,10,20,0.75)",
+              background: "rgba(10,10,20,0.80)",
               backdropFilter: "blur(28px) saturate(180%)",
               WebkitBackdropFilter: "blur(28px) saturate(180%)",
             }}
           >
+            {/* Destination field with autocomplete */}
             <div className="relative flex-1 border-b md:border-b-0 md:border-r border-white/15">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50 pointer-events-none" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50 pointer-events-none z-10" />
               <input
+                ref={inputRef}
                 type="text"
                 placeholder={t("Куда хотите поехать?", "Where do you want to go?")}
                 value={destination}
-                onChange={e => setDestination(e.target.value)}
-                className="w-full bg-transparent pl-12 pr-5 py-5 text-white placeholder:text-white/45 focus:outline-none text-base"
+                onChange={e => { setDestination(e.target.value); setShowSuggestions(true); }}
+                onFocus={() => destination && setShowSuggestions(true)}
+                className="w-full bg-transparent pl-12 pr-5 py-5 text-white placeholder:text-white/45 focus:outline-none text-base rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none"
                 data-testid="input-hero-search"
+                autoComplete="off"
               />
+              {showSuggestions && suggestions.length > 0 && (
+                <div
+                  ref={suggestionsRef}
+                  className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-card rounded-2xl shadow-2xl border border-border/40 overflow-hidden z-50"
+                >
+                  {suggestions.map((s, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={e => { setDestination(s.label); setShowSuggestions(false); handleSearch(e as any, s.label); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-primary/8 transition-colors text-left group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                        {s.type === "country" ? <Globe className="h-4 w-4 text-primary" /> :
+                          s.type === "city" ? <MapPin className="h-4 w-4 text-primary" /> :
+                            <Search className="h-4 w-4 text-primary" />}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{s.label}</p>
+                        <p className="text-xs text-muted-foreground">{s.sub}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
+            {/* Date range picker */}
             <div className="relative border-b md:border-b-0 md:border-r border-white/15">
+              <Popover open={dateOpen} onOpenChange={setDateOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center gap-2.5 px-5 py-5 text-white hover:bg-white/8 transition-colors text-sm w-full md:w-auto whitespace-nowrap"
+                    data-testid="button-date-picker"
+                  >
+                    <CalendarDays className="h-5 w-5 text-white/50 shrink-0" />
+                    <span className={dateFrom ? "text-white" : "text-white/55"}>{formatDateRange()}</span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-4 rounded-2xl shadow-2xl" align="start">
+                  <div className="mb-3 flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPickingDate("from")}
+                      className={`flex-1 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${pickingDate === "from" ? "bg-primary text-white" : "bg-muted text-muted-foreground"}`}
+                    >
+                      {t("Начало", "Start")} {dateFrom ? format(dateFrom, "dd.MM") : "—"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPickingDate("to")}
+                      className={`flex-1 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${pickingDate === "to" ? "bg-primary text-white" : "bg-muted text-muted-foreground"}`}
+                    >
+                      {t("Конец", "End")} {dateTo ? format(dateTo, "dd.MM") : "—"}
+                    </button>
+                  </div>
+                  <Calendar
+                    mode="single"
+                    selected={pickingDate === "from" ? dateFrom : dateTo}
+                    onSelect={handleCalendarSelect}
+                    disabled={{ before: pickingDate === "to" && dateFrom ? dateFrom : new Date() }}
+                    initialFocus
+                  />
+                  {(dateFrom || dateTo) && (
+                    <button
+                      type="button"
+                      onClick={() => { setDateFrom(undefined); setDateTo(undefined); setPickingDate("from"); }}
+                      className="mt-2 w-full text-center text-xs text-destructive hover:underline"
+                    >
+                      {t("Сбросить даты", "Clear dates")}
+                    </button>
+                  )}
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Travelers dropdown */}
+            <div className="relative border-b md:border-b-0 md:border-r border-white/15" ref={travelersRef}>
               <button
                 type="button"
                 onClick={() => setTravelersOpen(!travelersOpen)}
-                className="flex items-center gap-2.5 px-5 py-5 text-white hover:bg-white/10 transition-colors text-base w-full md:w-auto whitespace-nowrap"
+                className="flex items-center gap-2.5 px-5 py-5 text-white hover:bg-white/8 transition-colors text-sm w-full md:w-auto whitespace-nowrap"
                 data-testid="button-travelers-picker"
               >
                 <Users className="h-5 w-5 text-white/50 shrink-0" />
-                <span>{travelers} {t("туристов", "travelers")}</span>
+                <span>{TRAVELER_OPTIONS.find(o => o.value === travelers)?.[lang === "ru" ? "labelRu" : "labelEn"]}</span>
+                <ChevronDown className="h-4 w-4 text-white/40 ml-1" />
               </button>
               {travelersOpen && (
-                <div className="absolute top-full mt-2 left-0 md:left-1/2 md:-translate-x-1/2 bg-white rounded-2xl shadow-2xl p-5 z-50 min-w-[220px]">
-                  <p className="text-sm font-semibold text-foreground mb-4 text-center">{t("Количество туристов", "Number of travelers")}</p>
-                  <div className="flex items-center justify-center gap-5">
-                    <button type="button" onClick={() => setTravelers(v => Math.max(1, v - 1))}
-                      className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-xl font-bold text-gray-600 hover:border-primary hover:text-primary transition-colors">−</button>
-                    <span className="text-2xl font-bold text-foreground w-8 text-center">{travelers}</span>
-                    <button type="button" onClick={() => setTravelers(v => Math.min(20, v + 1))}
-                      className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-xl font-bold text-gray-600 hover:border-primary hover:text-primary transition-colors">+</button>
-                  </div>
-                  <button type="button" onClick={() => setTravelersOpen(false)}
-                    className="mt-4 w-full text-center text-sm text-primary font-semibold">{t("Готово", "Done")}</button>
+                <div className="absolute top-full mt-2 left-0 bg-white dark:bg-card rounded-2xl shadow-2xl border border-border/40 overflow-hidden z-50 min-w-[180px]">
+                  {TRAVELER_OPTIONS.map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => { setTravelers(opt.value); setTravelersOpen(false); }}
+                      className={`w-full px-4 py-3 text-left text-sm hover:bg-primary/8 transition-colors font-medium ${travelers === opt.value ? "text-primary bg-primary/5" : "text-foreground"}`}
+                      data-testid={`option-travelers-${opt.value}`}
+                    >
+                      {lang === "ru" ? opt.labelRu : opt.labelEn}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
 
             <Button
               type="submit"
-              className="rounded-none md:rounded-r-2xl px-8 py-5 text-base font-bold h-auto shrink-0"
+              className="rounded-none md:rounded-r-2xl px-7 py-5 text-base font-bold h-auto shrink-0"
               data-testid="button-hero-search-submit"
             >
               <Search className="h-5 w-5 mr-2" />
-              {t("Найти тур", "Find Tour")}
+              {t("Найти тур", "Search Tours")}
             </Button>
           </div>
         </form>
