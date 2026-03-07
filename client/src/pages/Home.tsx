@@ -429,13 +429,54 @@ function SearchSection() {
   );
 }
 
+function TourScrollFeed({ tours, accentColor = "cyan" }: { tours: Tour[]; accentColor?: string }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (dir: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir === "left" ? -580 : 580, behavior: "smooth" });
+  };
+
+  return (
+    <div className="relative group">
+      <button
+        onClick={() => scroll("left")}
+        className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white border border-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-xl"
+        aria-label="Scroll left"
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </button>
+
+      <div ref={scrollRef} className="feed-scroll overflow-x-auto pb-3">
+        <div
+          className="grid grid-rows-2 grid-flow-col gap-5"
+          style={{ gridAutoColumns: "272px" }}
+        >
+          {tours.map(tour => (
+            <div key={tour.id} className="w-[272px]">
+              <TourCard tour={tour} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <button
+        onClick={() => scroll("right")}
+        className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white border border-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-xl"
+        aria-label="Scroll right"
+      >
+        <ChevronRight className="h-5 w-5" />
+      </button>
+    </div>
+  );
+}
+
 function PopularToursSection({ tours }: { tours: Tour[] }) {
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
     <section className="pt-28 pb-24 relative overflow-hidden">
-
-
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="flex items-end justify-between mb-14">
           <div>
@@ -450,13 +491,7 @@ function PopularToursSection({ tours }: { tours: Tour[] }) {
             </Button>
           </Link>
         </Reveal>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
-          {tours.slice(0, 8).map((tour, i) => (
-            <Reveal key={tour.id} delay={i * 80} y={20}>
-              <TourCard tour={tour} />
-            </Reveal>
-          ))}
-        </div>
+        <TourScrollFeed tours={tours} accentColor="cyan" />
         <div className="mt-10 flex justify-center md:hidden">
           <Link href="/tours">
             <Button className="rounded-full px-8 py-5 bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm">
@@ -474,8 +509,6 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
   if (tours.length === 0) return null;
   return (
     <section className="py-24 relative overflow-hidden">
-
-
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="flex items-end justify-between mb-14">
           <div>
@@ -490,13 +523,7 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
             </Button>
           </Link>
         </Reveal>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
-          {tours.slice(0, 4).map((tour, i) => (
-            <Reveal key={tour.id} delay={i * 90} y={20}>
-              <TourCard tour={tour} />
-            </Reveal>
-          ))}
-        </div>
+        <TourScrollFeed tours={tours} accentColor="orange" />
       </div>
     </section>
   );
