@@ -8,7 +8,7 @@ import TourCard from "@/components/TourCard";
 import { useI18n } from "@/lib/i18n";
 import {
   Search, Star, ChevronLeft, ChevronRight, MapPin, Clock,
-  Users, ArrowRight, Quote, Flame, ChevronDown,
+  Users, ArrowRight, Quote, Flame,
   Award, Globe, Shield, Gem, ThumbsUp, TrendingUp
 } from "lucide-react";
 import type { Tour } from "@shared/schema";
@@ -196,97 +196,90 @@ function CinematicHero() {
         background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%)"
       }} />
 
-      {/* Content */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-white pb-12">
-        <div className="max-w-5xl w-full">
+      {/* Title/subtitle — centred in upper portion */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-white" style={{ paddingBottom: "160px" }}>
+        <div className="max-w-4xl w-full">
           <div className="hero-fade-in-up-1">
-            <Badge className="mb-6 bg-white/15 backdrop-blur-md text-white border-white/30 px-5 py-2 text-sm font-semibold tracking-widest uppercase">
+            <Badge className="mb-5 bg-white/15 backdrop-blur-md text-white border-white/30 px-5 py-2 text-sm font-semibold tracking-widest uppercase">
               ✈&nbsp; {t("Лучшие туры 2025", "Best Tours 2025")}
             </Badge>
           </div>
 
           <h1
-            className="hero-fade-in-up-2 text-6xl sm:text-7xl md:text-8xl lg:text-[5.5rem] font-extrabold leading-[1.0] mb-6 tracking-tight"
+            className="hero-fade-in-up-2 text-5xl sm:text-6xl md:text-7xl font-extrabold leading-[1.05] mb-5 tracking-tight"
             style={{ textShadow: "0 4px 32px rgba(0,0,0,0.5), 0 1px 0 rgba(0,0,0,0.3)" }}
           >
             {slideTitle || t("Мир ждёт тебя", "The World Awaits")}
           </h1>
 
-          <p className="hero-fade-in-up-3 text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-12 leading-relaxed font-light">
+          <p className="hero-fade-in-up-3 text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed font-light">
             {slideSubtitle || t(
               "Незабываемые путешествия по всему миру. Премиальный сервис, лучшие цены, идеальные воспоминания.",
               "Unforgettable journeys worldwide. Premium service, best prices, perfect memories."
             )}
           </p>
-
-          {/* Glassmorphism search bar */}
-          <form onSubmit={handleSearch} className="hero-fade-in-up-4 hero-glass-glow relative max-w-3xl mx-auto">
-            <div
-              className="flex flex-col md:flex-row rounded-2xl overflow-hidden md:overflow-visible border border-white/25 shadow-2xl"
-              style={{
-                background: "rgba(255,255,255,0.10)",
-                backdropFilter: "blur(24px) saturate(180%)",
-                WebkitBackdropFilter: "blur(24px) saturate(180%)",
-              }}
-            >
-              <div className="relative flex-1 border-b md:border-b-0 md:border-r border-white/20">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60 pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder={t("Куда хотите поехать?", "Where do you want to go?")}
-                  value={destination}
-                  onChange={e => setDestination(e.target.value)}
-                  className="w-full bg-transparent pl-12 pr-5 py-5 text-white placeholder:text-white/55 focus:outline-none text-base md:text-lg"
-                  data-testid="input-hero-search"
-                />
-              </div>
-
-              <div className="relative border-b md:border-b-0 md:border-r border-white/20">
-                <button
-                  type="button"
-                  onClick={() => setTravelersOpen(!travelersOpen)}
-                  className="flex items-center gap-2.5 px-5 py-5 text-white hover:bg-white/10 transition-colors text-base w-full md:w-auto whitespace-nowrap"
-                  data-testid="button-travelers-picker"
-                >
-                  <Users className="h-5 w-5 text-white/60 shrink-0" />
-                  <span>{travelers} {t("туристов", "travelers")}</span>
-                </button>
-                {travelersOpen && (
-                  <div className="absolute top-full mt-3 left-0 md:left-1/2 md:-translate-x-1/2 bg-white rounded-2xl shadow-2xl p-5 z-50 min-w-[220px]">
-                    <p className="text-sm font-semibold text-foreground mb-4 text-center">{t("Количество туристов", "Number of travelers")}</p>
-                    <div className="flex items-center justify-center gap-5">
-                      <button type="button" onClick={() => setTravelers(v => Math.max(1, v - 1))}
-                        className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-xl font-bold text-gray-600 hover:border-primary hover:text-primary transition-colors">−</button>
-                      <span className="text-2xl font-bold text-foreground w-8 text-center">{travelers}</span>
-                      <button type="button" onClick={() => setTravelers(v => Math.min(20, v + 1))}
-                        className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-xl font-bold text-gray-600 hover:border-primary hover:text-primary transition-colors">+</button>
-                    </div>
-                    <button type="button" onClick={() => setTravelersOpen(false)}
-                      className="mt-4 w-full text-center text-sm text-primary font-semibold">{t("Готово", "Done")}</button>
-                  </div>
-                )}
-              </div>
-
-              <Button
-                type="submit"
-                className="rounded-none md:rounded-2xl px-8 py-5 text-base font-bold h-auto shrink-0"
-                data-testid="button-hero-search-submit"
-              >
-                <Search className="h-5 w-5 mr-2" />
-                {t("Найти", "Search")}
-              </Button>
-            </div>
-          </form>
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-white/50 pointer-events-none"
-        style={{ animation: "heroFadeInUp 1s ease 1.8s both" }}
-      >
-        <span className="text-[10px] uppercase tracking-[0.3em] font-medium">Scroll</span>
-        <ChevronDown className="h-5 w-5 animate-bounce" />
+      {/* Search bar — always anchored to bottom of hero */}
+      <div className="absolute bottom-20 left-0 right-0 px-4 z-10">
+        <form onSubmit={handleSearch} className="hero-fade-in-up-4 hero-glass-glow relative max-w-3xl mx-auto">
+          <div
+            className="flex flex-col md:flex-row rounded-2xl overflow-hidden md:overflow-visible border border-white/25 shadow-2xl"
+            style={{
+              background: "rgba(255,255,255,0.12)",
+              backdropFilter: "blur(24px) saturate(180%)",
+              WebkitBackdropFilter: "blur(24px) saturate(180%)",
+            }}
+          >
+            <div className="relative flex-1 border-b md:border-b-0 md:border-r border-white/20">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60 pointer-events-none" />
+              <input
+                type="text"
+                placeholder={t("Куда хотите поехать?", "Where do you want to go?")}
+                value={destination}
+                onChange={e => setDestination(e.target.value)}
+                className="w-full bg-transparent pl-12 pr-5 py-4 text-white placeholder:text-white/55 focus:outline-none text-base"
+                data-testid="input-hero-search"
+              />
+            </div>
+
+            <div className="relative border-b md:border-b-0 md:border-r border-white/20">
+              <button
+                type="button"
+                onClick={() => setTravelersOpen(!travelersOpen)}
+                className="flex items-center gap-2.5 px-5 py-4 text-white hover:bg-white/10 transition-colors text-base w-full md:w-auto whitespace-nowrap"
+                data-testid="button-travelers-picker"
+              >
+                <Users className="h-5 w-5 text-white/60 shrink-0" />
+                <span>{travelers} {t("туристов", "travelers")}</span>
+              </button>
+              {travelersOpen && (
+                <div className="absolute bottom-full mb-3 left-0 md:left-1/2 md:-translate-x-1/2 bg-white rounded-2xl shadow-2xl p-5 z-50 min-w-[220px]">
+                  <p className="text-sm font-semibold text-foreground mb-4 text-center">{t("Количество туристов", "Number of travelers")}</p>
+                  <div className="flex items-center justify-center gap-5">
+                    <button type="button" onClick={() => setTravelers(v => Math.max(1, v - 1))}
+                      className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-xl font-bold text-gray-600 hover:border-primary hover:text-primary transition-colors">−</button>
+                    <span className="text-2xl font-bold text-foreground w-8 text-center">{travelers}</span>
+                    <button type="button" onClick={() => setTravelers(v => Math.min(20, v + 1))}
+                      className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-xl font-bold text-gray-600 hover:border-primary hover:text-primary transition-colors">+</button>
+                  </div>
+                  <button type="button" onClick={() => setTravelersOpen(false)}
+                    className="mt-4 w-full text-center text-sm text-primary font-semibold">{t("Готово", "Done")}</button>
+                </div>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              className="rounded-none md:rounded-2xl px-8 py-4 text-base font-bold h-auto shrink-0"
+              data-testid="button-hero-search-submit"
+            >
+              <Search className="h-5 w-5 mr-2" />
+              {t("Найти", "Search")}
+            </Button>
+          </div>
+        </form>
       </div>
 
       {/* Slide controls */}
@@ -304,12 +297,12 @@ function CinematicHero() {
           >
             <ChevronRight className="h-5 w-5" />
           </button>
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-20">
             {heroImages.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
-                className={`h-1 rounded-full transition-all duration-500 ${i === current ? "w-10 bg-white" : "w-3 bg-white/35 hover:bg-white/60"}`}
+                className={`h-1 rounded-full transition-all duration-500 ${i === current ? "w-8 bg-white" : "w-2.5 bg-white/35 hover:bg-white/60"}`}
               />
             ))}
           </div>
