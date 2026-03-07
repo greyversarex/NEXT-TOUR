@@ -323,7 +323,8 @@ html {
 /* ── Page & Depth Foundations ──────────────────────────────────── */
 body {
   background-image:
-    linear-gradient(rgba(180,210,255,0.18), rgba(220,240,255,0.12)),
+    linear-gradient(rgba(0,0,0,0.22), rgba(0,0,0,0.22)),
+    linear-gradient(rgba(180,210,255,0.10), rgba(220,240,255,0.06)),
     url('/images/bg-nature.jpg');
   background-size: cover;
   background-attachment: fixed;
