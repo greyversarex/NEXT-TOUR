@@ -37,14 +37,16 @@ function useTypingEffect(text: string, started: boolean, speed = 45) {
 
 export default function IntroScreen() {
   const { t, lang } = useI18n();
-  const [visible, setVisible] = useState(false);
+  // Shown immediately and synchronously — no flash of site content
+  const [visible, setVisible] = useState(() => !sessionStorage.getItem("intro_shown"));
   const [hiding, setHiding] = useState(false);
   const [phase, setPhase] = useState(0);
   const [progress, setProgress] = useState(0);
+  const animStarted = useRef(false);
   const particles = useParticles();
   const DURATION = 4000;
 
-  const { data: intro } = useQuery({
+  const { data: intro, isSuccess } = useQuery({
     queryKey: ["/api/intro-screen"],
     queryFn: async () => {
       const res = await fetch("/api/intro-screen");
@@ -54,31 +56,40 @@ export default function IntroScreen() {
   });
 
   useEffect(() => {
-    const shown = sessionStorage.getItem("intro_shown");
-    if (!shown && intro?.isActive) {
-      setVisible(true);
-      const t1 = setTimeout(() => setPhase(1), 200);
-      const t2 = setTimeout(() => setPhase(2), 900);
-      const t3 = setTimeout(() => setPhase(3), 1600);
-      const start = Date.now();
-      const raf = requestAnimationFrame(function tick() {
-        const elapsed = Date.now() - start;
-        setProgress(Math.min(elapsed / DURATION, 1));
-        if (elapsed < DURATION) requestAnimationFrame(tick);
-      });
-      const hide = setTimeout(() => {
-        setHiding(true);
-        setTimeout(() => {
-          setVisible(false);
-          sessionStorage.setItem("intro_shown", "1");
-        }, 900);
-      }, DURATION);
-      return () => {
-        clearTimeout(t1); clearTimeout(t2); clearTimeout(t3);
-        clearTimeout(hide); cancelAnimationFrame(raf);
-      };
+    if (!visible) return;
+    if (!isSuccess) return;
+
+    // API says intro is disabled — hide immediately without animation
+    if (!intro?.isActive) {
+      setVisible(false);
+      return;
     }
-  }, [intro]);
+
+    // Prevent double-starting animation
+    if (animStarted.current) return;
+    animStarted.current = true;
+
+    const t1 = setTimeout(() => setPhase(1), 200);
+    const t2 = setTimeout(() => setPhase(2), 900);
+    const t3 = setTimeout(() => setPhase(3), 1600);
+    const start = Date.now();
+    const raf = requestAnimationFrame(function tick() {
+      const elapsed = Date.now() - start;
+      setProgress(Math.min(elapsed / DURATION, 1));
+      if (elapsed < DURATION) requestAnimationFrame(tick);
+    });
+    const hide = setTimeout(() => {
+      setHiding(true);
+      setTimeout(() => {
+        setVisible(false);
+        sessionStorage.setItem("intro_shown", "1");
+      }, 900);
+    }, DURATION);
+    return () => {
+      clearTimeout(t1); clearTimeout(t2); clearTimeout(t3);
+      clearTimeout(hide); cancelAnimationFrame(raf);
+    };
+  }, [isSuccess, intro, visible]);
 
   const title = intro ? (lang === "ru" ? intro.titleRu : intro.titleEn) : "TravelPro";
   const slogan = intro
