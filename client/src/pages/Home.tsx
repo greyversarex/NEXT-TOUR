@@ -2,14 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import TourCard from "@/components/TourCard";
 import { useI18n } from "@/lib/i18n";
 import {
   Search, Star, ChevronLeft, ChevronRight, MapPin, Clock,
-  Users, Calendar, ArrowRight, Quote, Sparkles, Flame, TrendingUp, ChevronDown
+  Users, ArrowRight, Quote, Flame, ChevronDown,
+  Award, Globe, Shield, Gem, ThumbsUp, TrendingUp
 } from "lucide-react";
 import type { Tour } from "@shared/schema";
 
@@ -71,10 +71,34 @@ const DESTINATIONS = [
 ];
 
 const STATS = [
-  { valueRu: "50 000+", valueEn: "50,000+", labelRu: "довольных клиентов", labelEn: "happy clients" },
-  { valueRu: "120+", valueEn: "120+", labelRu: "направлений", labelEn: "destinations" },
-  { valueRu: "15 лет", valueEn: "15 years", labelRu: "на рынке", labelEn: "of experience" },
-  { valueRu: "4.9 ★", valueEn: "4.9 ★", labelRu: "средняя оценка", labelEn: "average rating" },
+  {
+    Icon: Users,
+    color: "from-blue-500 to-cyan-400",
+    bgLight: "from-blue-50 to-cyan-50",
+    valueRu: "50 000+", valueEn: "50,000+",
+    labelRu: "Довольных клиентов", labelEn: "Happy Clients",
+  },
+  {
+    Icon: Globe,
+    color: "from-emerald-500 to-teal-400",
+    bgLight: "from-emerald-50 to-teal-50",
+    valueRu: "120+", valueEn: "120+",
+    labelRu: "Направлений", labelEn: "Destinations",
+  },
+  {
+    Icon: Award,
+    color: "from-violet-500 to-purple-400",
+    bgLight: "from-violet-50 to-purple-50",
+    valueRu: "15 лет", valueEn: "15 Years",
+    labelRu: "На рынке", labelEn: "Of Experience",
+  },
+  {
+    Icon: Star,
+    color: "from-amber-500 to-yellow-400",
+    bgLight: "from-amber-50 to-yellow-50",
+    valueRu: "4.9 ★", valueEn: "4.9 ★",
+    labelRu: "Средняя оценка", labelEn: "Average Rating",
+  },
 ];
 
 function Reveal({
@@ -150,7 +174,7 @@ function CinematicHero() {
       {heroImages.map((src, i) => (
         <div
           key={i}
-          className="absolute inset-0 transition-opacity duration-1500"
+          className="absolute inset-0"
           style={{ opacity: i === current ? 1 : 0, transition: "opacity 1.4s ease" }}
         >
           <img
@@ -166,9 +190,8 @@ function CinematicHero() {
       ))}
 
       {/* Multi-layer cinematic gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-black/85" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
-      {/* Vignette edge darkening */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/25 to-black/85" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/35" />
       <div className="absolute inset-0" style={{
         background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%)"
       }} />
@@ -176,14 +199,12 @@ function CinematicHero() {
       {/* Content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-white pb-12">
         <div className="max-w-5xl w-full">
-          {/* Badge */}
           <div className="hero-fade-in-up-1">
             <Badge className="mb-6 bg-white/15 backdrop-blur-md text-white border-white/30 px-5 py-2 text-sm font-semibold tracking-widest uppercase">
               ✈&nbsp; {t("Лучшие туры 2025", "Best Tours 2025")}
             </Badge>
           </div>
 
-          {/* Title */}
           <h1
             className="hero-fade-in-up-2 text-6xl sm:text-7xl md:text-8xl lg:text-[5.5rem] font-extrabold leading-[1.0] mb-6 tracking-tight"
             style={{ textShadow: "0 4px 32px rgba(0,0,0,0.5), 0 1px 0 rgba(0,0,0,0.3)" }}
@@ -191,7 +212,6 @@ function CinematicHero() {
             {slideTitle || t("Мир ждёт тебя", "The World Awaits")}
           </h1>
 
-          {/* Subtitle */}
           <p className="hero-fade-in-up-3 text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-12 leading-relaxed font-light">
             {slideSubtitle || t(
               "Незабываемые путешествия по всему миру. Премиальный сервис, лучшие цены, идеальные воспоминания.",
@@ -200,19 +220,15 @@ function CinematicHero() {
           </p>
 
           {/* Glassmorphism search bar */}
-          <form
-            onSubmit={handleSearch}
-            className="hero-fade-in-up-4 hero-glass-glow relative max-w-3xl mx-auto"
-          >
+          <form onSubmit={handleSearch} className="hero-fade-in-up-4 hero-glass-glow relative max-w-3xl mx-auto">
             <div
-              className="flex flex-col md:flex-row gap-0 md:gap-0 rounded-2xl overflow-hidden md:overflow-visible border border-white/25 shadow-2xl"
+              className="flex flex-col md:flex-row rounded-2xl overflow-hidden md:overflow-visible border border-white/25 shadow-2xl"
               style={{
                 background: "rgba(255,255,255,0.10)",
                 backdropFilter: "blur(24px) saturate(180%)",
                 WebkitBackdropFilter: "blur(24px) saturate(180%)",
               }}
             >
-              {/* Destination input */}
               <div className="relative flex-1 border-b md:border-b-0 md:border-r border-white/20">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60 pointer-events-none" />
                 <input
@@ -225,7 +241,6 @@ function CinematicHero() {
                 />
               </div>
 
-              {/* Travelers picker */}
               <div className="relative border-b md:border-b-0 md:border-r border-white/20">
                 <button
                   type="button"
@@ -252,7 +267,6 @@ function CinematicHero() {
                 )}
               </div>
 
-              {/* Search button */}
               <Button
                 type="submit"
                 className="rounded-none md:rounded-2xl px-8 py-5 text-base font-bold h-auto shrink-0"
@@ -267,9 +281,11 @@ function CinematicHero() {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/50 pointer-events-none"
-        style={{ animation: "heroPulseGlow 3s ease-in-out infinite, heroFadeInUp 1s ease 1.8s both" }}>
-        <span className="text-[10px] uppercase tracking-[0.25em] font-medium">Scroll</span>
+      <div
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-white/50 pointer-events-none"
+        style={{ animation: "heroFadeInUp 1s ease 1.8s both" }}
+      >
+        <span className="text-[10px] uppercase tracking-[0.3em] font-medium">Scroll</span>
         <ChevronDown className="h-5 w-5 animate-bounce" />
       </div>
 
@@ -306,21 +322,29 @@ function CinematicHero() {
 function StatsBar() {
   const { t, lang } = useI18n();
   return (
-    <div
-      className="text-primary-foreground relative overflow-hidden"
-      style={{ background: "linear-gradient(135deg, hsl(210 85% 38%) 0%, hsl(210 85% 45%) 45%, hsl(220 80% 52%) 100%)" }}
-    >
-      {/* Decorative orb */}
-      <div className="depth-blob w-64 h-64 bg-white/10 -top-16 -right-16" />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-primary-foreground/20">
-          {STATS.map((stat, i) => (
-            <div key={i} className="py-8 px-8 text-center">
-              <div className="text-3xl md:text-4xl font-extrabold tracking-tight">{lang === "ru" ? stat.valueRu : stat.valueEn}</div>
-              <div className="text-sm text-primary-foreground/75 mt-1">{lang === "ru" ? stat.labelRu : stat.labelEn}</div>
+    <div className="relative -mt-16 z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-0">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {STATS.map((stat, i) => (
+          <Reveal key={i} delay={i * 80} y={16}>
+            <div
+              className={`group bg-gradient-to-br ${stat.bgLight} dark:from-card dark:to-card
+                border border-white/80 dark:border-card-border
+                rounded-2xl p-5 text-center
+                shadow-[0_8px_32px_rgba(0,0,0,0.12)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.18)]
+                hover:-translate-y-1.5 transition-all duration-300 cursor-default`}
+            >
+              <div className={`inline-flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br ${stat.color} shadow-md mb-3 group-hover:scale-110 transition-transform duration-300`}>
+                <stat.Icon className="h-5 w-5 text-white" />
+              </div>
+              <div className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground">
+                {lang === "ru" ? stat.valueRu : stat.valueEn}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1 font-medium">
+                {lang === "ru" ? stat.labelRu : stat.labelEn}
+              </div>
             </div>
-          ))}
-        </div>
+          </Reveal>
+        ))}
       </div>
     </div>
   );
@@ -330,20 +354,21 @@ function PopularToursSection({ tours }: { tours: Tour[] }) {
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
-    <section className="py-24 relative overflow-hidden">
-      {/* Layered background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white via-blue-50/30 to-white pointer-events-none" />
+    <section className="pt-28 pb-24 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-50/60 via-white to-white pointer-events-none" />
       <div className="depth-blob w-96 h-96 bg-blue-200 top-0 -left-32" style={{ opacity: 0.12 }} />
       <div className="depth-blob w-72 h-72 bg-primary/20 bottom-0 -right-24" style={{ opacity: 0.10 }} />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="flex items-end justify-between mb-14">
           <div>
-            <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Лучшие предложения", "Top Offers")}</p>
+            <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3 flex items-center gap-1.5">
+              <TrendingUp className="h-3.5 w-3.5" /> {t("Лучшие предложения", "Top Offers")}
+            </p>
             <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Популярные туры", "Popular Tours")}</h2>
           </div>
           <Link href="/tours">
-            <Button variant="outline" className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold shadow-sm">
+            <Button variant="outline" className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
               {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
@@ -372,7 +397,6 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
   if (tours.length === 0) return null;
   return (
     <section className="py-24 relative overflow-hidden section-surface">
-      {/* Warm tinted background */}
       <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-amber-50/60 to-yellow-50/30 dark:from-orange-950/20 dark:to-amber-950/20 pointer-events-none" />
       <div className="depth-blob w-80 h-80 bg-orange-300 -top-20 right-0" style={{ opacity: 0.13 }} />
       <div className="depth-blob w-64 h-64 bg-amber-200 bottom-0 left-0" style={{ opacity: 0.10 }} />
@@ -386,7 +410,7 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
             <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Горящие туры", "Hot Deals")}</h2>
           </div>
           <Link href="/promotions">
-            <Button variant="outline" className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold shadow-sm">
+            <Button variant="outline" className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
               {t("Все акции", "All Deals")} <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
@@ -411,81 +435,53 @@ function DestinationCard({ dest, lang, aspectClass = "aspect-[3/4]" }: {
   const name = lang === "ru" ? dest.nameRu : dest.nameEn;
   const tags = lang === "ru" ? dest.tagsRu : dest.tagsEn;
   return (
-    <Link href={`/tours`} className="block h-full">
+    <Link href="/tours" className="block h-full">
       <div
         className={`group relative rounded-2xl overflow-hidden cursor-pointer h-full
           ${aspectClass}
-          shadow-md hover:shadow-[0_20px_60px_-10px_rgba(0,0,0,0.35)]
-          hover:-translate-y-1.5
+          shadow-md hover:shadow-[0_24px_64px_-10px_rgba(0,0,0,0.40)]
+          hover:-translate-y-2
           transition-all duration-500 ease-out`}
         data-testid={`card-destination-${dest.id}`}
       >
-        {/* Image with zoom */}
         <img
           src={dest.image}
           alt={name}
-          className="absolute inset-0 w-full h-full object-cover
-            transition-transform duration-700 ease-out
-            group-hover:scale-[1.09]"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.10]"
         />
 
-        {/* Base gradient — always visible, darkens bottom */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 transition-opacity duration-500" />
-
-        {/* Hover overlay — adds top darkening for polish */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/10 transition-opacity duration-500" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-        {/* Sheen flash */}
         <div
           className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           style={{ background: "linear-gradient(135deg, transparent 35%, rgba(255,255,255,0.07) 55%, transparent 75%)" }}
         />
 
-        {/* Country flag badge */}
         <div className="absolute top-3.5 left-3.5 z-10">
           <span className="text-2xl drop-shadow-md">{countryFlag(dest.country)}</span>
         </div>
 
-        {/* Arrow CTA — top right, scale-in on hover */}
-        <div className="absolute top-3.5 right-3.5 z-10
-          scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100
-          transition-all duration-300 ease-out">
+        <div className="absolute top-3.5 right-3.5 z-10 scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 ease-out">
           <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
             <ArrowRight className="h-4 w-4 text-primary" />
           </div>
         </div>
 
-        {/* Text — slides up slightly on hover */}
-        <div className="absolute bottom-0 left-0 right-0 p-5 z-10
-          translate-y-1 group-hover:translate-y-0
-          transition-transform duration-400 ease-out">
-
-          {/* Destination name */}
+        <div className="absolute bottom-0 left-0 right-0 p-5 z-10 translate-y-1 group-hover:translate-y-0 transition-transform duration-400 ease-out">
           <h3
             className="text-white font-extrabold leading-tight mb-2.5"
-            style={{
-              fontSize: "clamp(1.25rem, 3vw, 1.75rem)",
-              textShadow: "0 2px 16px rgba(0,0,0,0.5)",
-            }}
+            style={{ fontSize: "clamp(1.25rem, 3vw, 1.75rem)", textShadow: "0 2px 16px rgba(0,0,0,0.5)" }}
           >
             {name}
           </h3>
-
-          {/* Tags as bullet-separated inline text */}
           <p className="text-white/75 text-xs font-medium tracking-wide mb-2.5 group-hover:text-white/90 transition-colors duration-300">
             {tags.join(" • ")}
           </p>
-
-          {/* Pill tags — hidden, expand in on hover */}
-          <div className="flex flex-wrap gap-1.5
-            max-h-0 overflow-hidden group-hover:max-h-12
-            transition-all duration-400 ease-out">
+          <div className="flex flex-wrap gap-1.5 max-h-0 overflow-hidden group-hover:max-h-12 transition-all duration-400 ease-out">
             {tags.map((tag, i) => (
               <span
                 key={i}
-                className="text-[11px] text-white/95 bg-white/20 backdrop-blur-sm
-                  rounded-full px-2.5 py-0.5 border border-white/25 font-medium
-                  opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                className="text-[11px] text-white/95 bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-0.5 border border-white/25 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 style={{ transitionDelay: `${i * 60}ms` }}
               >
                 {tag}
@@ -509,15 +505,16 @@ function DestinationsSection() {
   return (
     <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <Reveal className="text-center mb-16">
-        <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Исследуйте", "Explore")}</p>
+        <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5">
+          <MapPin className="h-3.5 w-3.5" /> {t("Исследуйте", "Explore")}
+        </p>
         <h2 className="text-3xl md:text-5xl font-bold mb-5 leading-tight">{t("Направления мечты", "Dream Destinations")}</h2>
         <p className="text-muted-foreground max-w-xl mx-auto text-base leading-relaxed">
           {t("Откройте для себя самые красивые уголки планеты с нашими эксклюзивными турами", "Discover the most beautiful corners of the planet with our exclusive tours")}
         </p>
       </Reveal>
 
-      {/* Editorial magazine grid — mobile: 2-col / desktop: 3-col asymmetric */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6 md:[grid-template-rows:auto_auto_auto]">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
         {DESTINATIONS.map((dest, i) => {
           let wrapClass = "";
           let aspect = "aspect-[3/4]";
@@ -544,47 +541,55 @@ function DestinationsSection() {
 function PromoBanner({ banners }: { banners: any[] }) {
   const { t, lang } = useI18n();
   const banner = banners[0];
-  if (!banner) return (
+
+  const content = (src: string, titleEl: React.ReactNode, subtitleEl?: React.ReactNode, linkUrl = "/promotions") => (
     <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-8">
-      <div className="relative rounded-3xl overflow-hidden h-64 md:h-80 bg-gradient-to-r from-primary via-blue-600 to-cyan-500 shadow-2xl">
-        <div className="absolute inset-0 opacity-20">
-          <img src="/images/tour-maldives.png" alt="" className="w-full h-full object-cover" />
-        </div>
-        <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between px-10 md:px-16 py-10 gap-6">
-          <div className="text-white text-center md:text-left">
-            <Badge className="bg-white/20 text-white border-white/30 mb-4">🔥 {t("Специальное предложение", "Special Offer")}</Badge>
-            <h3 className="text-2xl md:text-4xl font-bold mb-2">{t("Скидки до 30% на летние туры", "Up to 30% off summer tours")}</h3>
-            <p className="text-white/80 text-sm md:text-base mt-2">{t("Успейте забронировать по лучшим ценам", "Book now at the best prices")}</p>
+      <Reveal y={16}>
+        <div className="group relative rounded-3xl overflow-hidden h-72 md:h-96 shadow-2xl hover:shadow-[0_32px_80px_rgba(0,0,0,0.28)] transition-shadow duration-500 cursor-pointer">
+          <img src={src} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+
+          {/* Decorative accent line */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-cyan-400 to-primary/0" />
+
+          <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between px-10 md:px-16 py-12 gap-6">
+            <div className="text-white text-center md:text-left">
+              <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 mb-5 text-xs tracking-widest uppercase px-4 py-1.5">
+                🔥 {t("Специальное предложение", "Special Offer")}
+              </Badge>
+              <h3 className="text-3xl md:text-5xl font-extrabold mb-3 leading-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+                {titleEl}
+              </h3>
+              {subtitleEl && (
+                <p className="text-white/75 text-sm md:text-base mt-2 max-w-md leading-relaxed">{subtitleEl}</p>
+              )}
+            </div>
+            <Link href={linkUrl} className="shrink-0">
+              <Button
+                size="lg"
+                className="bg-white text-primary hover:bg-white/95 font-bold px-10 py-6 rounded-2xl shadow-xl text-base hover:scale-105 hover:shadow-2xl transition-all duration-200"
+              >
+                {t("Смотреть акции", "View Offers")} <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
           </div>
-          <Link href="/promotions" className="shrink-0">
-            <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-bold px-10 py-6 rounded-xl shadow-lg text-base">
-              {t("Смотреть акции", "View Offers")}
-            </Button>
-          </Link>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 
-  return (
-    <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-8">
-      <div className="relative rounded-3xl overflow-hidden h-64 md:h-80 shadow-2xl">
-        <img src={banner.imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-transparent" />
-        <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between px-10 md:px-16 py-10 gap-6">
-          <div className="text-white text-center md:text-left">
-            <Badge className="bg-white/20 text-white border-white/30 mb-4">🔥 {t("Специальное предложение", "Special Offer")}</Badge>
-            <h3 className="text-2xl md:text-4xl font-bold mb-2">{lang === "ru" ? banner.titleRu : (banner.titleEn || banner.titleRu)}</h3>
-            {banner.subtitleRu && <p className="text-white/80 text-sm md:text-base mt-2">{lang === "ru" ? banner.subtitleRu : (banner.subtitleEn || banner.subtitleRu)}</p>}
-          </div>
-          <Link href={banner.linkUrl || "/promotions"} className="shrink-0">
-            <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-bold px-10 py-6 rounded-xl shadow-lg text-base">
-              {t("Смотреть", "View")} <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-          </Link>
-        </div>
-      </div>
-    </section>
+  if (!banner) return content(
+    "/images/tour-maldives.png",
+    t("Скидки до 30% на летние туры", "Up to 30% off summer tours"),
+    t("Успейте забронировать по лучшим ценам сезона", "Book now at the best prices of the season")
+  );
+
+  return content(
+    banner.imageUrl,
+    lang === "ru" ? banner.titleRu : (banner.titleEn || banner.titleRu),
+    banner.subtitleRu ? (lang === "ru" ? banner.subtitleRu : (banner.subtitleEn || banner.subtitleRu)) : undefined,
+    banner.linkUrl || "/promotions"
   );
 }
 
@@ -619,29 +624,54 @@ function ReviewsSection() {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="text-center mb-16">
-          <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">{t("Отзывы", "Testimonials")}</p>
+          <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5">
+            <ThumbsUp className="h-3.5 w-3.5" /> {t("Отзывы", "Testimonials")}
+          </p>
           <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("Что говорят наши клиенты", "What Our Clients Say")}</h2>
         </Reveal>
 
         <div className="max-w-3xl mx-auto">
           <div className={`transition-all duration-200 ${animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}>
-            <div className="bg-white dark:bg-card rounded-3xl p-10 md:p-16 relative depth-card" style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.9) inset" }}>
-              <Quote className="h-10 w-10 text-primary/20 absolute top-8 left-8" />
-              <div className="flex justify-center mb-6">
+            <div
+              className="bg-white dark:bg-card rounded-3xl p-10 md:p-14 relative"
+              style={{ boxShadow: "0 12px 60px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.9) inset" }}
+            >
+              {/* Large decorative quote */}
+              <div className="absolute top-6 left-8 opacity-[0.07]">
+                <Quote className="h-20 w-20 text-primary fill-primary" />
+              </div>
+
+              {/* Stars */}
+              <div className="flex justify-center gap-1 mb-7">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className={`h-5 w-5 ${i < rev.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}`} />
+                  <Star
+                    key={i}
+                    className={`h-5 w-5 transition-colors ${i < rev.rating ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
+                    style={{ filter: i < rev.rating ? "drop-shadow(0 1px 4px rgba(251,191,36,0.4))" : undefined }}
+                  />
                 ))}
               </div>
-              <blockquote className="text-lg md:text-xl text-foreground/80 italic text-center leading-relaxed mb-8">
+
+              {/* Quote text */}
+              <blockquote className="text-lg md:text-2xl text-foreground/80 italic text-center leading-relaxed mb-10 font-light relative z-10">
                 "{lang === "ru" ? rev.textRu : (rev.textEn || rev.textRu)}"
               </blockquote>
+
+              {/* Divider */}
+              <div className="w-16 h-px bg-gradient-to-r from-transparent via-border to-transparent mx-auto mb-8" />
+
+              {/* Author */}
               <div className="flex items-center justify-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center text-white font-bold text-lg">
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg"
+                  style={{ background: "linear-gradient(135deg, hsl(210 85% 45%), hsl(200 90% 55%))" }}
+                >
                   {rev.user?.name?.[0] || "?"}
                 </div>
-                <div>
-                  <div className="font-bold text-foreground">{rev.user?.name}</div>
-                  <div className="text-sm text-muted-foreground">
+                <div className="text-left">
+                  <div className="font-bold text-foreground text-base">{rev.user?.name}</div>
+                  <div className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
                     {lang === "ru" ? rev.tour?.titleRu : rev.tour?.titleEn}
                   </div>
                 </div>
@@ -651,18 +681,25 @@ function ReviewsSection() {
 
           {reviews.length > 1 && (
             <div className="flex items-center justify-center gap-4 mt-8">
-              <button onClick={() => go(-1)}
-                className="p-3 rounded-full border-2 border-border hover:border-primary hover:text-primary transition-colors">
+              <button
+                onClick={() => go(-1)}
+                className="p-3 rounded-full border-2 border-border hover:border-primary hover:text-primary hover:bg-primary/5 transition-all duration-200"
+              >
                 <ChevronLeft className="h-5 w-5" />
               </button>
               <div className="flex gap-2">
                 {reviews.map((_, i) => (
-                  <button key={i} onClick={() => { setIdx(i); }}
-                    className={`h-2 rounded-full transition-all duration-300 ${i === idx ? "w-8 bg-primary" : "w-2 bg-gray-300"}`} />
+                  <button
+                    key={i}
+                    onClick={() => setIdx(i)}
+                    className={`h-2 rounded-full transition-all duration-300 ${i === idx ? "w-8 bg-primary" : "w-2 bg-gray-300 hover:bg-gray-400"}`}
+                  />
                 ))}
               </div>
-              <button onClick={() => go(1)}
-                className="p-3 rounded-full border-2 border-border hover:border-primary hover:text-primary transition-colors">
+              <button
+                onClick={() => go(1)}
+                className="p-3 rounded-full border-2 border-border hover:border-primary hover:text-primary hover:bg-primary/5 transition-all duration-200"
+              >
                 <ChevronRight className="h-5 w-5" />
               </button>
             </div>
@@ -676,11 +713,44 @@ function ReviewsSection() {
 function WhyUsSection() {
   const { t } = useI18n();
   const items = [
-    { icon: "🛡️", titleRu: "Надёжность", titleEn: "Reliability", descRu: "15 лет работаем на рынке, тысячи довольных клиентов", descEn: "15 years in the market, thousands of happy clients" },
-    { icon: "💎", titleRu: "Премиум сервис", titleEn: "Premium Service", descRu: "Персональный менеджер для каждого клиента 24/7", descEn: "Personal manager for every client 24/7" },
-    { icon: "💰", titleRu: "Лучшие цены", titleEn: "Best Prices", descRu: "Гарантируем лучшую цену или вернём разницу", descEn: "Best price guarantee or we refund the difference" },
-    { icon: "🌍", titleRu: "Любое направление", titleEn: "Any Destination", descRu: "Более 120 направлений по всему миру", descEn: "Over 120 destinations worldwide" },
+    {
+      Icon: Shield,
+      gradient: "from-blue-500 to-cyan-400",
+      bg: "from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/20",
+      titleRu: "Надёжность",
+      titleEn: "Reliability",
+      descRu: "15 лет работаем на рынке, тысячи довольных клиентов по всему миру",
+      descEn: "15 years in the market, thousands of happy clients worldwide",
+    },
+    {
+      Icon: Gem,
+      gradient: "from-violet-500 to-purple-400",
+      bg: "from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/20",
+      titleRu: "Премиум сервис",
+      titleEn: "Premium Service",
+      descRu: "Персональный менеджер для каждого клиента, доступен 24/7",
+      descEn: "Personal manager for every client, available 24/7",
+    },
+    {
+      Icon: TrendingUp,
+      gradient: "from-emerald-500 to-teal-400",
+      bg: "from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/20",
+      titleRu: "Лучшие цены",
+      titleEn: "Best Prices",
+      descRu: "Гарантируем лучшую цену на рынке или вернём разницу",
+      descEn: "Best price guarantee or we refund the difference",
+    },
+    {
+      Icon: Globe,
+      gradient: "from-amber-500 to-orange-400",
+      bg: "from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/20",
+      titleRu: "Любое направление",
+      titleEn: "Any Destination",
+      descRu: "Более 120 направлений по всему миру — найдём тур для вас",
+      descEn: "Over 120 destinations worldwide — we'll find the right tour",
+    },
   ];
+
   return (
     <section className="py-24 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-white to-slate-50/60 dark:from-background dark:to-background pointer-events-none" />
@@ -695,15 +765,22 @@ function WhyUsSection() {
           {items.map((item, i) => (
             <Reveal key={i} delay={i * 100} y={20}>
               <div
-                className="group bg-white dark:bg-card border border-card-border rounded-2xl p-8 text-center
-                  depth-card h-full
-                  hover:border-primary/30 hover:-translate-y-1.5
-                  transition-all duration-300"
-                style={{ transitionTimingFunction: "ease-out" }}
+                className={`group bg-gradient-to-br ${item.bg} border border-white/80 dark:border-card-border
+                  rounded-2xl p-8 text-center h-full
+                  shadow-[0_2px_16px_rgba(0,0,0,0.06)]
+                  hover:shadow-[0_16px_48px_rgba(0,0,0,0.14)]
+                  hover:-translate-y-2
+                  transition-all duration-300 ease-out`}
               >
-                <div className="text-5xl mb-5 group-hover:scale-110 transition-transform duration-300">{item.icon}</div>
-                <h3 className="font-bold text-lg mb-3 group-hover:text-primary transition-colors duration-200">{t(item.titleRu, item.titleEn)}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{t(item.descRu, item.descEn)}</p>
+                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${item.gradient} shadow-lg mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                  <item.Icon className="h-7 w-7 text-white" />
+                </div>
+                <h3 className="font-bold text-lg mb-3 group-hover:text-primary transition-colors duration-200">
+                  {t(item.titleRu, item.titleEn)}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {t(item.descRu, item.descEn)}
+                </p>
               </div>
             </Reveal>
           ))}
@@ -733,7 +810,7 @@ export default function Home() {
       <StatsBar />
 
       {isLoading ? (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 space-y-10">
           <Skeleton className="h-9 w-72 mb-6" />
           <div className="grid grid-cols-4 gap-7">
             {[1,2,3,4].map(i => <Skeleton key={i} className="h-80 rounded-2xl" />)}

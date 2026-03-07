@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Heart, ArrowRight, Star } from "lucide-react";
+import { Clock, Heart, ArrowRight, Star, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -46,53 +46,49 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
   return (
     <Link href={`/tours/${tour.id}`}>
       <div
-        className="group relative rounded-2xl overflow-hidden bg-card border border-card-border cursor-pointer h-full flex flex-col
-          shadow-sm
+        className="group relative rounded-2xl overflow-hidden bg-white dark:bg-card border border-gray-100 dark:border-card-border cursor-pointer h-full flex flex-col
+          shadow-[0_2px_12px_rgba(0,0,0,0.06)]
           hover:shadow-[0_24px_64px_-12px_rgba(0,0,0,0.22)]
           hover:-translate-y-2
-          transition-all duration-350 ease-out"
-        style={{ transition: "transform 0.35s ease-out, box-shadow 0.35s ease-out" }}
+          transition-all duration-400 ease-out"
         data-testid={`card-tour-${tour.id}`}
       >
-        {/* Top accent bar — slides in from left on hover */}
+        {/* Top accent bar */}
         <div className="absolute top-0 left-0 right-0 h-[3px] z-20 overflow-hidden rounded-t-2xl">
-          <div className="h-full bg-gradient-to-r from-primary via-primary/80 to-primary/50 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out" />
+          <div className="h-full bg-gradient-to-r from-primary via-cyan-400 to-primary/50 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out" />
         </div>
 
         {/* Image area */}
         <div className="relative overflow-hidden" style={{ aspectRatio: "4/3" }}>
-          {/* Photo with smooth zoom */}
           <img
             src={tour.mainImage || "/images/hero-banner.png"}
             alt={title}
-            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.07]"
+            className="w-full h-full object-cover transition-transform duration-600 ease-out group-hover:scale-[1.08]"
           />
 
-          {/* Base gradient — deepens on hover */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent transition-opacity duration-350 group-hover:opacity-90" />
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent transition-opacity duration-400 group-hover:opacity-90" />
 
-          {/* Sheen / glare flash on hover */}
+          {/* Sheen flash */}
           <div
             className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-            style={{
-              background: "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.08) 50%, transparent 70%)",
-            }}
+            style={{ background: "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.09) 50%, transparent 70%)" }}
           />
 
-          {/* Badges: discount / hot */}
+          {/* Discount & hot badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
             {tour.discountPercent > 0 && (
-              <Badge
-                className="bg-red-500 text-white border-0 shadow-md text-xs font-bold"
+              <div
+                className="flex items-center gap-1 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-xl shadow-lg"
                 data-testid={`badge-discount-${tour.id}`}
               >
-                -{tour.discountPercent}%
-              </Badge>
+                <span>-{tour.discountPercent}%</span>
+              </div>
             )}
             {tour.isHot && (
-              <Badge className="bg-orange-500 text-white border-0 shadow-md text-xs font-bold">
+              <div className="flex items-center gap-1 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-xl shadow-lg">
                 🔥 {t("Горящий", "Hot")}
-              </Badge>
+              </div>
             )}
           </div>
 
@@ -105,17 +101,17 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
                 transition-all duration-200"
               data-testid={`button-fav-${tour.id}`}
             >
-              <Heart className={`h-4 w-4 transition-colors ${favState ? "fill-red-500 text-red-500" : "text-white"}`} />
+              <Heart className={`h-4 w-4 transition-colors ${favState ? "fill-red-400 text-red-400" : "text-white"}`} />
             </button>
           )}
 
-          {/* Duration badge — bottom left */}
-          <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5 text-white text-xs">
-            <Clock className="h-3.5 w-3.5 opacity-80" />
+          {/* Duration — bottom left */}
+          <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5 bg-black/35 backdrop-blur-sm text-white text-xs rounded-full px-2.5 py-1">
+            <Clock className="h-3 w-3 opacity-80" />
             <span className="font-semibold">{tour.duration} {t("дн.", "days")}</span>
           </div>
 
-          {/* "View tour" CTA — slides up from bottom on hover */}
+          {/* "View tour" pill — slides up on hover */}
           <div className="absolute bottom-0 inset-x-0 z-10 flex items-center justify-center pb-4 pt-8
             opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0
             transition-all duration-300 ease-out pointer-events-none">
@@ -127,7 +123,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
         </div>
 
         {/* Text content */}
-        <div className="p-4 flex flex-col flex-1">
+        <div className="p-5 flex flex-col flex-1">
           <h3
             className="font-bold text-base leading-snug mb-1.5 line-clamp-2 group-hover:text-primary transition-colors duration-200"
             data-testid={`text-tour-title-${tour.id}`}
@@ -139,17 +135,17 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
           </p>
 
           {/* Price row */}
-          <div className="flex items-end justify-between border-t border-card-border pt-3 mt-auto">
+          <div className="flex items-end justify-between border-t border-gray-100 dark:border-card-border pt-4 mt-auto">
             <div>
-              <p className="text-xs text-muted-foreground mb-0.5">{t("от", "from")}</p>
-              <div className="flex items-baseline gap-1.5">
+              <p className="text-[11px] text-muted-foreground mb-0.5 uppercase tracking-wide font-medium">{t("от", "from")}</p>
+              <div className="flex items-baseline gap-2">
                 {tour.discountPercent > 0 && (
                   <span className="text-sm text-muted-foreground line-through">
                     ${price.toFixed(0)}
                   </span>
                 )}
                 <span
-                  className="text-xl font-bold text-primary"
+                  className="text-2xl font-extrabold text-primary leading-none"
                   data-testid={`text-tour-price-${tour.id}`}
                 >
                   ${discountedPrice.toFixed(0)}
@@ -158,7 +154,6 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
               </div>
             </div>
 
-            {/* Arrow link — hidden until hover, slides in from right */}
             <div className="flex items-center gap-1 text-primary text-sm font-semibold
               opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0
               transition-all duration-250 ease-out">
