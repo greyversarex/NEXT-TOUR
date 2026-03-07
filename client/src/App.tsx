@@ -32,10 +32,11 @@ import HeroSlidesAdmin from "@/pages/admin/HeroSlidesAdmin";
 import CitiesAdmin from "@/pages/admin/CitiesAdmin";
 import StatisticsAdmin from "@/pages/admin/StatisticsAdmin";
 import LoyaltyAdmin from "@/pages/admin/LoyaltyAdmin";
+import IntroScreenAdmin from "@/pages/admin/IntroScreenAdmin";
 
 const ADMIN_PATHS = ["/admin", "/admin/tours", "/admin/reviews", "/admin/bookings",
   "/admin/users", "/admin/countries", "/admin/cities", "/admin/categories", "/admin/feeds",
-  "/admin/news", "/admin/banners", "/admin/price-components", "/admin/hero-slides", "/admin/statistics", "/admin/loyalty"];
+  "/admin/news", "/admin/banners", "/admin/price-components", "/admin/hero-slides", "/admin/statistics", "/admin/loyalty", "/admin/intro-screen"];
 
 function Router() {
   return (
@@ -65,6 +66,7 @@ function Router() {
       <Route path="/admin/hero-slides" component={HeroSlidesAdmin} />
       <Route path="/admin/statistics" component={StatisticsAdmin} />
       <Route path="/admin/loyalty" component={LoyaltyAdmin} />
+      <Route path="/admin/intro-screen" component={IntroScreenAdmin} />
       <Route component={NotFound} />
     </Switch>
   );

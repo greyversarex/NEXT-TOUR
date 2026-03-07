@@ -10,6 +10,7 @@ import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import { ImageUpload } from "@/components/ui/image-upload";
 import type { Country, City } from "@shared/schema";
 
 function EntityForm({ item, fields, onSave, onClose, title, isSaving }: any) {
@@ -180,13 +181,10 @@ export default function CountriesAdmin() {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2">
-                  <Label>{t("Изображение (URL)", "Image URL")}</Label>
-                  <Input
-                    value={editing.imageUrl || ""}
-                    onChange={e => setEditing((p: any) => ({ ...p, imageUrl: e.target.value }))}
-                    className="mt-1"
-                    placeholder="/images/tour-xxx.png"
-                  />
+                  <Label>{t("Изображение", "Image")}</Label>
+                  <div className="mt-1">
+                    <ImageUpload value={editing.imageUrl || ""} onChange={v => setEditing((p: any) => ({ ...p, imageUrl: v }))} />
+                  </div>
                 </div>
                 <div>
                   <Label>{t("Код страны", "Country Code")}</Label>

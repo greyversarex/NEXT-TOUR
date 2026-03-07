@@ -11,6 +11,7 @@ import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 export default function BannersAdmin() {
   const { t, lang } = useI18n();
@@ -66,7 +67,7 @@ export default function BannersAdmin() {
                 <div><Label>{t("Заголовок (RU)", "Title (RU)")}</Label><Input value={editing.titleRu || ""} onChange={e => setEditing((p: any) => ({ ...p, titleRu: e.target.value }))} className="mt-1" required /></div>
                 <div><Label>{t("Заголовок (EN)", "Title (EN)")}</Label><Input value={editing.titleEn || ""} onChange={e => setEditing((p: any) => ({ ...p, titleEn: e.target.value }))} className="mt-1" required /></div>
               </div>
-              <div><Label>{t("Изображение (URL)", "Image URL")}</Label><Input value={editing.imageUrl || ""} onChange={e => setEditing((p: any) => ({ ...p, imageUrl: e.target.value }))} className="mt-1" required /></div>
+              <div><Label>{t("Изображение", "Image")}</Label><div className="mt-1"><ImageUpload value={editing.imageUrl || ""} onChange={v => setEditing((p: any) => ({ ...p, imageUrl: v }))} /></div></div>
               <div><Label>{t("Ссылка (URL)", "Link URL")}</Label><Input value={editing.linkUrl || ""} onChange={e => setEditing((p: any) => ({ ...p, linkUrl: e.target.value }))} className="mt-1" /></div>
               <div><Label>{t("Порядок", "Order")}</Label><Input type="number" value={editing.order || 0} onChange={e => setEditing((p: any) => ({ ...p, order: Number(e.target.value) }))} className="mt-1" /></div>
               <div className="flex items-center gap-2">

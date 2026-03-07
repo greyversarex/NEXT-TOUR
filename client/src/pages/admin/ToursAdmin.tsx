@@ -10,11 +10,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus, Edit, Trash2, Eye } from "lucide-react";
+import { ImageUpload } from "@/components/ui/image-upload";
+import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route } from "lucide-react";
 import { Link } from "wouter";
+import { format } from "date-fns";
 import type { Tour, Country, Category } from "@shared/schema";
 
 export default function ToursAdmin() {
@@ -23,6 +26,7 @@ export default function ToursAdmin() {
   const queryClient = useQueryClient();
   const [editTour, setEditTour] = useState<Partial<Tour> | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [manageTour, setManageTour] = useState<Tour | null>(null);
 
   const { data: tours = [] } = useQuery<Tour[]>({ queryKey: ["/api/tours"] });
   const { data: countries = [] } = useQuery<Country[]>({ queryKey: ["/api/countries"] });
@@ -79,7 +83,10 @@ export default function ToursAdmin() {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button variant="ghost" size="icon" title={t("Даты / Опции / Программа", "Dates / Options / Itinerary")} onClick={() => setManageTour(tour)} data-testid={`button-manage-tour-${tour.id}`}>
+                    <CalendarDays className="h-4 w-4 text-primary" />
+                  </Button>
                   <Link href={`/tours/${tour.id}`}>
                     <Button variant="ghost" size="icon" title="View"><Eye className="h-4 w-4" /></Button>
                   </Link>
@@ -107,6 +114,10 @@ export default function ToursAdmin() {
           isSaving={saveMutation.isPending}
         />
       )}
+
+      {manageTour && (
+        <TourSubManager tour={manageTour} onClose={() => setManageTour(null)} />
+      )}
     </AdminLayout>
   );
 }
@@ -125,6 +136,7 @@ function TourForm({ tour, countries, categories, cities, onSave, onClose, isSavi
     basePrice: tour.basePrice || 500,
     discountPercent: tour.discountPercent || 0,
     mainImage: tour.mainImage || "",
+    mapUrl: tour.mapUrl || "",
     isHot: tour.isHot || false,
     isFeatured: tour.isFeatured || false,
     isActive: tour.isActive !== false,
@@ -213,8 +225,15 @@ function TourForm({ tour, countries, categories, cities, onSave, onClose, isSavi
           </div>
 
           <div>
-            <Label>{t("Главное фото (URL)", "Main Image (URL)")}</Label>
-            <Input value={form.mainImage} onChange={e => set("mainImage", e.target.value)} className="mt-1" placeholder="https://..." />
+            <Label>{t("Главное фото", "Main Image")}</Label>
+            <div className="mt-1">
+              <ImageUpload value={form.mainImage} onChange={v => set("mainImage", v)} />
+            </div>
+          </div>
+
+          <div>
+            <Label>{t("Ссылка на карту (iframe URL)", "Map URL (iframe)")}</Label>
+            <Input value={form.mapUrl} onChange={e => set("mapUrl", e.target.value)} className="mt-1" placeholder="https://www.google.com/maps/embed?..." />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -223,8 +242,19 @@ function TourForm({ tour, countries, categories, cities, onSave, onClose, isSavi
               <Textarea value={form.includedRu} onChange={e => set("includedRu", e.target.value)} className="mt-1" placeholder={t("Каждый пункт на новой строке", "One item per line")} />
             </div>
             <div>
+              <Label>{t("Включено (EN)", "Included (EN)")}</Label>
+              <Textarea value={form.includedEn} onChange={e => set("includedEn", e.target.value)} className="mt-1" placeholder="One item per line" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
               <Label>{t("Не включено (RU)", "Not Included (RU)")}</Label>
               <Textarea value={form.notIncludedRu} onChange={e => set("notIncludedRu", e.target.value)} className="mt-1" placeholder={t("Каждый пункт на новой строке", "One item per line")} />
+            </div>
+            <div>
+              <Label>{t("Не включено (EN)", "Not Included (EN)")}</Label>
+              <Textarea value={form.notIncludedEn} onChange={e => set("notIncludedEn", e.target.value)} className="mt-1" placeholder="One item per line" />
             </div>
           </div>
 
@@ -250,5 +280,266 @@ function TourForm({ tour, countries, categories, cities, onSave, onClose, isSavi
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function TourSubManager({ tour, onClose }: { tour: Tour; onClose: () => void }) {
+  const { t, lang } = useI18n();
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <span>{lang === "ru" ? tour.titleRu : tour.titleEn}</span>
+          </DialogTitle>
+        </DialogHeader>
+        <Tabs defaultValue="dates">
+          <TabsList className="w-full">
+            <TabsTrigger value="dates" className="flex-1 gap-1.5"><CalendarDays className="h-4 w-4" />{t("Даты", "Dates")}</TabsTrigger>
+            <TabsTrigger value="options" className="flex-1 gap-1.5"><ListChecks className="h-4 w-4" />{t("Опции", "Options")}</TabsTrigger>
+            <TabsTrigger value="itinerary" className="flex-1 gap-1.5"><Route className="h-4 w-4" />{t("Программа", "Itinerary")}</TabsTrigger>
+          </TabsList>
+          <TabsContent value="dates" className="pt-4">
+            <DatesManager tourId={tour.id} />
+          </TabsContent>
+          <TabsContent value="options" className="pt-4">
+            <OptionsManager tourId={tour.id} />
+          </TabsContent>
+          <TabsContent value="itinerary" className="pt-4">
+            <ItineraryManager tourId={tour.id} />
+          </TabsContent>
+        </Tabs>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function DatesManager({ tourId }: { tourId: string }) {
+  const { t } = useI18n();
+  const { toast } = useToast();
+  const qc = useQueryClient();
+  const { data: dates = [], isLoading } = useQuery<any[]>({ queryKey: [`/api/tours/${tourId}/dates`] });
+  const [form, setForm] = useState({ startDate: "", endDate: "", maxPeople: 20 });
+  const [editing, setEditing] = useState<any>(null);
+
+  const addMutation = useMutation({
+    mutationFn: (d: any) => apiRequest("POST", `/api/tours/${tourId}/dates`, d),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/dates`] }); setForm({ startDate: "", endDate: "", maxPeople: 20 }); toast({ title: t("Дата добавлена", "Date added") }); },
+  });
+  const editMutation = useMutation({
+    mutationFn: (d: any) => apiRequest("PUT", `/api/tour-dates/${d.id}`, d),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/dates`] }); setEditing(null); toast({ title: t("Сохранено", "Saved") }); },
+  });
+  const delMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/tour-dates/${id}`, {}),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/dates`] }),
+  });
+
+  const activeForm = editing || form;
+  const setF = (k: string, v: any) => editing ? setEditing((p: any) => ({ ...p, [k]: v })) : setForm(p => ({ ...p, [k]: v }));
+
+  return (
+    <div className="space-y-4">
+      <div className="border rounded-xl p-4 space-y-3 bg-muted/30">
+        <p className="text-sm font-semibold">{editing ? t("Редактировать дату", "Edit Date") : t("Новая дата", "New Date")}</p>
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <Label className="text-xs">{t("Начало", "Start")}</Label>
+            <Input type="date" value={editing ? (editing.startDate ? editing.startDate.slice(0,10) : "") : form.startDate} onChange={e => setF("startDate", e.target.value)} className="mt-1 h-9 text-sm" />
+          </div>
+          <div>
+            <Label className="text-xs">{t("Конец", "End")}</Label>
+            <Input type="date" value={editing ? (editing.endDate ? editing.endDate.slice(0,10) : "") : form.endDate} onChange={e => setF("endDate", e.target.value)} className="mt-1 h-9 text-sm" />
+          </div>
+          <div>
+            <Label className="text-xs">{t("Макс. мест", "Max spots")}</Label>
+            <Input type="number" value={activeForm.maxPeople} onChange={e => setF("maxPeople", Number(e.target.value))} className="mt-1 h-9 text-sm" min={1} />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button size="sm" onClick={() => editing ? editMutation.mutate(editing) : addMutation.mutate({ ...form, startDate: new Date(form.startDate), endDate: new Date(form.endDate), tourId })}>
+            {editing ? t("Сохранить", "Save") : t("Добавить", "Add")}
+          </Button>
+          {editing && <Button size="sm" variant="outline" onClick={() => setEditing(null)}>{t("Отмена", "Cancel")}</Button>}
+        </div>
+      </div>
+      {isLoading ? <p className="text-sm text-muted-foreground">{t("Загрузка...", "Loading...")}</p> : dates.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-4">{t("Нет дат", "No dates yet")}</p>
+      ) : (
+        <div className="space-y-2">
+          {dates.map((d: any) => (
+            <div key={d.id} className="flex items-center justify-between p-3 border rounded-lg">
+              <div>
+                <p className="text-sm font-medium">{format(new Date(d.startDate), "dd.MM.yyyy")} — {format(new Date(d.endDate), "dd.MM.yyyy")}</p>
+                <p className="text-xs text-muted-foreground">{t("Мест:", "Spots:")} {d.maxPeople - d.bookedCount} / {d.maxPeople}</p>
+              </div>
+              <div className="flex gap-1">
+                <Button variant="ghost" size="icon" onClick={() => setEditing(d)}><Edit className="h-3.5 w-3.5" /></Button>
+                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => delMutation.mutate(d.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function OptionsManager({ tourId }: { tourId: string }) {
+  const { t, lang } = useI18n();
+  const { toast } = useToast();
+  const qc = useQueryClient();
+  const { data: options = [], isLoading } = useQuery<any[]>({ queryKey: [`/api/tours/${tourId}/options`] });
+  const [form, setForm] = useState({ nameRu: "", nameEn: "", price: 0 });
+  const [editing, setEditing] = useState<any>(null);
+
+  const addMutation = useMutation({
+    mutationFn: (d: any) => apiRequest("POST", `/api/tours/${tourId}/options`, d),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/options`] }); setForm({ nameRu: "", nameEn: "", price: 0 }); toast({ title: t("Опция добавлена", "Option added") }); },
+  });
+  const editMutation = useMutation({
+    mutationFn: (d: any) => apiRequest("PUT", `/api/tour-options/${d.id}`, d),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/options`] }); setEditing(null); },
+  });
+  const delMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/tour-options/${id}`, {}),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/options`] }),
+  });
+
+  const activeForm = editing || form;
+  const setF = (k: string, v: any) => editing ? setEditing((p: any) => ({ ...p, [k]: v })) : setForm(p => ({ ...p, [k]: v }));
+
+  return (
+    <div className="space-y-4">
+      <div className="border rounded-xl p-4 space-y-3 bg-muted/30">
+        <p className="text-sm font-semibold">{editing ? t("Редактировать опцию", "Edit Option") : t("Новая опция", "New Option")}</p>
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <Label className="text-xs">{t("Название (RU)", "Name (RU)")}</Label>
+            <Input value={activeForm.nameRu} onChange={e => setF("nameRu", e.target.value)} className="mt-1 h-9 text-sm" />
+          </div>
+          <div>
+            <Label className="text-xs">{t("Название (EN)", "Name (EN)")}</Label>
+            <Input value={activeForm.nameEn} onChange={e => setF("nameEn", e.target.value)} className="mt-1 h-9 text-sm" />
+          </div>
+          <div>
+            <Label className="text-xs">{t("Цена ($)", "Price ($)")}</Label>
+            <Input type="number" value={activeForm.price} onChange={e => setF("price", Number(e.target.value))} className="mt-1 h-9 text-sm" min={0} />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button size="sm" onClick={() => editing ? editMutation.mutate(editing) : addMutation.mutate({ ...form, tourId })}>
+            {editing ? t("Сохранить", "Save") : t("Добавить", "Add")}
+          </Button>
+          {editing && <Button size="sm" variant="outline" onClick={() => setEditing(null)}>{t("Отмена", "Cancel")}</Button>}
+        </div>
+      </div>
+      {isLoading ? <p className="text-sm text-muted-foreground">{t("Загрузка...", "Loading...")}</p> : options.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-4">{t("Нет опций", "No options yet")}</p>
+      ) : (
+        <div className="space-y-2">
+          {options.map((o: any) => (
+            <div key={o.id} className="flex items-center justify-between p-3 border rounded-lg">
+              <div>
+                <p className="text-sm font-medium">{lang === "ru" ? o.nameRu : o.nameEn}</p>
+                <p className="text-xs text-muted-foreground">+${Number(o.price).toFixed(0)}</p>
+              </div>
+              <div className="flex gap-1">
+                <Button variant="ghost" size="icon" onClick={() => setEditing(o)}><Edit className="h-3.5 w-3.5" /></Button>
+                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => delMutation.mutate(o.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ItineraryManager({ tourId }: { tourId: string }) {
+  const { t, lang } = useI18n();
+  const { toast } = useToast();
+  const qc = useQueryClient();
+  const { data: items = [], isLoading } = useQuery<any[]>({ queryKey: [`/api/tours/${tourId}/itinerary`] });
+  const [form, setForm] = useState({ dayNumber: 1, titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationHours: null as number | null });
+  const [editing, setEditing] = useState<any>(null);
+
+  const addMutation = useMutation({
+    mutationFn: (d: any) => apiRequest("POST", `/api/tours/${tourId}/itinerary`, d),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/itinerary`] }); setForm({ dayNumber: (items.length + 2), titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationHours: null }); toast({ title: t("День добавлен", "Day added") }); },
+  });
+  const editMutation = useMutation({
+    mutationFn: (d: any) => apiRequest("PUT", `/api/itinerary/${d.id}`, d),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/itinerary`] }); setEditing(null); },
+  });
+  const delMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/itinerary/${id}`, {}),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/itinerary`] }),
+  });
+
+  const activeForm = editing || form;
+  const setF = (k: string, v: any) => editing ? setEditing((p: any) => ({ ...p, [k]: v })) : setForm(p => ({ ...p, [k]: v }));
+
+  return (
+    <div className="space-y-4">
+      <div className="border rounded-xl p-4 space-y-3 bg-muted/30">
+        <p className="text-sm font-semibold">{editing ? t("Редактировать день", "Edit Day") : t("Добавить день", "Add Day")}</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label className="text-xs">{t("День №", "Day #")}</Label>
+            <Input type="number" value={activeForm.dayNumber} onChange={e => setF("dayNumber", Number(e.target.value))} className="mt-1 h-9 text-sm" min={1} />
+          </div>
+          <div>
+            <Label className="text-xs">{t("Часов", "Hours")}</Label>
+            <Input type="number" value={activeForm.durationHours ?? ""} onChange={e => setF("durationHours", e.target.value ? Number(e.target.value) : null)} className="mt-1 h-9 text-sm" min={1} placeholder="—" />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label className="text-xs">{t("Заголовок (RU)", "Title (RU)")}</Label>
+            <Input value={activeForm.titleRu} onChange={e => setF("titleRu", e.target.value)} className="mt-1 h-9 text-sm" />
+          </div>
+          <div>
+            <Label className="text-xs">{t("Заголовок (EN)", "Title (EN)")}</Label>
+            <Input value={activeForm.titleEn} onChange={e => setF("titleEn", e.target.value)} className="mt-1 h-9 text-sm" />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label className="text-xs">{t("Описание (RU)", "Description (RU)")}</Label>
+            <Textarea value={activeForm.descriptionRu} onChange={e => setF("descriptionRu", e.target.value)} className="mt-1 text-sm min-h-[60px]" />
+          </div>
+          <div>
+            <Label className="text-xs">{t("Описание (EN)", "Description (EN)")}</Label>
+            <Textarea value={activeForm.descriptionEn} onChange={e => setF("descriptionEn", e.target.value)} className="mt-1 text-sm min-h-[60px]" />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button size="sm" onClick={() => editing ? editMutation.mutate(editing) : addMutation.mutate({ ...form, tourId })}>
+            {editing ? t("Сохранить", "Save") : t("Добавить", "Add")}
+          </Button>
+          {editing && <Button size="sm" variant="outline" onClick={() => setEditing(null)}>{t("Отмена", "Cancel")}</Button>}
+        </div>
+      </div>
+      {isLoading ? <p className="text-sm text-muted-foreground">{t("Загрузка...", "Loading...")}</p> : items.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-4">{t("Программа не добавлена", "No itinerary yet")}</p>
+      ) : (
+        <div className="space-y-2">
+          {items.map((item: any) => (
+            <div key={item.id} className="flex items-start justify-between p-3 border rounded-lg gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold">{t("День", "Day")} {item.dayNumber}: {lang === "ru" ? item.titleRu : item.titleEn}</p>
+                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{lang === "ru" ? item.descriptionRu : item.descriptionEn}</p>
+                {item.durationHours && <p className="text-xs text-muted-foreground">{item.durationHours} {t("ч.", "hrs.")}</p>}
+              </div>
+              <div className="flex gap-1 shrink-0">
+                <Button variant="ghost" size="icon" onClick={() => setEditing(item)}><Edit className="h-3.5 w-3.5" /></Button>
+                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => delMutation.mutate(item.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

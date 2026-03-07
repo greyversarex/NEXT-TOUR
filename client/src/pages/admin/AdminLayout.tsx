@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Map, Building2, Tag, Image, Layers,
   Users, BookOpen, MessageSquare, Newspaper, Package,
   PlusCircle, ChevronRight, Settings, Globe, BarChart3,
-  Award
+  Award, Monitor
 } from "lucide-react";
 
 const navItems = [
@@ -21,6 +21,7 @@ const navItems = [
   { href: "/admin/banners", label: "Banners", labelRu: "Баннеры", icon: Image },
   { href: "/admin/feeds", label: "Tour Feeds", labelRu: "Ленты", icon: Layers },
   { href: "/admin/hero-slides", label: "Hero Slides", labelRu: "Слайды", icon: Image },
+  { href: "/admin/intro-screen", label: "Intro Screen", labelRu: "Вступ. экран", icon: Monitor },
   { href: "/admin/news", label: "News", labelRu: "Новости", icon: Newspaper },
   { href: "/admin/reviews", label: "Reviews", labelRu: "Отзывы", icon: MessageSquare },
   { href: "/admin/bookings", label: "Bookings", labelRu: "Бронирования", icon: BookOpen },

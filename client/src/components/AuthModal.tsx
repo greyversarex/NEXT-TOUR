@@ -22,7 +22,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
   const [mode, setMode] = useState<"auth" | "forgotPassword">("auth");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [resetToken, setResetToken] = useState<string | null>(null);
+  const [resetInfo, setResetInfo] = useState<{ resetUrl: string; emailSent: boolean } | null>(null);
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [registerData, setRegisterData] = useState({ name: "", email: "", username: "", password: "" });
@@ -67,8 +67,13 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
-      setResetToken(data.resetToken);
-      toast({ title: t("Запрос отправлен", "Request sent"), description: t("Инструкции по сбросу пароля отображены ниже", "Reset instructions are shown below") });
+      setResetInfo({ resetUrl: data.resetUrl, emailSent: data.emailSent });
+      toast({
+        title: t("Запрос отправлен", "Request sent"),
+        description: data.emailSent
+          ? t("Письмо со ссылкой для сброса отправлено на ваш email", "A password reset link has been sent to your email")
+          : t("Ссылка для сброса сгенерирована (демо-режим)", "Reset link generated (demo mode)"),
+      });
     } catch (err: any) {
       toast({ title: t("Ошибка", "Error"), description: err.message, variant: "destructive" });
     } finally {
@@ -79,7 +84,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
   const resetForm = () => {
     setMode("auth");
     setTab("login");
-    setResetToken(null);
+    setResetInfo(null);
     setForgotEmail("");
   };
 
@@ -251,7 +256,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             </Tabs>
           ) : (
             <div className="space-y-4">
-              {!resetToken ? (
+              {!resetInfo ? (
                 <form onSubmit={handleForgotPassword} className="space-y-4">
                   <div className="space-y-1.5">
                     <Label htmlFor="forgot-email" className="text-sm font-medium">{t("Email", "Email")}</Label>
@@ -284,19 +289,36 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                 </form>
               ) : (
                 <div className="space-y-4 text-center">
-                  <div className="p-4 bg-primary/10 rounded-lg text-sm text-left break-all">
-                    <p className="font-semibold mb-2">{t("Демо-режим: Ссылка для сброса", "Demo Mode: Reset Link")}:</p>
-                    <code className="text-primary block p-2 bg-white rounded border select-all cursor-pointer" onClick={() => {
-                      window.location.href = `/reset-password?token=${resetToken}`;
-                      onClose();
-                      resetForm();
-                    }}>
-                      /reset-password?token={resetToken}
-                    </code>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {t("Нажмите на ссылку выше, чтобы перейти на страницу сброса пароля", "Click the link above to proceed to the password reset page")}
-                  </p>
+                  {resetInfo.emailSent ? (
+                    <>
+                      <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-sm text-left">
+                        <p className="font-semibold text-green-800 mb-1">{t("Письмо отправлено!", "Email sent!")}</p>
+                        <p className="text-green-700">
+                          {t(`Мы отправили инструкции по сбросу пароля на ${forgotEmail}. Проверьте почту и перейдите по ссылке в письме.`,
+                            `We sent password reset instructions to ${forgotEmail}. Please check your inbox and follow the link in the email.`)}
+                        </p>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {t("Письмо не пришло? Проверьте папку «Спам»", "Didn't receive it? Check your spam folder")}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="p-4 bg-primary/10 rounded-lg text-sm text-left break-all">
+                        <p className="font-semibold mb-2">{t("Демо-режим: Ссылка для сброса", "Demo Mode: Reset Link")}:</p>
+                        <code className="text-primary block p-2 bg-white rounded border select-all cursor-pointer" onClick={() => {
+                          window.location.href = resetInfo.resetUrl;
+                          onClose();
+                          resetForm();
+                        }}>
+                          {resetInfo.resetUrl}
+                        </code>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {t("Нажмите на ссылку выше, чтобы перейти на страницу сброса пароля", "Click the link above to proceed to the password reset page")}
+                      </p>
+                    </>
+                  )}
                   <Button variant="outline" className="w-full" onClick={resetForm}>
                     {t("Готово", "Done")}
                   </Button>

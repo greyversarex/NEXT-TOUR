@@ -12,6 +12,7 @@ import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { format } from "date-fns";
 
 export default function NewsAdmin() {
@@ -69,7 +70,7 @@ export default function NewsAdmin() {
                 <div><Label>{t("Текст (RU)", "Content (RU)")}</Label><Textarea value={editing.contentRu || ""} onChange={e => setEditing((p: any) => ({ ...p, contentRu: e.target.value }))} className="mt-1 min-h-[120px]" required /></div>
                 <div><Label>{t("Текст (EN)", "Content (EN)")}</Label><Textarea value={editing.contentEn || ""} onChange={e => setEditing((p: any) => ({ ...p, contentEn: e.target.value }))} className="mt-1 min-h-[120px]" required /></div>
               </div>
-              <div><Label>{t("Изображение (URL)", "Image URL")}</Label><Input value={editing.imageUrl || ""} onChange={e => setEditing((p: any) => ({ ...p, imageUrl: e.target.value }))} className="mt-1" /></div>
+              <div><Label>{t("Изображение", "Image")}</Label><div className="mt-1"><ImageUpload value={editing.imageUrl || ""} onChange={v => setEditing((p: any) => ({ ...p, imageUrl: v }))} /></div></div>
               <div className="flex items-center gap-2">
                 <Switch checked={editing.isPublished !== false} onCheckedChange={v => setEditing((p: any) => ({ ...p, isPublished: v }))} id="pub" />
                 <Label htmlFor="pub">{t("Опубликовано", "Published")}</Label>

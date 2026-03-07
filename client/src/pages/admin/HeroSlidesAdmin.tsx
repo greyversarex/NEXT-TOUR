@@ -12,6 +12,7 @@ import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 export default function HeroSlidesAdmin() {
   const { t, lang } = useI18n();
@@ -71,7 +72,7 @@ export default function HeroSlidesAdmin() {
                 <div><Label>{t("Подзаголовок (RU)", "Subtitle (RU)")}</Label><Input value={editing.subtitleRu || ""} onChange={e => setEditing((p: any) => ({ ...p, subtitleRu: e.target.value }))} className="mt-1" /></div>
                 <div><Label>{t("Подзаголовок (EN)", "Subtitle (EN)")}</Label><Input value={editing.subtitleEn || ""} onChange={e => setEditing((p: any) => ({ ...p, subtitleEn: e.target.value }))} className="mt-1" /></div>
               </div>
-              <div><Label>{t("URL медиа", "Media URL")}</Label><Input value={editing.mediaUrl || ""} onChange={e => setEditing((p: any) => ({ ...p, mediaUrl: e.target.value }))} className="mt-1" required /></div>
+              <div><Label>{t("Медиа (фото / видео)", "Media (image / video)")}</Label><div className="mt-1"><ImageUpload value={editing.mediaUrl || ""} onChange={v => setEditing((p: any) => ({ ...p, mediaUrl: v }))} /></div></div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label>{t("Тип медиа", "Media Type")}</Label>

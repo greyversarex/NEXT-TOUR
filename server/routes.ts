@@ -8,6 +8,7 @@ import { Pool } from "pg";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import path from "path";
+import { sendPasswordResetEmail } from "./email";
 import multer from "multer";
 import { storage } from "./storage";
 import {
@@ -486,7 +487,10 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       if (!user) return res.status(404).json({ message: "Email not found" });
       const token = crypto.randomBytes(32).toString("hex");
       await storage.createPasswordResetToken(user.id, token);
-      res.json({ success: true, resetToken: token, resetUrl: `/reset-password?token=${token}` });
+      const appUrl = process.env.APP_URL || `${req.protocol}://${req.get("host")}`;
+      const resetUrl = `${appUrl}/reset-password?token=${token}`;
+      const emailSent = await sendPasswordResetEmail(email, resetUrl);
+      res.json({ success: true, emailSent, resetUrl: `/reset-password?token=${token}` });
     } catch (e: any) {
       res.status(500).json({ message: e.message });
     }
