@@ -43,7 +43,7 @@ export default function Header() {
       <header
         className={`sticky top-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-white/96 dark:bg-background/96 backdrop-blur-xl shadow-[0_1px_24px_rgba(0,0,0,0.08)] border-b border-border/50"
+            ? "bg-[#0b1f3a]/97 backdrop-blur-xl shadow-[0_2px_24px_rgba(0,0,0,0.25)] border-b border-white/10"
             : "bg-black/20 backdrop-blur-sm border-b border-white/10"
         }`}
       >
@@ -58,7 +58,7 @@ export default function Header() {
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center shadow-sm">
                   <Plane className="h-4 w-4 text-white -rotate-45" />
                 </div>
-                <span className={`text-xl font-extrabold tracking-tight transition-all duration-300 ${scrolled ? "bg-gradient-to-r from-primary to-cyan-500 bg-clip-text text-transparent" : "text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]"}`}>
+                <span className="text-xl font-extrabold tracking-tight text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
                   TravelPro
                 </span>
               </span>
@@ -71,14 +71,14 @@ export default function Header() {
                   <span
                     className={`relative px-3.5 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ${
                       isActive(link.href)
-                        ? scrolled ? "text-blue-700 font-bold dark:text-blue-300" : "text-white font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]"
-                        : scrolled ? "text-blue-700 font-semibold hover:text-blue-900 hover:bg-blue-50 dark:text-blue-300 dark:hover:text-blue-200" : "text-white/90 font-semibold hover:text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)] hover:bg-white/10"
+                        ? "text-white font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]"
+                        : "text-white/85 font-semibold hover:text-white hover:bg-white/10"
                     }`}
                     data-testid={`link-nav-${link.href.replace("/", "") || "home"}`}
                   >
                     {link.label}
                     {isActive(link.href) && (
-                      <span className={`absolute bottom-0 left-3 right-3 h-0.5 rounded-full ${scrolled ? "bg-gradient-to-r from-blue-600 to-cyan-500" : "bg-white"}`} />
+                      <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-white" />
                     )}
                   </span>
                 </Link>
@@ -91,7 +91,7 @@ export default function Header() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setLang(lang === "ru" ? "en" : "ru")}
-                className={`gap-1.5 h-9 px-3 rounded-lg transition-all duration-200 ${scrolled ? "text-muted-foreground hover:bg-muted/70" : "text-white/90 hover:text-white hover:bg-white/15"}`}
+                className="gap-1.5 h-9 px-3 rounded-lg transition-all duration-200 text-white/90 hover:text-white hover:bg-white/15"
                 data-testid="button-lang-toggle"
               >
                 <Globe className="h-4 w-4" />
@@ -103,7 +103,7 @@ export default function Header() {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      className={`gap-2 pl-2 pr-3 h-9 rounded-xl transition-all duration-200 ${scrolled ? "hover:bg-muted/70" : "text-white hover:bg-white/15"}`}
+                      className="gap-2 pl-2 pr-3 h-9 rounded-xl transition-all duration-200 text-white hover:bg-white/15"
                       data-testid="button-user-menu"
                     >
                       <Avatar className="h-7 w-7 ring-2 ring-primary/20">
@@ -170,7 +170,7 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className={`md:hidden h-9 w-9 rounded-lg transition-colors duration-200 ${scrolled ? "" : "text-white hover:bg-white/15"}`}
+                className="md:hidden h-9 w-9 rounded-lg transition-colors duration-200 text-white hover:bg-white/15"
                 onClick={() => setMenuOpen(!menuOpen)}
                 data-testid="button-mobile-menu"
               >
@@ -182,15 +182,15 @@ export default function Header() {
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden border-t border-border/40 bg-white/98 dark:bg-background/98 backdrop-blur-xl">
+          <div className="md:hidden border-t border-white/10 bg-[#0b1f3a]/97 backdrop-blur-xl">
             <nav className="flex flex-col px-4 py-3 gap-0.5">
               {navLinks.map(link => (
                 <Link key={link.href} href={link.href}>
                   <span
                     className={`block px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 ${
                       isActive(link.href)
-                        ? "text-blue-900 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 font-bold"
-                        : "text-blue-800 dark:text-blue-300 font-semibold hover:text-blue-950 dark:hover:text-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950/40"
+                        ? "text-white font-bold bg-white/10"
+                        : "text-white/85 font-semibold hover:text-white hover:bg-white/10"
                     }`}
                     onClick={() => setMenuOpen(false)}
                   >
