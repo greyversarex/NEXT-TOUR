@@ -65,11 +65,14 @@ export default function TourDetail() {
     );
   }
 
-  const { tour, dates, priceComponents, options, itinerary, reviews, isFavorite } = data;
+  const { tour, dates, priceComponents, options, itinerary, reviews, isFavorite, country, city, category } = data;
   const title = lang === "ru" ? tour.titleRu : tour.titleEn;
   const description = lang === "ru" ? tour.descriptionRu : tour.descriptionEn;
   const included = lang === "ru" ? tour.includedRu : tour.includedEn;
   const notIncluded = lang === "ru" ? tour.notIncludedRu : tour.notIncludedEn;
+  const countryName = country ? (lang === "ru" ? country.nameRu : country.nameEn) : null;
+  const cityName = city ? (lang === "ru" ? city.nameRu : city.nameEn) : null;
+  const categoryName = category ? (lang === "ru" ? category.nameRu : category.nameEn) : null;
 
   const price = Number(tour.basePrice);
   const discountedPrice = tour.discountPercent > 0 ? price * (1 - tour.discountPercent / 100) : price;
@@ -163,15 +166,54 @@ export default function TourDetail() {
               </button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 mb-8">
+            <div className="flex flex-wrap items-center gap-2 mb-7">
+              {/* Duration */}
               <span className="flex items-center gap-1.5 text-sm font-medium bg-muted/60 rounded-full px-3 py-1.5">
                 <Clock className="h-4 w-4 text-primary" /> {tour.duration} {t("дней", "days")}
               </span>
+
+              {/* Country */}
+              {countryName && (
+                <span className="flex items-center gap-1.5 text-sm font-medium bg-muted/60 rounded-full px-3 py-1.5">
+                  {country?.countryCode
+                    ? <span className="text-base leading-none">{String.fromCodePoint(...[...country.countryCode.toUpperCase()].map(c => 0x1F1E0 - 65 + c.charCodeAt(0)))}</span>
+                    : <MapPin className="h-4 w-4 text-primary" />
+                  }
+                  {countryName}
+                </span>
+              )}
+
+              {/* City */}
+              {cityName && (
+                <span className="flex items-center gap-1.5 text-sm font-medium bg-muted/60 rounded-full px-3 py-1.5">
+                  <MapPin className="h-4 w-4 text-primary/70" />
+                  {cityName}
+                </span>
+              )}
+
+              {/* Category */}
+              {categoryName && (
+                <span className="flex items-center gap-1.5 text-sm font-medium bg-primary/10 text-primary rounded-full px-3 py-1.5">
+                  <Tag className="h-4 w-4" />
+                  {categoryName}
+                </span>
+              )}
+
+              {/* Hot deal */}
               {tour.isHot && (
                 <span className="flex items-center gap-1.5 text-sm font-bold bg-orange-100 dark:bg-orange-950/30 text-orange-600 rounded-full px-3 py-1.5">
                   🔥 {t("Горящий", "Hot Deal")}
                 </span>
               )}
+
+              {/* Discount */}
+              {tour.discountPercent > 0 && (
+                <span className="flex items-center gap-1 text-sm font-bold bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-400 rounded-full px-3 py-1.5">
+                  −{tour.discountPercent}% {t("скидка", "off")}
+                </span>
+              )}
+
+              {/* Stars */}
               <div className="flex items-center gap-1 ml-auto">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star key={i} className={`h-4 w-4 ${i < Math.round(Number(tour.rating || 0)) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`} />

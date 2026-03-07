@@ -210,18 +210,21 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   app.get("/api/tours/:id/full", async (req, res) => {
     const tour = await storage.getTour(req.params.id);
     if (!tour) return res.status(404).json({ message: "Tour not found" });
-    const [dates, priceComponents, options, itinerary, reviews] = await Promise.all([
+    const [dates, priceComponents, options, itinerary, reviews, country, city, category] = await Promise.all([
       storage.getTourDates(req.params.id),
       storage.getTourPriceComponents(req.params.id),
       storage.getTourOptions(req.params.id),
       storage.getTourItinerary(req.params.id),
       storage.getReviews(req.params.id, "approved"),
+      tour.countryId ? storage.getCountry(tour.countryId) : Promise.resolve(undefined),
+      tour.cityId ? storage.getCity(tour.cityId) : Promise.resolve(undefined),
+      tour.categoryId ? storage.getCategory(tour.categoryId) : Promise.resolve(undefined),
     ]);
     let isFavorite = false;
     if (req.user) {
       isFavorite = await storage.isFavorite((req.user as any).id, req.params.id);
     }
-    res.json({ tour, dates, priceComponents, options, itinerary, reviews, isFavorite });
+    res.json({ tour, dates, priceComponents, options, itinerary, reviews, isFavorite, country, city, category });
   });
 
   // Tour Dates
