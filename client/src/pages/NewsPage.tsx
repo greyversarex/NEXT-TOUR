@@ -13,19 +13,34 @@ export default function NewsPage() {
   const { data: newsList = [], isLoading } = useQuery<News[]>({ queryKey: ["/api/news"] });
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold mb-2">{t("Новости", "News")}</h1>
-      <p className="text-muted-foreground mb-8">{t("Последние новости и статьи о путешествиях", "Latest travel news and articles")}</p>
+    <div className="min-h-screen">
+      {/* Hero header */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950/20 dark:via-background dark:to-background border-b border-border/40 mb-12">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.07),transparent_60%)] pointer-events-none" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center shadow-md">
+              <Calendar className="h-5 w-5 text-white" />
+            </div>
+            <p className="text-muted-foreground font-semibold text-sm uppercase tracking-widest">{t("Журнал", "Journal")}</p>
+          </div>
+          <h1 className="text-3xl md:text-5xl font-extrabold mb-3 leading-tight">{t("Новости и статьи", "News & Articles")}</h1>
+          <p className="text-muted-foreground text-base md:text-lg max-w-xl leading-relaxed">
+            {t("Последние новости, советы путешественникам и вдохновение для следующего приключения", "Latest news, travel tips and inspiration for your next adventure")}
+          </p>
+        </div>
+      </div>
 
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1,2,3,4,5,6].map(i => <Skeleton key={i} className="h-64 rounded-lg" />)}
+          {[1,2,3,4,5,6].map(i => <Skeleton key={i} className="h-64 rounded-2xl" />)}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {newsList.map(item => (
             <Link key={item.id} href={`/news/${item.id}`}>
-              <article className="group rounded-lg overflow-hidden bg-card border border-card-border hover-elevate cursor-pointer h-full flex flex-col" data-testid={`card-news-${item.id}`}>
+              <article className="group rounded-2xl overflow-hidden bg-card border border-card-border hover-elevate cursor-pointer h-full flex flex-col shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300" data-testid={`card-news-${item.id}`}>
                 {item.imageUrl && (
                   <div className="aspect-video overflow-hidden">
                     <img src={item.imageUrl} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -46,6 +61,7 @@ export default function NewsPage() {
           ))}
         </div>
       )}
+    </div>
     </div>
   );
 }

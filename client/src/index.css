@@ -287,6 +287,39 @@
   }
 }
 
+/* ── Global Polish ─────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.28);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.28);
+}
+
+* {
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* ── Page & Depth Foundations ──────────────────────────────────── */
 body {
   background: linear-gradient(180deg, #f0f5ff 0%, #ffffff 12%, #ffffff 100%);

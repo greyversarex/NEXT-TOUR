@@ -1,0 +1,80 @@
+Perform a final UI/UX polishing pass on the entire website to make it feel like a high-end premium travel platform.
+
+Focus on visual refinement, micro-interactions and professional UI quality.
+
+VISUAL DEPTH
+
+• Improve visual hierarchy across the entire page
+• Add layered UI feeling with soft shadows and elevation
+• Use subtle gradients for backgrounds instead of flat colors
+• Ensure sections have clear visual separation
+
+TYPOGRAPHY
+
+• Improve typography hierarchy
+• Increase heading sizes slightly
+• Improve line spacing and readability
+• Make important elements (prices, titles, CTA buttons) more visually dominant
+
+BUTTONS AND INTERACTIONS
+
+Improve all buttons:
+
+• Add smooth hover animations
+• Add subtle scale or shadow elevation on hover
+• Improve CTA buttons (Search Tour, View Tour, etc.) so they feel more premium
+
+CARD POLISHING
+
+For all cards (tours, destinations, advantages, testimonials):
+
+• Improve internal padding
+• Improve shadows for better depth
+• Add smooth hover transitions
+• Ensure image corners and borders are consistent
+• Ensure cards feel interactive and modern
+
+IMAGES
+
+Improve image presentation:
+
+• Ensure images have subtle overlays when text appears on them
+• Improve image cropping consistency
+• Add gentle zoom-on-hover effects where appropriate
+
+SPACING AND LAYOUT
+
+Refine spacing across the whole site:
+
+• Increase whitespace between sections
+• Align elements more precisely
+• Ensure consistent margins and paddings
+• Make the layout feel more spacious and elegant
+
+SCROLL EXPERIENCE
+
+Improve the scroll experience:
+
+• Add subtle scroll animations
+• Ensure sections smoothly appear while scrolling
+• Avoid heavy animations, keep them smooth and professional
+
+MICROINTERACTIONS
+
+Add small interaction details:
+
+• Button hover feedback
+• Card hover elevation
+• Smooth transitions between states
+• Subtle loading transitions where needed
+
+OVERALL GOAL
+
+The website should feel:
+
+• premium
+• modern
+• visually immersive
+• emotionally inspiring for travel
+
+It should look like a high-end travel platform rather than a standard template website.

@@ -79,38 +79,51 @@ export default function TourDetail() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Gallery */}
-      <div className="relative mb-8 rounded-2xl overflow-hidden bg-muted h-72 md:h-[420px]">
+      {/* Cinematic Gallery */}
+      <div className="relative mb-10 rounded-3xl overflow-hidden bg-muted h-80 md:h-[500px] shadow-[0_8px_48px_rgba(0,0,0,0.18)]">
         {images.length > 0 ? (
           <>
             <img
               src={images[currentImg]}
               alt={title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-all duration-700"
             />
+            {/* Bottom gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
+
             {images.length > 1 && (
               <>
-                <button onClick={() => setCurrentImg(i => (i - 1 + images.length) % images.length)}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/30 text-white hover:bg-black/50">
+                <button
+                  onClick={() => setCurrentImg(i => (i - 1 + images.length) % images.length)}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 flex items-center justify-center transition-all duration-200 hover:scale-110"
+                >
                   <ChevronLeft className="h-5 w-5" />
                 </button>
-                <button onClick={() => setCurrentImg(i => (i + 1) % images.length)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/30 text-white hover:bg-black/50">
+                <button
+                  onClick={() => setCurrentImg(i => (i + 1) % images.length)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 flex items-center justify-center transition-all duration-200 hover:scale-110"
+                >
                   <ChevronRight className="h-5 w-5" />
                 </button>
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
                   {images.map((_: any, i: number) => (
-                    <button key={i} onClick={() => setCurrentImg(i)}
-                      className={`w-2 h-2 rounded-full transition-all ${i === currentImg ? "bg-white" : "bg-white/50"}`} />
+                    <button
+                      key={i}
+                      onClick={() => setCurrentImg(i)}
+                      className={`rounded-full transition-all duration-300 ${i === currentImg ? "w-6 h-2 bg-white" : "w-2 h-2 bg-white/50 hover:bg-white/80"}`}
+                    />
                   ))}
                 </div>
               </>
             )}
             {images.length > 1 && (
-              <div className="absolute bottom-4 right-4 flex gap-2">
+              <div className="absolute bottom-5 right-5 flex gap-2">
                 {images.slice(0, 4).map((img: string, i: number) => (
-                  <button key={i} onClick={() => setCurrentImg(i)}
-                    className={`w-14 h-10 rounded border-2 overflow-hidden transition-all ${i === currentImg ? "border-white" : "border-white/40"}`}>
+                  <button
+                    key={i}
+                    onClick={() => setCurrentImg(i)}
+                    className={`w-16 h-11 rounded-xl border-2 overflow-hidden transition-all duration-200 hover:scale-105 ${i === currentImg ? "border-white shadow-lg" : "border-white/40 opacity-70 hover:opacity-100"}`}
+                  >
                     <img src={img} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
@@ -123,29 +136,45 @@ export default function TourDetail() {
           </div>
         )}
         {tour.discountPercent > 0 && (
-          <Badge className="absolute top-4 left-4 bg-destructive text-destructive-foreground text-sm px-3 py-1">
+          <Badge className="absolute top-5 left-5 bg-gradient-to-r from-red-500 to-rose-600 text-white text-sm px-4 py-1.5 rounded-full shadow-lg border-0 font-bold">
             -{tour.discountPercent}% {t("скидка", "off")}
+          </Badge>
+        )}
+        {tour.isHot && (
+          <Badge className="absolute top-5 left-5 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm px-4 py-1.5 rounded-full shadow-lg border-0 font-bold">
+            🔥 {t("Горящий", "Hot Deal")}
           </Badge>
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Main Content */}
         <div className="lg:col-span-2">
-          <div className="flex items-start justify-between mb-4">
-            <h1 className="text-2xl md:text-3xl font-bold" data-testid="text-tour-detail-title">{title}</h1>
+          <div className="flex items-start justify-between mb-5">
+            <h1 className="text-2xl md:text-4xl font-extrabold leading-tight" data-testid="text-tour-detail-title">{title}</h1>
             <button
               onClick={() => user ? favMutation.mutate() : setAuthOpen(true)}
-              className="p-2 rounded-full hover:bg-muted transition-colors shrink-0 ml-2"
+              className="w-11 h-11 rounded-2xl bg-muted/60 hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center justify-center transition-all duration-200 hover:scale-110 shrink-0 ml-3"
               data-testid="button-toggle-favorite"
             >
-              <Heart className={`h-6 w-6 ${isFavorite ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+              <Heart className={`h-5 w-5 transition-colors ${isFavorite ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
             </button>
           </div>
 
-          <div className="flex flex-wrap gap-3 mb-6 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {tour.duration} {t("дней", "days")}</span>
-            {tour.isHot && <Badge className="bg-orange-500 text-white">{t("Горящий", "Hot Deal")}</Badge>}
+          <div className="flex flex-wrap items-center gap-3 mb-8">
+            <span className="flex items-center gap-1.5 text-sm font-medium bg-muted/60 rounded-full px-3 py-1.5">
+              <Clock className="h-4 w-4 text-primary" /> {tour.duration} {t("дней", "days")}
+            </span>
+            {tour.isHot && (
+              <span className="flex items-center gap-1.5 text-sm font-bold bg-orange-100 dark:bg-orange-950/30 text-orange-600 rounded-full px-3 py-1.5">
+                🔥 {t("Горящий", "Hot Deal")}
+              </span>
+            )}
+            <div className="flex items-center gap-1 ml-auto">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} className={`h-4 w-4 ${i < Math.round(Number(tour.rating || 0)) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`} />
+              ))}
+            </div>
           </div>
 
           <Tabs defaultValue="description">
@@ -267,100 +296,112 @@ export default function TourDetail() {
 
         {/* Booking Sidebar */}
         <div className="lg:col-span-1">
-          <Card className="sticky top-20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">{t("Забронировать", "Book Now")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-baseline gap-2 mb-4">
+          <div className="sticky top-24">
+            <div className="rounded-3xl overflow-hidden shadow-[0_8px_40px_rgba(0,0,0,0.12)] border border-border/60">
+              {/* Sidebar header gradient */}
+              <div className="bg-gradient-to-br from-primary to-cyan-500 px-6 py-5">
+                <p className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-1">{t("Стоимость", "Price")}</p>
+                <div className="flex items-baseline gap-2">
+                  {tour.discountPercent > 0 && (
+                    <span className="text-white/50 line-through text-base">${price.toFixed(0)}</span>
+                  )}
+                  <span className="text-3xl font-extrabold text-white">${discountedPrice.toFixed(0)}</span>
+                  <span className="text-white/70 text-sm">/ {t("чел.", "person")}</span>
+                </div>
                 {tour.discountPercent > 0 && (
-                  <span className="text-muted-foreground line-through text-sm">${price.toFixed(0)}</span>
+                  <div className="mt-2 inline-flex items-center bg-white/20 rounded-full px-3 py-1 text-white text-xs font-bold">
+                    -{tour.discountPercent}% {t("скидка", "discount")}
+                  </div>
                 )}
-                <span className="text-2xl font-bold text-primary">${discountedPrice.toFixed(0)}</span>
-                <span className="text-sm text-muted-foreground">/ {t("чел.", "person")}</span>
               </div>
 
-              {dates.length > 0 ? (
-                <div className="space-y-2 mb-4">
-                  <p className="text-sm font-medium">{t("Доступные даты:", "Available dates:")}</p>
-                  {dates.slice(0, 3).map((d: any) => (
-                    <div key={d.id} className="flex justify-between items-center text-sm bg-muted rounded-md px-3 py-2">
-                      <span className="flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5 text-primary" />
-                        {format(new Date(d.startDate), "dd MMM")} – {format(new Date(d.endDate), "dd MMM yyyy")}
-                      </span>
-                      <Badge variant="secondary" className="text-xs">
-                        {d.maxPeople - d.bookedCount} {t("мест", "spots")}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground mb-4">{t("Уточняйте даты у менеджера", "Contact us for available dates")}</p>
-              )}
-
-              {options.length > 0 && (
-                <div className="mb-4">
-                  <p className="text-sm font-medium mb-2 flex items-center gap-1.5">
-                    <Tag className="h-3.5 w-3.5 text-primary" />
-                    {t("Дополнительно:", "Add-ons:")}
-                  </p>
-                  <div className="space-y-2 rounded-lg border border-border p-3 bg-muted/30">
-                    {options.map((opt: any) => {
-                      const checked = sidebarOptions.includes(opt.id);
-                      return (
-                        <label
-                          key={opt.id}
-                          className={`flex items-center justify-between gap-2 cursor-pointer rounded-md px-2 py-1.5 transition-colors ${checked ? "bg-primary/10" : "hover:bg-muted"}`}
-                          data-testid={`checkbox-addon-${opt.id}`}
-                        >
-                          <span className="flex items-center gap-2 text-sm">
-                            <Checkbox
-                              checked={checked}
-                              onCheckedChange={v =>
-                                setSidebarOptions(prev =>
-                                  v ? [...prev, opt.id] : prev.filter(x => x !== opt.id)
-                                )
-                              }
-                            />
-                            {lang === "ru" ? opt.nameRu : opt.nameEn}
-                          </span>
-                          <span className={`text-xs font-semibold shrink-0 ${checked ? "text-primary" : "text-muted-foreground"}`}>
-                            +${Number(opt.price).toFixed(0)}
-                          </span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                  {sidebarOptions.length > 0 && (
-                    <p className="text-xs text-primary font-medium mt-2 text-right">
-                      +${options.filter((o: any) => sidebarOptions.includes(o.id)).reduce((s: number, o: any) => s + Number(o.price), 0).toFixed(0)} {t("доп. опции", "add-ons")}
+              <div className="bg-card p-5">
+                {dates.length > 0 ? (
+                  <div className="space-y-2 mb-5">
+                    <p className="text-sm font-semibold flex items-center gap-1.5 mb-3">
+                      <Calendar className="h-4 w-4 text-primary" />
+                      {t("Доступные даты:", "Available dates:")}
                     </p>
-                  )}
-                </div>
-              )}
+                    {dates.slice(0, 3).map((d: any) => (
+                      <div key={d.id} className="flex justify-between items-center text-sm bg-muted/60 rounded-xl px-3.5 py-2.5 border border-border/40">
+                        <span className="flex items-center gap-1.5 text-foreground/80">
+                          {format(new Date(d.startDate), "dd MMM")} – {format(new Date(d.endDate), "dd MMM yyyy")}
+                        </span>
+                        <Badge variant="secondary" className="text-xs rounded-full">
+                          {d.maxPeople - d.bookedCount} {t("мест", "spots")}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground mb-5 p-3 bg-muted/40 rounded-xl">
+                    {t("Уточняйте даты у менеджера", "Contact us for available dates")}
+                  </p>
+                )}
 
-              <Button
-                className="w-full"
-                onClick={() => user ? setBookingOpen(true) : setAuthOpen(true)}
-                data-testid="button-book-now"
-              >
-                {t("Забронировать", "Book Now")}
-              </Button>
-              {!user && (
-                <p className="text-xs text-muted-foreground text-center mt-2">
-                  {t("Войдите чтобы забронировать", "Sign in to book")}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+                {options.length > 0 && (
+                  <div className="mb-5">
+                    <p className="text-sm font-semibold mb-3 flex items-center gap-1.5">
+                      <Tag className="h-4 w-4 text-primary" />
+                      {t("Дополнительно:", "Add-ons:")}
+                    </p>
+                    <div className="space-y-1.5 rounded-2xl border border-border/50 p-3 bg-muted/30">
+                      {options.map((opt: any) => {
+                        const checked = sidebarOptions.includes(opt.id);
+                        return (
+                          <label
+                            key={opt.id}
+                            className={`flex items-center justify-between gap-2 cursor-pointer rounded-xl px-3 py-2 transition-all duration-200 ${checked ? "bg-primary/10 border border-primary/20" : "hover:bg-muted border border-transparent"}`}
+                            data-testid={`checkbox-addon-${opt.id}`}
+                          >
+                            <span className="flex items-center gap-2.5 text-sm">
+                              <Checkbox
+                                checked={checked}
+                                onCheckedChange={v =>
+                                  setSidebarOptions(prev =>
+                                    v ? [...prev, opt.id] : prev.filter(x => x !== opt.id)
+                                  )
+                                }
+                              />
+                              {lang === "ru" ? opt.nameRu : opt.nameEn}
+                            </span>
+                            <span className={`text-xs font-bold shrink-0 ${checked ? "text-primary" : "text-muted-foreground"}`}>
+                              +${Number(opt.price).toFixed(0)}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                    {sidebarOptions.length > 0 && (
+                      <p className="text-xs text-primary font-semibold mt-2.5 text-right">
+                        +${options.filter((o: any) => sidebarOptions.includes(o.id)).reduce((s: number, o: any) => s + Number(o.price), 0).toFixed(0)} {t("доп. опции", "add-ons")}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <Button
+                  className="w-full h-12 rounded-2xl font-bold text-base shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+                  onClick={() => user ? setBookingOpen(true) : setAuthOpen(true)}
+                  data-testid="button-book-now"
+                >
+                  {t("Забронировать", "Book Now")}
+                </Button>
+                {!user && (
+                  <p className="text-xs text-muted-foreground text-center mt-2.5">
+                    {t("Войдите чтобы забронировать", "Sign in to book")}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {recommendedTours.length > 0 && (
-        <div className="mt-12">
-          <h2 className="text-xl font-bold mb-6">{t("Похожие туры", "Similar Tours")}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="mt-16 pt-12 border-t border-border/40">
+          <h2 className="text-2xl md:text-3xl font-extrabold mb-8">{t("Похожие туры", "Similar Tours")}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {recommendedTours.map((tour: any) => <TourCard key={tour.id} tour={tour} />)}
           </div>
         </div>
