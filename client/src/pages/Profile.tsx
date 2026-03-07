@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRoute, Link, Redirect } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { User, Heart, BookOpen, Trophy, Star, Calendar, DollarSign } from "lucide-react";
+import { User, Heart, BookOpen, Trophy, Star, Calendar, DollarSign, Upload, Loader2 } from "lucide-react";
 import TourCard from "@/components/TourCard";
 import { format } from "date-fns";
 import type { Tour } from "@shared/schema";
@@ -31,7 +31,7 @@ export default function Profile() {
   if (isLoading) return <div className="flex justify-center p-16"><Skeleton className="h-64 w-full max-w-lg" /></div>;
   if (!user) return <Redirect to="/" />;
 
-  const loyalty = LOYALTY_INFO[user.loyaltyLevel] || LOYALTY_INFO.beginner;
+  const loyalty = LOYALTY_INFO[user.loyaltyLevel as keyof typeof LOYALTY_INFO] || LOYALTY_INFO.beginner;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -91,6 +91,8 @@ function EditProfileForm() {
   const queryClient = useQueryClient();
   const [name, setName] = useState(user?.name || "");
   const [avatar, setAvatar] = useState(user?.avatar || "");
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const mutation = useMutation({
     mutationFn: (data: any) => apiRequest("PATCH", "/api/auth/me", data),
@@ -100,10 +102,81 @@ function EditProfileForm() {
     },
   });
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: t("Ошибка", "Error"),
+        description: t("Размер файла не должен превышать 5МБ", "File size should not exceed 5MB"),
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const data = await res.json();
+      setAvatar(data.url);
+      toast({ title: t("Фото загружено", "Photo uploaded") });
+    } catch (error) {
+      toast({
+        title: t("Ошибка", "Error"),
+        description: t("Не удалось загрузить фото", "Failed to upload photo"),
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader><CardTitle>{t("Редактировать профиль", "Edit Profile")}</CardTitle></CardHeader>
       <CardContent>
+        <div className="mb-6 flex items-center gap-4">
+          <Avatar className="h-20 w-20">
+            <AvatarImage src={avatar || undefined} />
+            <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
+              {name.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleFileUpload}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+              data-testid="button-upload-avatar"
+            >
+              {uploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
+              {t("Загрузить фото", "Upload Photo")}
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2">
+              JPG, PNG, WebP or GIF. Max 5MB.
+            </p>
+          </div>
+        </div>
+
         <form onSubmit={e => { e.preventDefault(); mutation.mutate({ name, avatar }); }} className="space-y-4 max-w-sm">
           <div>
             <Label>{t("Имя", "Full Name")}</Label>
@@ -113,7 +186,7 @@ function EditProfileForm() {
             <Label>{t("Фото (URL)", "Photo (URL)")}</Label>
             <Input value={avatar} onChange={e => setAvatar(e.target.value)} className="mt-1" placeholder="https://..." data-testid="input-profile-avatar" />
           </div>
-          <Button type="submit" disabled={mutation.isPending} data-testid="button-profile-save">
+          <Button type="submit" disabled={mutation.isPending || uploading} data-testid="button-profile-save">
             {t("Сохранить", "Save")}
           </Button>
         </form>
@@ -121,6 +194,7 @@ function EditProfileForm() {
     </Card>
   );
 }
+
 
 function BookingsTab() {
   const { t, lang } = useI18n();

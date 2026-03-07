@@ -6,6 +6,9 @@ import { Strategy as LocalStrategy } from "passport-local";
 import connectPgSimple from "connect-pg-simple";
 import { Pool } from "pg";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import path from "path";
+import multer from "multer";
 import { storage } from "./storage";
 import {
   insertUserSchema, insertTourSchema, insertTourDateSchema,
@@ -469,6 +472,87 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Stats
   app.get("/api/admin/stats", requireAdmin, async (req, res) => {
     res.json(await storage.getStats());
+  });
+
+  // Password Recovery
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) return res.status(400).json({ message: "Email required" });
+      const user = await storage.getUserByEmail(email);
+      if (!user) return res.status(404).json({ message: "Email not found" });
+      const token = crypto.randomBytes(32).toString("hex");
+      await storage.createPasswordResetToken(user.id, token);
+      res.json({ success: true, resetToken: token, resetUrl: `/reset-password?token=${token}` });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+      if (!token || !newPassword) return res.status(400).json({ message: "Token and new password required" });
+      const resetToken = await storage.getPasswordResetToken(token);
+      if (!resetToken) return res.status(400).json({ message: "Invalid token" });
+      if (resetToken.used) return res.status(400).json({ message: "Token already used" });
+      if (new Date() > resetToken.expiresAt) return res.status(400).json({ message: "Token expired" });
+      const hashed = await bcrypt.hash(newPassword, 10);
+      await storage.updateUserPassword(resetToken.userId, hashed);
+      await storage.markTokenUsed(token);
+      res.json({ success: true });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  // File Upload
+  const upload = multer({
+    storage: multer.diskStorage({
+      destination: path.join(process.cwd(), "client/public/uploads"),
+      filename: (_req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        cb(null, `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`);
+      },
+    }),
+    fileFilter: (_req, file, cb) => {
+      const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+      cb(null, allowed.includes(file.mimetype));
+    },
+    limits: { fileSize: 5 * 1024 * 1024 },
+  });
+
+  app.post("/api/upload", requireAuth, upload.single("file"), (req, res) => {
+    if (!req.file) return res.status(400).json({ message: "No file uploaded or invalid type" });
+    res.json({ url: `/uploads/${req.file.filename}` });
+  });
+
+  // Analytics
+  app.get("/api/admin/analytics", requireAdmin, async (req, res) => {
+    try {
+      const { startDate, endDate, paymentType, status } = req.query;
+      const filters: any = {};
+      if (startDate) filters.startDate = new Date(startDate as string);
+      if (endDate) filters.endDate = new Date(endDate as string);
+      if (paymentType) filters.paymentType = paymentType;
+      if (status) filters.status = status;
+      res.json(await storage.getAnalytics(filters));
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  // Loyalty Settings
+  app.get("/api/admin/loyalty-settings", requireAdmin, async (req, res) => {
+    res.json(await storage.getLoyaltySettings());
+  });
+
+  app.put("/api/admin/loyalty-settings", requireAdmin, async (req, res) => {
+    try {
+      res.json(await storage.updateLoyaltySettings(req.body));
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
   });
 
   return httpServer;

@@ -183,6 +183,7 @@ export default function TourDetail() {
               <TabsTrigger value="program">{t("Программа", "Itinerary")}</TabsTrigger>
               <TabsTrigger value="included">{t("Включено", "Included")}</TabsTrigger>
               {reviews.length > 0 && <TabsTrigger value="reviews">{t("Отзывы", "Reviews")} ({reviews.length})</TabsTrigger>}
+              {tour.mapUrl && <TabsTrigger value="map">{t("На карте", "On the Map")}</TabsTrigger>}
             </TabsList>
 
             <TabsContent value="description">
@@ -291,6 +292,26 @@ export default function TourDetail() {
                 </div>
               )}
             </TabsContent>
+
+            {tour.mapUrl && (
+              <TabsContent value="map">
+                <div className="rounded-2xl overflow-hidden shadow-lg border-0 bg-muted">
+                  <iframe
+                    src={tour.mapUrl.includes("maps.google.com/maps?") && !tour.mapUrl.includes("output=embed")
+                      ? tour.mapUrl.replace("maps.google.com/maps?", "maps.google.com/maps?output=embed&")
+                      : tour.mapUrl
+                    }
+                    width="100%"
+                    height="400"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    sandbox="allow-scripts allow-same-origin"
+                  />
+                </div>
+              </TabsContent>
+            )}
           </Tabs>
         </div>
 

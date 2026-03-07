@@ -4,7 +4,7 @@ import {
   users, countries, cities, categories, tours, tourDates,
   priceComponents, tourPriceComponents, tourOptions, tourItinerary,
   banners, tourFeeds, tourFeedItems, reviews, bookings, news,
-  favorites, introScreen, heroSlides,
+  favorites, introScreen, heroSlides, passwordResetTokens, settings,
   type User, type InsertUser, type Country, type InsertCountry,
   type City, type InsertCity, type Category, type InsertCategory,
   type Tour, type InsertTour, type TourDate, type InsertTourDate,
@@ -13,6 +13,8 @@ import {
   type Banner, type InsertBanner, type TourFeed, type TourFeedItem,
   type Review, type InsertReview, type Booking, type InsertBooking,
   type News, type InsertNews, type Favorite, type IntroScreen, type HeroSlide,
+  type PasswordResetToken,
+  type AnalyticsData, type LoyaltySettings,
 } from "@shared/schema";
 import bcrypt from "bcryptjs";
 
@@ -133,6 +135,19 @@ export interface IStorage {
 
   // Stats
   getStats(): Promise<{ tours: number; bookings: number; users: number; revenue: string }>;
+
+  // Password Reset
+  createPasswordResetToken(userId: string, token: string): Promise<void>;
+  getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined>;
+  markTokenUsed(token: string): Promise<void>;
+  updateUserPassword(userId: string, hashedPassword: string): Promise<void>;
+
+  // Analytics
+  getAnalytics(filters?: { startDate?: Date; endDate?: Date; paymentType?: string; status?: string }): Promise<AnalyticsData>;
+
+  // Loyalty Settings
+  getLoyaltySettings(): Promise<LoyaltySettings>;
+  updateLoyaltySettings(data: LoyaltySettings): Promise<LoyaltySettings>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -641,6 +656,120 @@ export class DatabaseStorage implements IStorage {
       users: Number(usersCount.count),
       revenue: revenue.total || "0",
     };
+  }
+
+  async createPasswordResetToken(userId: string, token: string) {
+    const expiresAt = new Date(Date.now() + 3600 * 1000);
+    await db.insert(passwordResetTokens).values({ userId, token, expiresAt });
+  }
+
+  async getPasswordResetToken(token: string) {
+    const [t] = await db.select().from(passwordResetTokens).where(eq(passwordResetTokens.token, token));
+    return t;
+  }
+
+  async markTokenUsed(token: string) {
+    await db.update(passwordResetTokens).set({ used: true }).where(eq(passwordResetTokens.token, token));
+  }
+
+  async updateUserPassword(userId: string, hashedPassword: string) {
+    await db.update(users).set({ password: hashedPassword }).where(eq(users.id, userId));
+  }
+
+  async getAnalytics(filters?: { startDate?: Date; endDate?: Date; paymentType?: string; status?: string }): Promise<AnalyticsData> {
+    const conditions: any[] = [ne(bookings.bookingStatus, "cancelled")];
+    if (filters?.startDate) conditions.push(sql`${bookings.createdAt} >= ${filters.startDate}`);
+    if (filters?.endDate) conditions.push(sql`${bookings.createdAt} <= ${filters.endDate}`);
+    if (filters?.paymentType && filters.paymentType !== "all") conditions.push(eq(bookings.paymentType, filters.paymentType as any));
+    if (filters?.status && filters.status !== "all") conditions.push(eq(bookings.bookingStatus, filters.status as any));
+
+    const whereClause = and(...conditions);
+
+    const [summary] = await db.select({
+      totalBookings: sql<number>`count(${bookings.id})::int`,
+      totalTourists: sql<number>`sum(${bookings.adults} + ${bookings.children})::int`,
+      totalRevenue: sql<number>`sum(${bookings.totalPrice})::float`,
+      prepaidRevenue: sql<number>`sum(case when ${bookings.paymentType} = 'prepay' then ${bookings.paidAmount} else 0 end)::float`,
+      fullRevenue: sql<number>`sum(case when ${bookings.paymentType} = 'full' then ${bookings.paidAmount} else 0 end)::float`,
+    }).from(bookings).where(whereClause);
+
+    const revenueByDay = await db.select({
+      date: sql<string>`to_char(${bookings.createdAt}, 'YYYY-MM-DD')`,
+      revenue: sql<number>`sum(${bookings.totalPrice})::float`,
+      bookings: sql<number>`count(${bookings.id})::int`,
+    }).from(bookings)
+      .where(whereClause)
+      .groupBy(sql`to_char(${bookings.createdAt}, 'YYYY-MM-DD')`)
+      .orderBy(asc(sql`to_char(${bookings.createdAt}, 'YYYY-MM-DD')`));
+
+    const revenueByMonth = await db.select({
+      month: sql<string>`to_char(${bookings.createdAt}, 'YYYY-MM')`,
+      revenue: sql<number>`sum(${bookings.totalPrice})::float`,
+      bookings: sql<number>`count(${bookings.id})::int`,
+    }).from(bookings)
+      .where(whereClause)
+      .groupBy(sql`to_char(${bookings.createdAt}, 'YYYY-MM')`)
+      .orderBy(asc(sql`to_char(${bookings.createdAt}, 'YYYY-MM')`));
+
+    const topTours = await db.select({
+      tourId: tours.id,
+      titleRu: tours.titleRu,
+      titleEn: tours.titleEn,
+      bookings: sql<number>`count(${bookings.id})::int`,
+      tourists: sql<number>`sum(${bookings.adults} + ${bookings.children})::int`,
+      revenue: sql<number>`sum(${bookings.totalPrice})::float`,
+    }).from(bookings)
+      .innerJoin(tours, eq(bookings.tourId, tours.id))
+      .where(whereClause)
+      .groupBy(tours.id, tours.titleRu, tours.titleEn)
+      .orderBy(desc(sql`revenue`))
+      .limit(10);
+
+    const topCountries = await db.select({
+      countryId: countries.id,
+      nameRu: countries.nameRu,
+      nameEn: countries.nameEn,
+      tourists: sql<number>`sum(${bookings.adults} + ${bookings.children})::int`,
+      revenue: sql<number>`sum(${bookings.totalPrice})::float`,
+    }).from(bookings)
+      .innerJoin(tours, eq(bookings.tourId, tours.id))
+      .innerJoin(countries, eq(tours.countryId, countries.id))
+      .where(whereClause)
+      .groupBy(countries.id, countries.nameRu, countries.nameEn)
+      .orderBy(desc(sql`revenue`))
+      .limit(10);
+
+    return {
+      totalBookings: summary?.totalBookings || 0,
+      totalTourists: summary?.totalTourists || 0,
+      totalRevenue: summary?.totalRevenue || 0,
+      prepaidRevenue: summary?.prepaidRevenue || 0,
+      fullRevenue: summary?.fullRevenue || 0,
+      revenueByDay: revenueByDay || [],
+      revenueByMonth: revenueByMonth || [],
+      topTours: topTours || [],
+      topCountries: topCountries || [],
+    };
+  }
+
+  async getLoyaltySettings(): Promise<LoyaltySettings> {
+    const [row] = await db.select().from(settings).where(eq(settings.key, "loyalty"));
+    if (row) return row.value as LoyaltySettings;
+    return {
+      beginner: { minBookings: 0, discount: 0 },
+      traveler: { minBookings: 3, discount: 10, discountCount: 2 },
+      premium: { minBookings: 6, discount: 5 },
+    };
+  }
+
+  async updateLoyaltySettings(data: LoyaltySettings): Promise<LoyaltySettings> {
+    const existing = await db.select().from(settings).where(eq(settings.key, "loyalty"));
+    if (existing.length > 0) {
+      await db.update(settings).set({ value: data as any }).where(eq(settings.key, "loyalty"));
+    } else {
+      await db.insert(settings).values({ key: "loyalty", value: data as any });
+    }
+    return data;
   }
 }
 

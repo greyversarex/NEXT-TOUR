@@ -5,13 +5,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   LayoutDashboard, Map, Building2, Tag, Image, Layers,
   Users, BookOpen, MessageSquare, Newspaper, Package,
-  PlusCircle, ChevronRight, Settings, Globe
+  PlusCircle, ChevronRight, Settings, Globe, BarChart3,
+  Award
 } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", labelRu: "Дашборд", icon: LayoutDashboard },
+  { href: "/admin/statistics", label: "Statistics", labelRu: "Статистика", icon: BarChart3 },
+  { href: "/admin/loyalty", label: "Loyalty Program", labelRu: "Программа лояльности", icon: Award },
   { href: "/admin/tours", label: "Tours", labelRu: "Туры", icon: Globe },
   { href: "/admin/countries", label: "Countries", labelRu: "Страны", icon: Map },
+  { href: "/admin/cities", label: "Cities", labelRu: "Города", icon: Building2 },
   { href: "/admin/categories", label: "Categories", labelRu: "Категории", icon: Tag },
   { href: "/admin/price-components", label: "Price Components", labelRu: "Компоненты", icon: Package },
   { href: "/admin/banners", label: "Banners", labelRu: "Баннеры", icon: Image },

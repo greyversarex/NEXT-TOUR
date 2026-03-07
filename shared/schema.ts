@@ -211,6 +211,21 @@ export const heroSlides = pgTable("hero_slides", {
   isActive: boolean("is_active").notNull().default(true),
 });
 
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  used: boolean("used").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const settings = pgTable("settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  key: text("key").notNull().unique(),
+  value: jsonb("value").notNull(),
+});
+
 // Insert Schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, loyaltyLevel: true, bookingsCount: true, discountsLeft: true });
 export const insertCountrySchema = createInsertSchema(countries).omit({ id: true });
@@ -264,3 +279,23 @@ export type InsertNews = z.infer<typeof insertNewsSchema>;
 export type Favorite = typeof favorites.$inferSelect;
 export type IntroScreen = typeof introScreen.$inferSelect;
 export type HeroSlide = typeof heroSlides.$inferSelect;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type Settings = typeof settings.$inferSelect;
+
+export interface AnalyticsData {
+  totalBookings: number;
+  totalTourists: number;
+  totalRevenue: number;
+  prepaidRevenue: number;
+  fullRevenue: number;
+  revenueByDay: Array<{ date: string; revenue: number; bookings: number }>;
+  revenueByMonth: Array<{ month: string; revenue: number; bookings: number }>;
+  topTours: Array<{ tourId: string; titleRu: string; titleEn: string; bookings: number; tourists: number; revenue: number }>;
+  topCountries: Array<{ countryId: string; nameRu: string; nameEn: string; tourists: number; revenue: number }>;
+}
+
+export interface LoyaltySettings {
+  beginner: { minBookings: number; discount: number };
+  traveler: { minBookings: number; discount: number; discountCount: number };
+  premium: { minBookings: number; discount: number };
+}

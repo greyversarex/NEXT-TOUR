@@ -16,6 +16,7 @@ import Profile from "@/pages/Profile";
 import NewsPage, { NewsDetail } from "@/pages/NewsPage";
 import Promotions from "@/pages/Promotions";
 import About from "@/pages/About";
+import ResetPassword from "@/pages/ResetPassword";
 import Dashboard from "@/pages/admin/Dashboard";
 import ToursAdmin from "@/pages/admin/ToursAdmin";
 import ReviewsAdmin from "@/pages/admin/ReviewsAdmin";
@@ -28,10 +29,13 @@ import NewsAdmin from "@/pages/admin/NewsAdmin";
 import BannersAdmin from "@/pages/admin/BannersAdmin";
 import PriceComponentsAdmin from "@/pages/admin/PriceComponentsAdmin";
 import HeroSlidesAdmin from "@/pages/admin/HeroSlidesAdmin";
+import CitiesAdmin from "@/pages/admin/CitiesAdmin";
+import StatisticsAdmin from "@/pages/admin/StatisticsAdmin";
+import LoyaltyAdmin from "@/pages/admin/LoyaltyAdmin";
 
 const ADMIN_PATHS = ["/admin", "/admin/tours", "/admin/reviews", "/admin/bookings",
-  "/admin/users", "/admin/countries", "/admin/categories", "/admin/feeds",
-  "/admin/news", "/admin/banners", "/admin/price-components", "/admin/hero-slides"];
+  "/admin/users", "/admin/countries", "/admin/cities", "/admin/categories", "/admin/feeds",
+  "/admin/news", "/admin/banners", "/admin/price-components", "/admin/hero-slides", "/admin/statistics", "/admin/loyalty"];
 
 function Router() {
   return (
@@ -45,18 +49,22 @@ function Router() {
       <Route path="/news/:id" component={NewsDetail} />
       <Route path="/promotions" component={Promotions} />
       <Route path="/about" component={About} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route path="/admin" component={Dashboard} />
       <Route path="/admin/tours" component={ToursAdmin} />
       <Route path="/admin/reviews" component={ReviewsAdmin} />
       <Route path="/admin/bookings" component={BookingsAdmin} />
       <Route path="/admin/users" component={UsersAdmin} />
       <Route path="/admin/countries" component={CountriesAdmin} />
+      <Route path="/admin/cities" component={CitiesAdmin} />
       <Route path="/admin/categories" component={CategoriesAdmin} />
       <Route path="/admin/feeds" component={FeedsAdmin} />
       <Route path="/admin/news" component={NewsAdmin} />
       <Route path="/admin/banners" component={BannersAdmin} />
       <Route path="/admin/price-components" component={PriceComponentsAdmin} />
       <Route path="/admin/hero-slides" component={HeroSlidesAdmin} />
+      <Route path="/admin/statistics" component={StatisticsAdmin} />
+      <Route path="/admin/loyalty" component={LoyaltyAdmin} />
       <Route component={NotFound} />
     </Switch>
   );

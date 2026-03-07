@@ -122,6 +122,26 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Map Section */}
+        <div className="mt-12 pt-8 border-t border-white/8">
+          <h4 className="font-semibold mb-5 text-xs uppercase tracking-widest text-white/35">
+            {t("Найти нас", "Find Us")}
+          </h4>
+          <div className="rounded-xl overflow-hidden shadow-2xl border border-white/10 h-[200px] w-full">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2245.3726684082543!2d37.61551!3d55.75584!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46b54a50b315e573%3A0xa886bf5a3d9b2e68!2z0JzQvtGB0LrQstCw!5e0!3m2!1sru!2sru!4v1709904000000!5m2!1sru!2sru"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen={true}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Office Location"
+              data-testid="iframe-google-map"
+            ></iframe>
+          </div>
+        </div>
+
         {/* Bottom bar */}
         <div className="border-t border-white/8 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/25">
           <span>© {new Date().getFullYear()} TravelPro. {t("Все права защищены.", "All rights reserved.")}</span>
