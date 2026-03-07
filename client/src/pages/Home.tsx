@@ -292,16 +292,11 @@ function SearchSection() {
       <Reveal y={12}>
         <form onSubmit={handleSearch}>
           <div
-            className="flex flex-col md:flex-row rounded-2xl overflow-visible shadow-2xl border border-white/20"
-            style={{
-              background: "rgba(10,10,20,0.80)",
-              backdropFilter: "blur(28px) saturate(180%)",
-              WebkitBackdropFilter: "blur(28px) saturate(180%)",
-            }}
+            className="flex flex-col md:flex-row rounded-2xl overflow-visible shadow-2xl border border-border/40 bg-white dark:bg-card"
           >
             {/* Destination field with autocomplete */}
-            <div className="relative flex-1 border-b md:border-b-0 md:border-r border-white/15">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50 pointer-events-none z-10" />
+            <div className="relative flex-1 border-b md:border-b-0 md:border-r border-border/40">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" />
               <input
                 ref={inputRef}
                 type="text"
@@ -309,7 +304,7 @@ function SearchSection() {
                 value={destination}
                 onChange={e => { setDestination(e.target.value); setShowSuggestions(true); }}
                 onFocus={() => destination && setShowSuggestions(true)}
-                className="w-full bg-transparent pl-12 pr-5 py-5 text-white placeholder:text-white/45 focus:outline-none text-base rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none"
+                className="w-full bg-transparent pl-12 pr-5 py-5 text-foreground placeholder:text-muted-foreground focus:outline-none text-base rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none"
                 data-testid="input-hero-search"
                 autoComplete="off"
               />
@@ -341,16 +336,16 @@ function SearchSection() {
             </div>
 
             {/* Date range picker */}
-            <div className="relative border-b md:border-b-0 md:border-r border-white/15">
+            <div className="relative border-b md:border-b-0 md:border-r border-border/40">
               <Popover open={dateOpen} onOpenChange={setDateOpen}>
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="flex items-center gap-2.5 px-5 py-5 text-white hover:bg-white/8 transition-colors text-sm w-full md:w-auto whitespace-nowrap"
+                    className="flex items-center gap-2.5 px-5 py-5 text-foreground hover:bg-primary/8 transition-colors text-sm w-full md:w-auto whitespace-nowrap"
                     data-testid="button-date-picker"
                   >
-                    <CalendarDays className="h-5 w-5 text-white/50 shrink-0" />
-                    <span className={dateFrom ? "text-white" : "text-white/55"}>{formatDateRange()}</span>
+                    <CalendarDays className="h-5 w-5 text-muted-foreground shrink-0" />
+                    <span className={dateFrom ? "text-foreground" : "text-muted-foreground"}>{formatDateRange()}</span>
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-4 rounded-2xl shadow-2xl" align="start">
@@ -391,16 +386,16 @@ function SearchSection() {
             </div>
 
             {/* Travelers dropdown */}
-            <div className="relative border-b md:border-b-0 md:border-r border-white/15" ref={travelersRef}>
+            <div className="relative border-b md:border-b-0 md:border-r border-border/40" ref={travelersRef}>
               <button
                 type="button"
                 onClick={() => setTravelersOpen(!travelersOpen)}
-                className="flex items-center gap-2.5 px-5 py-5 text-white hover:bg-white/8 transition-colors text-sm w-full md:w-auto whitespace-nowrap"
+                className="flex items-center gap-2.5 px-5 py-5 text-foreground hover:bg-primary/8 transition-colors text-sm w-full md:w-auto whitespace-nowrap"
                 data-testid="button-travelers-picker"
               >
-                <Users className="h-5 w-5 text-white/50 shrink-0" />
+                <Users className="h-5 w-5 text-muted-foreground shrink-0" />
                 <span>{TRAVELER_OPTIONS.find(o => o.value === travelers)?.[lang === "ru" ? "labelRu" : "labelEn"]}</span>
-                <ChevronDown className="h-4 w-4 text-white/40 ml-1" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground ml-1" />
               </button>
               {travelersOpen && (
                 <div className="absolute top-full mt-2 left-0 bg-white dark:bg-card rounded-2xl shadow-2xl border border-border/40 overflow-hidden z-50 min-w-[180px]">
