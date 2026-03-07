@@ -80,7 +80,7 @@ export default function TourDetail() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Cinematic Gallery */}
-      <div className="relative mb-10 rounded-3xl overflow-hidden bg-muted h-80 md:h-[500px] shadow-[0_8px_48px_rgba(0,0,0,0.18)]">
+      <div className="relative mb-0 rounded-t-3xl overflow-hidden bg-muted h-80 md:h-[480px] shadow-[0_8px_48px_rgba(0,0,0,0.18)]">
         {images.length > 0 ? (
           <>
             <img
@@ -147,37 +147,39 @@ export default function TourDetail() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* Main Content */}
-        <div className="lg:col-span-2">
-          <div className="flex items-start justify-between mb-5">
-            <h1 className="text-2xl md:text-4xl font-extrabold leading-tight" data-testid="text-tour-detail-title">{title}</h1>
-            <button
-              onClick={() => user ? favMutation.mutate() : setAuthOpen(true)}
-              className="w-11 h-11 rounded-2xl bg-muted/60 hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center justify-center transition-all duration-200 hover:scale-110 shrink-0 ml-3"
-              data-testid="button-toggle-favorite"
-            >
-              <Heart className={`h-5 w-5 transition-colors ${isFavorite ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
-            </button>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 mb-8">
-            <span className="flex items-center gap-1.5 text-sm font-medium bg-muted/60 rounded-full px-3 py-1.5">
-              <Clock className="h-4 w-4 text-primary" /> {tour.duration} {t("дней", "days")}
-            </span>
-            {tour.isHot && (
-              <span className="flex items-center gap-1.5 text-sm font-bold bg-orange-100 dark:bg-orange-950/30 text-orange-600 rounded-full px-3 py-1.5">
-                🔥 {t("Горящий", "Hot Deal")}
-              </span>
-            )}
-            <div className="flex items-center gap-1 ml-auto">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className={`h-4 w-4 ${i < Math.round(Number(tour.rating || 0)) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`} />
-              ))}
+      {/* Content card — connects to gallery above */}
+      <div className="bg-background/95 backdrop-blur-md rounded-b-3xl shadow-[0_12px_48px_rgba(0,0,0,0.15)] border border-border/40 border-t-0 mb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
+          {/* Main Content */}
+          <div className="lg:col-span-2 p-6 md:p-8 border-r border-border/30">
+            <div className="flex items-start justify-between mb-5">
+              <h1 className="text-2xl md:text-4xl font-extrabold leading-tight" data-testid="text-tour-detail-title">{title}</h1>
+              <button
+                onClick={() => user ? favMutation.mutate() : setAuthOpen(true)}
+                className="w-11 h-11 rounded-2xl bg-muted/60 hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center justify-center transition-all duration-200 hover:scale-110 shrink-0 ml-3"
+                data-testid="button-toggle-favorite"
+              >
+                <Heart className={`h-5 w-5 transition-colors ${isFavorite ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+              </button>
             </div>
-          </div>
 
-          <Tabs defaultValue="description">
+            <div className="flex flex-wrap items-center gap-3 mb-8">
+              <span className="flex items-center gap-1.5 text-sm font-medium bg-muted/60 rounded-full px-3 py-1.5">
+                <Clock className="h-4 w-4 text-primary" /> {tour.duration} {t("дней", "days")}
+              </span>
+              {tour.isHot && (
+                <span className="flex items-center gap-1.5 text-sm font-bold bg-orange-100 dark:bg-orange-950/30 text-orange-600 rounded-full px-3 py-1.5">
+                  🔥 {t("Горящий", "Hot Deal")}
+                </span>
+              )}
+              <div className="flex items-center gap-1 ml-auto">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className={`h-4 w-4 ${i < Math.round(Number(tour.rating || 0)) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`} />
+                ))}
+              </div>
+            </div>
+
+            <Tabs defaultValue="description">
             <TabsList className="mb-6 flex-wrap gap-1 h-auto">
               <TabsTrigger value="description">{t("Описание", "Description")}</TabsTrigger>
               <TabsTrigger value="program">{t("Программа", "Itinerary")}</TabsTrigger>
@@ -316,7 +318,7 @@ export default function TourDetail() {
         </div>
 
         {/* Booking Sidebar */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 p-6 md:p-8">
           <div className="sticky top-24">
             <div className="rounded-3xl overflow-hidden shadow-[0_8px_40px_rgba(0,0,0,0.12)] border border-border/60">
               {/* Sidebar header gradient */}
@@ -417,6 +419,7 @@ export default function TourDetail() {
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       {recommendedTours.length > 0 && (
