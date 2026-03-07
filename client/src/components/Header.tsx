@@ -71,8 +71,8 @@ export default function Header() {
                   <span
                     className={`relative px-3.5 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ${
                       isActive(link.href)
-                        ? "text-primary"
-                        : "text-foreground/65 hover:text-foreground hover:bg-muted/70"
+                        ? "text-primary font-semibold"
+                        : "text-primary/60 hover:text-primary hover:bg-primary/8"
                     }`}
                     data-testid={`link-nav-${link.href.replace("/", "") || "home"}`}
                   >
@@ -190,7 +190,7 @@ export default function Header() {
                     className={`block px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 ${
                       isActive(link.href)
                         ? "text-primary bg-primary/8 font-semibold"
-                        : "text-foreground/70 hover:text-foreground hover:bg-muted/60"
+                        : "text-primary/60 hover:text-primary hover:bg-primary/8"
                     }`}
                     onClick={() => setMenuOpen(false)}
                   >
