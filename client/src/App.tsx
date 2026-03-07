@@ -75,7 +75,7 @@ function AppShell() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <IntroScreen />
       <Header />
       <main className="flex-1">
