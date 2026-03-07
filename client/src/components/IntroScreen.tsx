@@ -101,10 +101,18 @@ export default function IntroScreen() {
       }}
     >
       {intro?.videoUrl ? (
-        <video
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.25 }}
-          autoPlay muted loop playsInline src={intro.videoUrl}
-        />
+        intro.videoUrl.toLowerCase().endsWith(".gif") ? (
+          <img
+            src={intro.videoUrl}
+            alt=""
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.28 }}
+          />
+        ) : (
+          <video
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.25 }}
+            autoPlay muted loop playsInline src={intro.videoUrl}
+          />
+        )
       ) : null}
 
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>

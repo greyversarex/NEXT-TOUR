@@ -97,8 +97,8 @@ export default function IntroScreenAdmin() {
 
             <div>
               <Label>{t("Видео (URL)", "Video (URL)")}</Label>
-              <p className="text-xs text-muted-foreground mb-1">{t("MP4 ссылка или загрузите файл", "MP4 link or upload a file")}</p>
-              <ImageUpload value={form.videoUrl} onChange={v => set("videoUrl", v)} placeholder="https://... или /uploads/video.mp4" />
+              <p className="text-xs text-muted-foreground mb-1">{t("Поддерживается MP4 и GIF — загрузите файл или вставьте ссылку", "Supports MP4 and GIF — upload a file or paste a link")}</p>
+              <ImageUpload value={form.videoUrl} onChange={v => set("videoUrl", v)} placeholder="https://... или /uploads/animation.gif" />
             </div>
 
             <div className="pt-2">
@@ -118,8 +118,12 @@ export default function IntroScreenAdmin() {
         {form.videoUrl && (
           <Card>
             <CardContent className="pt-6">
-              <p className="text-sm font-semibold mb-3">{t("Предпросмотр видео", "Video Preview")}</p>
-              <video src={form.videoUrl} controls className="w-full rounded-lg max-h-60 object-cover bg-black" />
+              <p className="text-sm font-semibold mb-3">{t("Предпросмотр фона", "Background Preview")}</p>
+              {form.videoUrl.toLowerCase().endsWith(".gif") ? (
+                <img src={form.videoUrl} alt="preview" className="w-full rounded-lg max-h-60 object-cover bg-black" />
+              ) : (
+                <video src={form.videoUrl} controls className="w-full rounded-lg max-h-60 object-cover bg-black" />
+              )}
             </CardContent>
           </Card>
         )}
