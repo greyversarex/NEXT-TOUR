@@ -84,11 +84,27 @@ export default function CountriesAdmin() {
           <div className="space-y-2">
             {countries.map(c => (
               <Card key={c.id}><CardContent className="pt-3 pb-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-sm">{c.nameRu} / {c.nameEn}</p>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {c.imageUrl && (
+                      <img src={c.imageUrl} alt={c.nameRu} className="h-10 w-16 rounded object-cover shrink-0" />
+                    )}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        {c.countryCode && (
+                          <span className="text-lg" title={c.countryCode}>
+                            {c.countryCode.toUpperCase().replace(/./g, ch => String.fromCodePoint(127397 + ch.charCodeAt(0)))}
+                          </span>
+                        )}
+                        <p className="font-medium text-sm">{c.nameRu} / {c.nameEn}</p>
+                        {c.countryCode && <span className="text-xs text-muted-foreground font-mono">{c.countryCode}</span>}
+                      </div>
+                      {c.tagsRu && c.tagsRu.length > 0 && (
+                        <p className="text-xs text-muted-foreground truncate">{c.tagsRu.join(" • ")}</p>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 shrink-0">
                     <Button variant="ghost" size="icon" onClick={() => setEditing(c)}><Edit className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => deleteCountryMutation.mutate(c.id)} className="text-destructive"><Trash2 className="h-4 w-4" /></Button>
                   </div>
@@ -127,18 +143,89 @@ export default function CountriesAdmin() {
       )}
 
       {editing !== null && (
-        <EntityForm
-          item={editing}
-          title={editing.id ? t("Редактировать страну", "Edit Country") : t("Добавить страну", "Add Country")}
-          fields={[
-            { key: "nameRu", label: t("Название (RU)", "Name (RU)"), required: true },
-            { key: "nameEn", label: t("Название (EN)", "Name (EN)"), required: true },
-            { key: "imageUrl", label: t("Изображение (URL)", "Image URL") },
-          ]}
-          onSave={countryMutation.mutate}
-          onClose={() => setEditing(null)}
-          isSaving={countryMutation.isPending}
-        />
+        <Dialog open onOpenChange={() => setEditing(null)}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>{editing.id ? t("Редактировать страну", "Edit Country") : t("Добавить страну", "Add Country")}</DialogTitle>
+            </DialogHeader>
+            <form
+              onSubmit={e => {
+                e.preventDefault();
+                const raw = editing;
+                countryMutation.mutate({
+                  ...raw,
+                  tagsRu: typeof raw.tagsRu === "string" ? raw.tagsRu.split(",").map((s: string) => s.trim()).filter(Boolean) : raw.tagsRu,
+                  tagsEn: typeof raw.tagsEn === "string" ? raw.tagsEn.split(",").map((s: string) => s.trim()).filter(Boolean) : raw.tagsEn,
+                });
+              }}
+              className="space-y-4"
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>{t("Название (RU)", "Name (RU)")}</Label>
+                  <Input
+                    value={editing.nameRu || ""}
+                    onChange={e => setEditing((p: any) => ({ ...p, nameRu: e.target.value }))}
+                    className="mt-1" required
+                  />
+                </div>
+                <div>
+                  <Label>{t("Название (EN)", "Name (EN)")}</Label>
+                  <Input
+                    value={editing.nameEn || ""}
+                    onChange={e => setEditing((p: any) => ({ ...p, nameEn: e.target.value }))}
+                    className="mt-1" required
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="col-span-2">
+                  <Label>{t("Изображение (URL)", "Image URL")}</Label>
+                  <Input
+                    value={editing.imageUrl || ""}
+                    onChange={e => setEditing((p: any) => ({ ...p, imageUrl: e.target.value }))}
+                    className="mt-1"
+                    placeholder="/images/tour-xxx.png"
+                  />
+                </div>
+                <div>
+                  <Label>{t("Код страны", "Country Code")}</Label>
+                  <Input
+                    value={editing.countryCode || ""}
+                    onChange={e => setEditing((p: any) => ({ ...p, countryCode: e.target.value.toUpperCase().slice(0, 2) }))}
+                    className="mt-1 uppercase"
+                    placeholder="FR"
+                    maxLength={2}
+                  />
+                </div>
+              </div>
+              <div>
+                <Label>{t("Теги (RU, через запятую)", "Tags (RU, comma separated)")}</Label>
+                <Input
+                  value={Array.isArray(editing.tagsRu) ? editing.tagsRu.join(", ") : (editing.tagsRu || "")}
+                  onChange={e => setEditing((p: any) => ({ ...p, tagsRu: e.target.value }))}
+                  className="mt-1"
+                  placeholder="Пляжи, Острова, Кораллы"
+                />
+              </div>
+              <div>
+                <Label>{t("Теги (EN, через запятую)", "Tags (EN, comma separated)")}</Label>
+                <Input
+                  value={Array.isArray(editing.tagsEn) ? editing.tagsEn.join(", ") : (editing.tagsEn || "")}
+                  onChange={e => setEditing((p: any) => ({ ...p, tagsEn: e.target.value }))}
+                  className="mt-1"
+                  placeholder="Beaches, Islands, Corals"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button type="submit" disabled={countryMutation.isPending}>
+                  {countryMutation.isPending ? t("Сохранение...", "Saving...") : t("Сохранить", "Save")}
+                </Button>
+                <Button type="button" variant="outline" onClick={() => setEditing(null)}>{t("Отмена", "Cancel")}</Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       )}
 
       {editingCity !== null && (

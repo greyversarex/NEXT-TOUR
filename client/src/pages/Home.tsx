@@ -16,62 +16,6 @@ import {
 } from "lucide-react";
 import type { Tour, Country, City } from "@shared/schema";
 
-const DESTINATIONS = [
-  {
-    id: "maldives",
-    nameRu: "Мальдивы",
-    nameEn: "Maldives",
-    image: "/images/tour-maldives.png",
-    tagsRu: ["Пляжи", "Острова", "Кораллы"],
-    tagsEn: ["Beaches", "Islands", "Corals"],
-    country: "MV",
-  },
-  {
-    id: "japan",
-    nameRu: "Япония",
-    nameEn: "Japan",
-    image: "/images/tour-tokyo.png",
-    tagsRu: ["Культура", "Сакура", "Кухня"],
-    tagsEn: ["Culture", "Cherry Blossoms", "Cuisine"],
-    country: "JP",
-  },
-  {
-    id: "italy",
-    nameRu: "Италия",
-    nameEn: "Italy",
-    image: "/images/dest-italy.jpg",
-    tagsRu: ["История", "Море", "Гастрономия"],
-    tagsEn: ["History", "Sea", "Gastronomy"],
-    country: "IT",
-  },
-  {
-    id: "turkey",
-    nameRu: "Турция",
-    nameEn: "Turkey",
-    image: "/images/dest-turkey.jpg",
-    tagsRu: ["Пейзажи", "Культура", "Природа"],
-    tagsEn: ["Landscapes", "Culture", "Nature"],
-    country: "TR",
-  },
-  {
-    id: "greece",
-    nameRu: "Греция",
-    nameEn: "Greece",
-    image: "/images/tour-santorini.png",
-    tagsRu: ["Острова", "Архитектура", "Закаты"],
-    tagsEn: ["Islands", "Architecture", "Sunsets"],
-    country: "GR",
-  },
-  {
-    id: "uae",
-    nameRu: "ОАЭ",
-    nameEn: "UAE",
-    image: "/images/dest-uae.jpg",
-    tagsRu: ["Роскошь", "Небоскрёбы", "Пустыня"],
-    tagsEn: ["Luxury", "Skyscrapers", "Desert"],
-    country: "AE",
-  },
-];
 
 const STATS = [
   {
@@ -563,15 +507,22 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
   );
 }
 
+function countryFlag(code: string): string {
+  return code
+    .toUpperCase()
+    .replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0)));
+}
+
 function DestinationCard({ dest, lang, aspectClass = "aspect-[3/4]" }: {
-  dest: typeof DESTINATIONS[0];
+  dest: Country;
   lang: string;
   aspectClass?: string;
 }) {
   const name = lang === "ru" ? dest.nameRu : dest.nameEn;
-  const tags = lang === "ru" ? dest.tagsRu : dest.tagsEn;
+  const tags: string[] = (lang === "ru" ? dest.tagsRu : dest.tagsEn) || [];
+  const image = dest.imageUrl || "/images/hero-banner.png";
   return (
-    <Link href="/tours" className="block h-full">
+    <Link href={`/tours`} className="block h-full">
       <div
         className={`group relative rounded-2xl overflow-hidden cursor-pointer h-full
           ${aspectClass}
@@ -581,7 +532,7 @@ function DestinationCard({ dest, lang, aspectClass = "aspect-[3/4]" }: {
         data-testid={`card-destination-${dest.id}`}
       >
         <img
-          src={dest.image}
+          src={image}
           alt={name}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.10]"
         />
@@ -593,9 +544,11 @@ function DestinationCard({ dest, lang, aspectClass = "aspect-[3/4]" }: {
           style={{ background: "linear-gradient(135deg, transparent 35%, rgba(255,255,255,0.07) 55%, transparent 75%)" }}
         />
 
-        <div className="absolute top-3.5 left-3.5 z-10">
-          <span className="text-2xl drop-shadow-md">{countryFlag(dest.country)}</span>
-        </div>
+        {dest.countryCode && (
+          <div className="absolute top-3.5 left-3.5 z-10">
+            <span className="text-2xl drop-shadow-md">{countryFlag(dest.countryCode)}</span>
+          </div>
+        )}
 
         <div className="absolute top-3.5 right-3.5 z-10 scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 ease-out">
           <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
@@ -610,68 +563,77 @@ function DestinationCard({ dest, lang, aspectClass = "aspect-[3/4]" }: {
           >
             {name}
           </h3>
-          <p className="text-white/75 text-xs font-medium tracking-wide mb-2.5 group-hover:text-white/90 transition-colors duration-300">
-            {tags.join(" • ")}
-          </p>
-          <div className="flex flex-wrap gap-1.5 max-h-0 overflow-hidden group-hover:max-h-12 transition-all duration-400 ease-out">
-            {tags.map((tag, i) => (
-              <span
-                key={i}
-                className="text-[11px] text-white/95 bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-0.5 border border-white/25 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ transitionDelay: `${i * 60}ms` }}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+          {tags.length > 0 && (
+            <>
+              <p className="text-white/75 text-xs font-medium tracking-wide mb-2.5 group-hover:text-white/90 transition-colors duration-300">
+                {tags.join(" • ")}
+              </p>
+              <div className="flex flex-wrap gap-1.5 max-h-0 overflow-hidden group-hover:max-h-12 transition-all duration-400 ease-out">
+                {tags.map((tag, i) => (
+                  <span
+                    key={i}
+                    className="text-[11px] text-white/95 bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-0.5 border border-white/25 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    style={{ transitionDelay: `${i * 60}ms` }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </Link>
   );
 }
 
-function countryFlag(code: string): string {
-  return code
-    .toUpperCase()
-    .replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0)));
-}
-
 function DestinationsSection() {
   const { t, lang } = useI18n();
+  const { data: countries = [], isLoading } = useQuery<Country[]>({ queryKey: ["/api/countries"] });
+
+  const destinations = countries.filter(c => c.imageUrl);
+
   return (
     <section className="py-24 relative overflow-hidden">
-
       <div className="relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <Reveal className="text-center mb-16">
-        <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
-          <MapPin className="h-3.5 w-3.5" /> {t("Исследуйте", "Explore")}
-        </p>
-        <h2 className="text-3xl md:text-5xl font-bold mb-5 leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Направления мечты", "Dream Destinations")}</h2>
-        <p className="text-white/70 max-w-xl mx-auto text-base leading-relaxed" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.4)" }}>
-          {t("Откройте для себя самые красивые уголки планеты с нашими эксклюзивными турами", "Discover the most beautiful corners of the planet with our exclusive tours")}
-        </p>
-      </Reveal>
+        <Reveal className="text-center mb-16">
+          <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
+            <MapPin className="h-3.5 w-3.5" /> {t("Исследуйте", "Explore")}
+          </p>
+          <h2 className="text-3xl md:text-5xl font-bold mb-5 leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Направления мечты", "Dream Destinations")}</h2>
+          <p className="text-white/70 max-w-xl mx-auto text-base leading-relaxed" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.4)" }}>
+            {t("Откройте для себя самые красивые уголки планеты с нашими эксклюзивными турами", "Discover the most beautiful corners of the planet with our exclusive tours")}
+          </p>
+        </Reveal>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
-        {DESTINATIONS.map((dest, i) => {
-          let wrapClass = "";
-          let aspect = "aspect-[3/4]";
+        {isLoading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className={`rounded-2xl ${i === 0 ? "col-span-2 aspect-[16/9]" : i === 5 ? "col-span-2 md:col-span-3 aspect-[21/9]" : "aspect-[3/4]"}`} />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
+            {destinations.map((dest, i) => {
+              let wrapClass = "";
+              let aspect = "aspect-[3/4]";
 
-          if (i === 0) {
-            wrapClass = "col-span-2 md:col-span-2";
-            aspect = "aspect-[4/3] md:aspect-[16/9]";
-          } else if (i === DESTINATIONS.length - 1) {
-            wrapClass = "col-span-2 md:col-span-3";
-            aspect = "aspect-[2/1] md:aspect-[21/9]";
-          }
+              if (i === 0) {
+                wrapClass = "col-span-2 md:col-span-2";
+                aspect = "aspect-[4/3] md:aspect-[16/9]";
+              } else if (i === destinations.length - 1 && destinations.length > 4) {
+                wrapClass = "col-span-2 md:col-span-3";
+                aspect = "aspect-[2/1] md:aspect-[21/9]";
+              }
 
-          return (
-            <Reveal key={dest.id} delay={i * 80} y={20} className={wrapClass}>
-              <DestinationCard dest={dest} lang={lang} aspectClass={aspect} />
-            </Reveal>
-          );
-        })}
-      </div>
+              return (
+                <Reveal key={dest.id} delay={i * 80} y={20} className={wrapClass}>
+                  <DestinationCard dest={dest} lang={lang} aspectClass={aspect} />
+                </Reveal>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );

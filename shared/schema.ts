@@ -30,6 +30,9 @@ export const countries = pgTable("countries", {
   nameRu: text("name_ru").notNull(),
   nameEn: text("name_en").notNull(),
   imageUrl: text("image_url"),
+  countryCode: varchar("country_code", { length: 2 }),
+  tagsRu: text("tags_ru").array(),
+  tagsEn: text("tags_en").array(),
 });
 
 export const cities = pgTable("cities", {
