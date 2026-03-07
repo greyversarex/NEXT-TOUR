@@ -495,7 +495,7 @@ function PopularToursSection({ tours }: { tours: Tour[] }) {
   if (tours.length === 0) return null;
   return (
     <section className="pt-28 pb-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-black/30 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/10 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="flex items-end justify-between mb-14">
@@ -535,7 +535,7 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
   if (tours.length === 0) return null;
   return (
     <section className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-black/30 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/10 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="flex items-end justify-between mb-14">
@@ -640,7 +640,7 @@ function DestinationsSection() {
   const { t, lang } = useI18n();
   return (
     <section className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-black/25 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/10 pointer-events-none" />
       <div className="relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <Reveal className="text-center mb-16">
         <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
@@ -757,7 +757,7 @@ function ReviewsSection() {
 
   return (
     <section className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-black/30 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/10 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="text-center mb-16">
@@ -890,7 +890,7 @@ function WhyUsSection() {
 
   return (
     <section className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-black/30 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/10 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="text-center mb-16">
