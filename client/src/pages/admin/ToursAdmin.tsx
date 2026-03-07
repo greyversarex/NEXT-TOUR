@@ -37,11 +37,17 @@ export default function ToursAdmin() {
     mutationFn: (data: any) => editTour?.id
       ? apiRequest("PUT", `/api/tours/${editTour.id}`, data)
       : apiRequest("POST", "/api/tours", data),
-    onSuccess: () => {
+    onSuccess: async (res: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/tours"] });
-      toast({ title: t("Сохранено", "Saved") });
-      setShowForm(false);
-      setEditTour(null);
+      if (!editTour?.id) {
+        const created = await res.json();
+        toast({ title: t("Тур создан!", "Tour created!"), description: t("Теперь вы можете добавить даты, опции и программу.", "You can now add dates, options and itinerary.") });
+        setEditTour(created);
+      } else {
+        toast({ title: t("Сохранено", "Saved") });
+        setShowForm(false);
+        setEditTour(null);
+      }
     },
   });
 
