@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Home } from "lucide-react";
 import { ImageUpload } from "@/components/ui/image-upload";
 import type { Country, City } from "@shared/schema";
 
@@ -99,6 +99,11 @@ export default function CountriesAdmin() {
                         )}
                         <p className="font-medium text-sm">{c.nameRu} / {c.nameEn}</p>
                         {c.countryCode && <span className="text-xs text-muted-foreground font-mono">{c.countryCode}</span>}
+                        {(c as any).showOnHome && (
+                          <span className="flex items-center gap-1 text-[11px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
+                            <Home className="h-3 w-3" />{t("На главной", "On Home")}
+                          </span>
+                        )}
                       </div>
                       {c.tagsRu && c.tagsRu.length > 0 && (
                         <p className="text-xs text-muted-foreground truncate">{c.tagsRu.join(" • ")}</p>
@@ -215,18 +220,33 @@ export default function CountriesAdmin() {
                   placeholder="Beaches, Islands, Corals"
                 />
               </div>
-              <div>
-                <Label>{t("Размер карточки", "Card Size")}</Label>
-                <select
-                  className="mt-1 w-full h-9 rounded-md border border-input px-3 text-sm bg-background"
-                  value={editing.cardSize || "normal"}
-                  onChange={e => setEditing((p: any) => ({ ...p, cardSize: e.target.value }))}
-                >
-                  <option value="normal">{t("Обычная (1×)", "Normal (1×)")}</option>
-                  <option value="wide">{t("Широкая (2 колонки)", "Wide (2 columns)")}</option>
-                  <option value="full">{t("Полная (3 колонки)", "Full width (3 columns)")}</option>
-                </select>
+              <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/30">
+                <input
+                  type="checkbox"
+                  id="showOnHome"
+                  checked={!!(editing.showOnHome)}
+                  onChange={e => setEditing((p: any) => ({ ...p, showOnHome: e.target.checked }))}
+                  className="w-4 h-4 rounded accent-primary cursor-pointer"
+                />
+                <label htmlFor="showOnHome" className="cursor-pointer select-none">
+                  <p className="text-sm font-medium">{t("Показывать на главной странице", "Show on Home Page")}</p>
+                  <p className="text-xs text-muted-foreground">{t("Страна появится в разделе «Направления мечты»", "Country will appear in the Dream Destinations section")}</p>
+                </label>
               </div>
+              {editing.showOnHome && (
+                <div>
+                  <Label>{t("Размер карточки", "Card Size")}</Label>
+                  <select
+                    className="mt-1 w-full h-9 rounded-md border border-input px-3 text-sm bg-background"
+                    value={editing.cardSize || "normal"}
+                    onChange={e => setEditing((p: any) => ({ ...p, cardSize: e.target.value }))}
+                  >
+                    <option value="normal">{t("Обычная (1×)", "Normal (1×)")}</option>
+                    <option value="wide">{t("Широкая (2 колонки)", "Wide (2 columns)")}</option>
+                    <option value="full">{t("Полная (3 колонки)", "Full width (3 columns)")}</option>
+                  </select>
+                </div>
+              )}
               <div className="flex gap-3 pt-2">
                 <Button type="submit" disabled={countryMutation.isPending}>
                   {countryMutation.isPending ? t("Сохранение...", "Saving...") : t("Сохранить", "Save")}

@@ -34,6 +34,7 @@ export const countries = pgTable("countries", {
   tagsRu: text("tags_ru").array(),
   tagsEn: text("tags_en").array(),
   cardSize: varchar("card_size", { length: 10 }).notNull().default("normal"),
+  showOnHome: boolean("show_on_home").notNull().default(false),
 });
 
 export const cities = pgTable("cities", {

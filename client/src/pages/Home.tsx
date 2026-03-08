@@ -606,9 +606,9 @@ function DestinationCard({ dest, lang, aspectClass = "aspect-[3/4]" }: {
 
 function DestinationsSection() {
   const { t, lang } = useI18n();
-  const { data: countries = [], isLoading } = useQuery<Country[]>({ queryKey: ["/api/countries"] });
+  const { data: countries = [], isLoading } = useQuery<Country[]>({ queryKey: ["/api/countries?showOnHome=true"] });
 
-  const destinations = countries.filter(c => c.imageUrl);
+  const destinations = countries;
 
   return (
     <section className="py-24 relative overflow-hidden">

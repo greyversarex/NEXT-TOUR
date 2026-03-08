@@ -28,7 +28,7 @@ export interface IStorage {
   getAllUsers(): Promise<User[]>;
 
   // Countries
-  getCountries(): Promise<Country[]>;
+  getCountries(showOnHome?: boolean): Promise<Country[]>;
   getCountry(id: string): Promise<Country | undefined>;
   createCountry(data: InsertCountry): Promise<Country>;
   updateCountry(id: string, data: Partial<Country>): Promise<Country | undefined>;
@@ -184,7 +184,10 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(users).orderBy(desc(users.createdAt));
   }
 
-  async getCountries() {
+  async getCountries(showOnHome?: boolean) {
+    if (showOnHome) {
+      return db.select().from(countries).where(eq(countries.showOnHome, true)).orderBy(asc(countries.nameEn));
+    }
     return db.select().from(countries).orderBy(asc(countries.nameEn));
   }
 

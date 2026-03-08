@@ -121,7 +121,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   // Countries
   app.get("/api/countries", async (req, res) => {
-    res.json(await storage.getCountries());
+    const showOnHome = req.query.showOnHome === "true";
+    res.json(await storage.getCountries(showOnHome || undefined));
   });
   app.post("/api/countries", requireAdmin, async (req, res) => {
     const data = insertCountrySchema.parse(req.body);
