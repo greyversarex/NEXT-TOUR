@@ -587,22 +587,16 @@ function DestinationCard({ dest, lang, aspectClass = "aspect-[3/4]" }: {
             {name}
           </h3>
           {tags.length > 0 && (
-            <>
-              <p className="text-white/75 text-xs font-medium tracking-wide mb-2.5 group-hover:text-white/90 transition-colors duration-300">
-                {tags.join(" • ")}
-              </p>
-              <div className="flex flex-wrap gap-1.5 max-h-0 overflow-hidden group-hover:max-h-12 transition-all duration-400 ease-out">
-                {tags.map((tag, i) => (
-                  <span
-                    key={i}
-                    className="text-[11px] text-white/95 bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-0.5 border border-white/25 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    style={{ transitionDelay: `${i * 60}ms` }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </>
+            <div className="flex flex-wrap gap-1.5">
+              {tags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="text-[11px] text-white/95 bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-0.5 border border-white/25 font-medium"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           )}
         </div>
       </div>
