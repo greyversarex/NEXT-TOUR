@@ -1,0 +1,117 @@
+root@6899447-yr427605:/var/www/nexttour# cd /var/www/nexttour && git pull origin main
+
+# Очистить все таблицы
+psql postgresql://nexttour:StrongPass123@localhost/nexttour -c "TRUNCATE TABLE users, countries, cities, categories, tours, tour_dates, price_components, tour_price_components, tour_options, tour_itinerary, tour_feeds, tour_feed_items, bookings, favorites, reviews, banners, hero_slides, intro_screen, news, settings, password_reset_tokens CASCADE;"
+
+# Импортировать данные
+psql postgresql://nexttour:StrongPass123@localhost/nexttour < client/public/uploads/nexttour_data.sql
+
+pm2 restart nexttour
+remote: Enumerating objects: 13, done.
+remote: Counting objects: 100% (13/13), done.
+remote: Compressing objects: 100% (4/4), done.
+remote: Total 8 (delta 4), reused 8 (delta 4), pack-reused 0 (from 0)
+Unpacking objects: 100% (8/8), 14.88 KiB | 435.00 KiB/s, done.
+From https://github.com/greyversarex/NEXT-TOUR
+ * branch            main       -> FETCH_HEAD
+   ca8fc7a..eba06a4  main       -> origin/main
+Updating ca8fc7a..eba06a4
+Fast-forward
+ attached_assets/Pasted-root-6899447-yr427605-var-www-nexttour-cd-var-www-nextt_1773006993409.txt | 149 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ client/public/uploads/nexttour_data.sql                                                          | 408 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 557 insertions(+)
+ create mode 100644 attached_assets/Pasted-root-6899447-yr427605-var-www-nexttour-cd-var-www-nextt_1773006993409.txt
+ create mode 100644 client/public/uploads/nexttour_data.sql
+TRUNCATE TABLE
+SET
+SET
+SET
+SET
+SET
+ set_config
+------------
+
+(1 row)
+
+SET
+SET
+SET
+SET
+SET
+ALTER TABLE
+COPY 2
+ALTER TABLE
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16734" is a system trigger
+COPY 6
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16734" is a system trigger
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16659" is a system trigger
+COPY 8
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16659" is a system trigger
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16724" is a system trigger
+COPY 9
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16724" is a system trigger
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16649" is a system trigger
+COPY 8
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16649" is a system trigger
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16654" is a system trigger
+COPY 16
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16654" is a system trigger
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16644" is a system trigger
+COPY 3
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16644" is a system trigger
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16646" is a system trigger
+COPY 0
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16646" is a system trigger
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16666" is a system trigger
+COPY 0
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16666" is a system trigger
+ALTER TABLE
+COPY 2
+ALTER TABLE
+ALTER TABLE
+COPY 1
+ALTER TABLE
+ALTER TABLE
+COPY 3
+ALTER TABLE
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16676" is a system trigger
+COPY 0
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16676" is a system trigger
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16719" is a system trigger
+COPY 5
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16719" is a system trigger
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16681" is a system trigger
+COPY 3
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16681" is a system trigger
+ALTER TABLE
+ERROR:  duplicate key value violates unique constraint "session_pkey"
+DETAIL:  Key (sid)=(R6fPNvblZYReqdrqcBh_1YF9wuVedIZD) already exists.
+CONTEXT:  COPY session, line 1
+ALTER TABLE
+ALTER TABLE
+COPY 0
+ALTER TABLE
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16694" is a system trigger
+COPY 3
+ERROR:  permission denied: "RI_ConstraintTrigger_a_16694" is a system trigger
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16696" is a system trigger
+COPY 14
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16696" is a system trigger
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16706" is a system trigger
+COPY 16
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16706" is a system trigger
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16711" is a system trigger
+COPY 16
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16711" is a system trigger
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16716" is a system trigger
+COPY 0
+ERROR:  permission denied: "RI_ConstraintTrigger_c_16716" is a system trigger
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [nexttour](ids: [ 0 ])
+[PM2] [nexttour](0) ✓
+┌────┬─────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name        │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼─────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ nexttour    │ default     │ N/A     │ fork    │ 8527     │ 0s     │ 33   │ online    │ 0%       │ 3.5mb    │ root     │ disabled │
+└────┴─────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+root@6899447-yr427605:/var/www/nexttour#

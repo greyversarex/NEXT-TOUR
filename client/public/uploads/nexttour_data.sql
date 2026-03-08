@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict PnjHI2MNJlGqu1YROAGiVtPiWJk1DjxxJzN4B57DJjkYlRq4VnLrfJlyYikUhNA
+\restrict MnR3C3fvhYbQSj0yOs7DNARFS9WcDu1DKRDs6JcRL4agnm6bSYP24JZqsgijyJC
 
 -- Dumped from database version 16.10
 -- Dumped by pg_dump version 16.10
@@ -22,23 +22,15 @@ SET row_security = off;
 -- Data for Name: banners; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-SET SESSION AUTHORIZATION DEFAULT;
-
-ALTER TABLE public.banners DISABLE TRIGGER ALL;
-
 COPY public.banners (id, title_ru, title_en, subtitle_ru, subtitle_en, image_url, link_url, "order", is_active) FROM stdin;
 0af2141d-7ebf-4bd4-a874-c78716c200e9	Специальное предложение: Бали со скидкой 15%!	Special Offer: Bali 15% off!	\N	\N	/images/tour-bali.png	/promotions	1	t
 fa675397-ea67-417d-a7e6-230703efefc1	Раннее бронирование — сэкономьте до 25%	Early Booking — Save up to 25%	\N	\N	/images/tour-paris.png	/tours	2	t
 \.
 
 
-ALTER TABLE public.banners ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: categories; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.categories DISABLE TRIGGER ALL;
 
 COPY public.categories (id, name_ru, name_en) FROM stdin;
 4bfc4c72-2f87-4d49-961d-3914101052d7	Пляжный отдых	Beach
@@ -50,13 +42,9 @@ cfb172d7-6613-4076-82ea-7e8556f455f3	Культура и история	Culture 
 \.
 
 
-ALTER TABLE public.categories ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: countries; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.countries DISABLE TRIGGER ALL;
 
 COPY public.countries (id, name_ru, name_en, image_url, country_code, tags_ru, tags_en, card_size, show_on_home) FROM stdin;
 65b36981-4d71-41d5-b601-402d67816fa6	Индонезия	Indonesia	/images/tour-bali.png	ID	{Тропики,Культура,Сёрфинг}	{Tropics,Culture,Surfing}	normal	t
@@ -70,13 +58,9 @@ b238150d-1115-4f25-bb69-fea81b4979f8	Франция	France	/images/tour-paris.pn
 \.
 
 
-ALTER TABLE public.countries ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: cities; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.cities DISABLE TRIGGER ALL;
 
 COPY public.cities (id, country_id, name_ru, name_en, image_url) FROM stdin;
 27948356-9ad8-469a-b380-36b567b1690e	2a1ef1f5-cbb1-4efe-ae64-3f07d2d0e940	Санторини	Santorini	\N
@@ -91,13 +75,9 @@ f206213c-6797-4aa3-8cb8-f5dc4fcc3737	12a16b6b-e8c5-4a1f-b1b3-6e63fd5711d5	Лим
 \.
 
 
-ALTER TABLE public.cities ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: tours; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.tours DISABLE TRIGGER ALL;
 
 COPY public.tours (id, title_ru, title_en, description_ru, description_en, city_id, country_id, category_id, duration, base_price, discount_percent, main_image, images, is_hot, is_featured, is_active, included_ru, included_en, not_included_ru, not_included_en, map_url, created_at) FROM stdin;
 d2f38f0f-7472-4ff5-8734-7ba754bb1ba3	Романтический Санторини	Romantic Santorini	Откройте для себя магию греческого острова Санторини. Белоснежные дома, синие купола церквей, потрясающие закаты над Эгейским морем и незабываемые моменты в одном из красивейших мест на земле.	Discover the magic of the Greek island of Santorini. White houses, blue church domes, stunning sunsets over the Aegean Sea and unforgettable moments in one of the most beautiful places on earth.	27948356-9ad8-469a-b380-36b567b1690e	2a1ef1f5-cbb1-4efe-ae64-3f07d2d0e940	908cd3c8-ac00-4241-a91f-a01ed817953a	7	1290.00	0	/images/tour-santorini.png	{/images/tour-santorini.png,/images/tour-paris.png,/images/hero-banner.png}	f	t	t	Авиаперелёт Москва-Афины-Москва\nПроживание в 4* отеле 7 ночей\nЗавтраки ежедневно\nТрансфер из аэропорта\nЭкскурсия по острову	Round trip flights Moscow-Athens\n7 nights in 4* hotel\nDaily breakfasts\nAirport transfers\nIsland tour	Виза (не требуется для РФ)\nМедицинская страховка\nЛичные расходы	Visa (not required)\nTravel insurance\nPersonal expenses	\N	2026-03-06 18:01:35.299777
@@ -111,13 +91,9 @@ d07bedad-48d6-4f26-a814-95f5b79d9510	Рай на Мальдивах	Paradise in 
 \.
 
 
-ALTER TABLE public.tours ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: tour_dates; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.tour_dates DISABLE TRIGGER ALL;
 
 COPY public.tour_dates (id, tour_id, start_date, end_date, max_people, booked_count) FROM stdin;
 d166676c-07f6-43ba-a60e-df902da50ab7	d2f38f0f-7472-4ff5-8734-7ba754bb1ba3	2026-04-05 18:01:35.303	2026-04-12 18:01:35.303	15	3
@@ -139,13 +115,9 @@ eec83841-dde8-4cc4-8c71-9d857fb72b27	73537b34-fcc9-4239-9258-52304b1f88a3	2026-0
 \.
 
 
-ALTER TABLE public.tour_dates ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.users DISABLE TRIGGER ALL;
 
 COPY public.users (id, email, username, name, password, avatar, role, loyalty_level, bookings_count, discounts_left, created_at) FROM stdin;
 ad568552-531b-46d6-9caf-f45774eef09d	admin@travelpro.ru	admin	Администратор	$2b$10$/wRLO2MPdJLlUFF6Rew6/uU9bFB0tEPvb.1y3NNJcv62GCDfH1Pqi	\N	admin	beginner	0	0	2026-03-06 18:01:35.085526
@@ -154,37 +126,25 @@ ec2b3a46-5f26-4834-9e59-f8f156a1d025	premium@travelpro.ru	premium_user	Анна 
 \.
 
 
-ALTER TABLE public.users ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: bookings; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.bookings DISABLE TRIGGER ALL;
 
 COPY public.bookings (id, user_id, tour_id, tour_date_id, adults, children, selected_options, total_price, paid_amount, payment_type, booking_status, notes, created_at) FROM stdin;
 \.
 
 
-ALTER TABLE public.bookings ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: favorites; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.favorites DISABLE TRIGGER ALL;
 
 COPY public.favorites (id, user_id, tour_id, created_at) FROM stdin;
 \.
 
 
-ALTER TABLE public.favorites ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: hero_slides; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.hero_slides DISABLE TRIGGER ALL;
 
 COPY public.hero_slides (id, title_ru, title_en, subtitle_ru, subtitle_en, button_text_ru, button_text_en, button_link, media_url, media_type, "order", is_active) FROM stdin;
 854d818c-7ec2-47cf-aa27-122c61b60b94	Откройте мир путешествий	Discover the World	Лучшие туры по всему миру по доступным ценам	Best tours worldwide at affordable prices	Найти тур	Find a Tour	/tours	/images/hero-banner.png	image	1	t
@@ -192,26 +152,18 @@ COPY public.hero_slides (id, title_ru, title_en, subtitle_ru, subtitle_en, butto
 \.
 
 
-ALTER TABLE public.hero_slides ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: intro_screen; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.intro_screen DISABLE TRIGGER ALL;
 
 COPY public.intro_screen (id, title_ru, title_en, slogan_ru, slogan_en, video_url, is_active) FROM stdin;
 f322a793-1396-4bbb-9d1c-4c2a5626f816	NEXT TOUR	NEXT TOUR	Открой мир путешествий	Discover the World	/uploads/1772924879855-mnnzmbv737o.gif	t
 \.
 
 
-ALTER TABLE public.intro_screen ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: news; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.news DISABLE TRIGGER ALL;
 
 COPY public.news (id, title_ru, title_en, content_ru, content_en, image_url, is_published, published_at) FROM stdin;
 c70758b4-8081-4ccb-bb48-9c745a62ba59	Топ-5 направлений лета 2024	Top 5 Summer 2024 Destinations	Лето 2024 обещает быть насыщенным на путешествия! Мы собрали для вас лучшие направления, которые стоит посетить этим летом.\n\n1. Санторини, Греция — невероятные закаты и белоснежная архитектура.\n\n2. Бали, Индонезия — тропический рай для любителей природы и культуры.\n\n3. Париж, Франция — вечная романтика и искусство.\n\n4. Токио, Япония — будущее и традиции в одном городе.\n\n5. Мальдивы — идеальный пляжный отдых.	Summer 2024 promises to be full of travel opportunities! We have gathered the best destinations worth visiting this summer.\n\n1. Santorini, Greece — incredible sunsets and white architecture.\n\n2. Bali, Indonesia — a tropical paradise for nature and culture lovers.\n\n3. Paris, France — eternal romance and art.\n\n4. Tokyo, Japan — future and tradition in one city.\n\n5. Maldives — perfect beach vacation.	/images/tour-santorini.png	t	2026-03-06 18:01:35.404297
@@ -220,25 +172,17 @@ adb5af36-78c6-4f2c-b93d-6e9629055a3b	Советы опытного путеше�
 \.
 
 
-ALTER TABLE public.news ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: password_reset_tokens; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.password_reset_tokens DISABLE TRIGGER ALL;
 
 COPY public.password_reset_tokens (id, user_id, token, expires_at, used, created_at) FROM stdin;
 \.
 
 
-ALTER TABLE public.password_reset_tokens ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: price_components; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.price_components DISABLE TRIGGER ALL;
 
 COPY public.price_components (id, name_ru, name_en) FROM stdin;
 27072d53-c2df-42c1-b46f-493bb91acb00	Авиаперелёт	Flights
@@ -249,13 +193,9 @@ COPY public.price_components (id, name_ru, name_en) FROM stdin;
 \.
 
 
-ALTER TABLE public.price_components ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: reviews; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.reviews DISABLE TRIGGER ALL;
 
 COPY public.reviews (id, user_id, tour_id, rating, text_ru, text_en, status, in_featured_feed, created_at) FROM stdin;
 c7f8b768-cf71-48d5-87b8-254b70d495f9	55906ec1-a840-4bcb-9310-e84758d68c6c	d2f38f0f-7472-4ff5-8734-7ba754bb1ba3	5	Потрясающее путешествие! Санторини — это сказка. Всё было организовано на высшем уровне, гид был замечательным. Рекомендую всем!	Amazing trip! Santorini is a fairy tale. Everything was organized at the highest level, the guide was wonderful. I recommend it to everyone!	approved	t	2026-03-06 18:01:35.407428
@@ -264,38 +204,26 @@ cde0ee23-bc5c-48f1-820b-af25483eefce	55906ec1-a840-4bcb-9310-e84758d68c6c	167240
 \.
 
 
-ALTER TABLE public.reviews ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: session; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.session DISABLE TRIGGER ALL;
 
 COPY public.session (sid, sess, expire) FROM stdin;
 R6fPNvblZYReqdrqcBh_1YF9wuVedIZD	{"cookie":{"originalMaxAge":2592000000,"expires":"2026-04-07T18:38:02.579Z","secure":false,"httpOnly":true,"path":"/"},"passport":{"user":"ad568552-531b-46d6-9caf-f45774eef09d"}}	2026-04-07 21:55:51
 \.
 
 
-ALTER TABLE public.session ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: settings; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.settings DISABLE TRIGGER ALL;
 
 COPY public.settings (id, key, value) FROM stdin;
 \.
 
 
-ALTER TABLE public.settings ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: tour_feeds; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.tour_feeds DISABLE TRIGGER ALL;
 
 COPY public.tour_feeds (id, name_ru, name_en, "order", is_active, card_width) FROM stdin;
 d9d86597-0079-4a9d-910d-c97e55582f03	🔥 Горящие туры	🔥 Hot Deals	1	t	medium
@@ -304,13 +232,9 @@ dbe3f3b6-9d14-46ca-b489-a7e35900c0db	⭐ Рекомендуемые	⭐ Featured
 \.
 
 
-ALTER TABLE public.tour_feeds ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: tour_feed_items; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.tour_feed_items DISABLE TRIGGER ALL;
 
 COPY public.tour_feed_items (id, feed_id, tour_id, "order") FROM stdin;
 8ae46541-724b-4ee7-9939-4c71834fc65b	d9d86597-0079-4a9d-910d-c97e55582f03	0af41af7-b393-40f3-89f8-fda40717aa84	0
@@ -330,13 +254,9 @@ b18fa47d-345b-4062-828c-c35703ed73b0	7575f58a-45f4-4ac3-b5b2-c1e1be7b3df6	167240
 \.
 
 
-ALTER TABLE public.tour_feed_items ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: tour_itinerary; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.tour_itinerary DISABLE TRIGGER ALL;
 
 COPY public.tour_itinerary (id, tour_id, day_number, title_ru, title_en, description_ru, description_en, duration_hours) FROM stdin;
 2500e13a-7352-463e-8eb2-4f0ced8147e5	d2f38f0f-7472-4ff5-8734-7ba754bb1ba3	1	Прибытие и заселение	Arrival and check-in	Встреча в аэропорту, трансфер в отель, заселение. Вечерняя прогулка по окрестностям.	Airport meeting, hotel transfer, check-in. Evening walk around the area.	8
@@ -358,13 +278,9 @@ a8cff27d-9448-439f-937a-698d509ee180	73537b34-fcc9-4239-9258-52304b1f88a3	2	Зн
 \.
 
 
-ALTER TABLE public.tour_itinerary ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: tour_options; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.tour_options DISABLE TRIGGER ALL;
 
 COPY public.tour_options (id, tour_id, name_ru, name_en, price) FROM stdin;
 b47956bf-6701-4b6f-8211-964ddb08a049	d2f38f0f-7472-4ff5-8734-7ba754bb1ba3	Страховая защита	Travel Insurance	89.00
@@ -386,23 +302,17 @@ f82dd2e2-7bb1-40e2-869b-7833b7cc4023	85c4c4e3-e11d-4d1c-afb0-d03f548021cf	Тра
 \.
 
 
-ALTER TABLE public.tour_options ENABLE TRIGGER ALL;
-
 --
 -- Data for Name: tour_price_components; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-ALTER TABLE public.tour_price_components DISABLE TRIGGER ALL;
 
 COPY public.tour_price_components (id, tour_id, component_id, price, included) FROM stdin;
 \.
 
 
-ALTER TABLE public.tour_price_components ENABLE TRIGGER ALL;
-
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict PnjHI2MNJlGqu1YROAGiVtPiWJk1DjxxJzN4B57DJjkYlRq4VnLrfJlyYikUhNA
+\unrestrict MnR3C3fvhYbQSj0yOs7DNARFS9WcDu1DKRDs6JcRL4agnm6bSYP24JZqsgijyJC
 
