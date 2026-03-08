@@ -536,9 +536,10 @@ function countryFlag(code: string): string {
     .replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0)));
 }
 
-function DestinationCard({ dest, lang }: {
+function DestinationCard({ dest, lang, aspectClass = "aspect-[8/9]" }: {
   dest: Country;
   lang: string;
+  aspectClass?: string;
 }) {
   const name = lang === "ru" ? dest.nameRu : dest.nameEn;
   const tags: string[] = (lang === "ru" ? dest.tagsRu : dest.tagsEn) || [];
@@ -546,10 +547,10 @@ function DestinationCard({ dest, lang }: {
   return (
     <Link href={`/tours`} className="block h-full">
       <div
-        className="group relative rounded-2xl overflow-hidden cursor-pointer h-full
+        className={`group relative rounded-2xl overflow-hidden cursor-pointer h-full ${aspectClass}
           shadow-md hover:shadow-[0_24px_64px_-10px_rgba(0,0,0,0.40)]
           hover:-translate-y-2
-          transition-all duration-500 ease-out"
+          transition-all duration-500 ease-out`}
         data-testid={`card-destination-${dest.id}`}
       >
         <img
@@ -622,26 +623,29 @@ function DestinationsSection() {
         </Reveal>
 
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6 auto-rows-[280px]">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className={`rounded-2xl h-full ${i === 0 ? "col-span-2" : i === 5 ? "col-span-2 md:col-span-3" : ""}`} />
+              <Skeleton key={i} className={`rounded-2xl ${i === 0 ? "col-span-2 aspect-[16/9]" : i === 5 ? "col-span-2 md:col-span-3 aspect-[21/9]" : "aspect-[8/9]"}`} />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6 auto-rows-[280px]">
-            {destinations.map((dest) => {
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
+            {destinations.map((dest, i) => {
               const size = (dest as any).cardSize || "normal";
               let wrapClass = "";
+              let aspect = "aspect-[8/9]";
 
               if (size === "wide") {
                 wrapClass = "col-span-2";
+                aspect = "aspect-[16/9]";
               } else if (size === "full") {
                 wrapClass = "col-span-2 md:col-span-3";
+                aspect = "aspect-[21/9]";
               }
 
               return (
-                <Reveal key={dest.id} delay={0} y={20} className={`${wrapClass} h-[280px]`}>
-                  <DestinationCard dest={dest} lang={lang} />
+                <Reveal key={dest.id} delay={i * 80} y={20} className={wrapClass}>
+                  <DestinationCard dest={dest} lang={lang} aspectClass={aspect} />
                 </Reveal>
               );
             })}
