@@ -1,0 +1,54 @@
+[TAILING] Tailing last 20 lines for [nexttour] process (change the value with --lines option)
+/root/.pm2/logs/nexttour-out.log last 20 lines:
+0|nexttour | 10:02:12 PM [express] GET /api/countries 500 in 16ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:02:12 PM [express] GET /api/hero-slides 500 in 21ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:02:12 PM [express] GET /api/intro-screen 500 in 19ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:02:12 PM [express] GET /api/cities 500 in 10ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:02:12 PM [express] GET /api/tours 500 in 9ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:02:12 PM [express] GET /api/tour-feeds 500 in 5ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:02:12 PM [express] GET /api/auth/me 401 in 1ms :: {"message":"Not authenticated"}
+0|nexttour | 10:02:12 PM [express] GET /api/banners 500 in 12ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:02:12 PM [express] GET /api/countries 500 in 5ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:02:12 PM [express] GET /api/reviews/featured 500 in 6ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:03:19 PM [express] GET /api/intro-screen 500 in 13ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:03:19 PM [express] GET /api/countries 500 in 15ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:03:19 PM [express] GET /api/cities 500 in 18ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:03:19 PM [express] GET /api/tours 500 in 17ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:03:19 PM [express] GET /api/hero-slides 500 in 19ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:03:19 PM [express] GET /api/auth/me 401 in 1ms :: {"message":"Not authenticated"}
+0|nexttour | 10:03:19 PM [express] GET /api/banners 500 in 9ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:03:19 PM [express] GET /api/tour-feeds 500 in 10ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:03:19 PM [express] GET /api/countries 500 in 10ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 10:03:19 PM [express] GET /api/reviews/featured 500 in 11ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+
+/root/.pm2/logs/nexttour-error.log last 20 lines:
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:74:13330
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:134:37949
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:274:20068
+0|nexttour | Internal Server Error: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:74:13330
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:134:37949
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:274:20425
+0|nexttour | Internal Server Error: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:74:13330
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:134:37949
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:274:15505
+0|nexttour | Internal Server Error: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:74:13330
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:134:37949
+0|nexttour |     at async Ly.getFeaturedReviews (/var/www/nexttour/dist/index.cjs:274:6348)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:274:21408
+
+0|nexttour  | > rest-express@1.0.0 start
+0|nexttour  | > NODE_ENV=production node dist/index.cjs
+0|nexttour  | [seed] Error: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+0|nexttour  |     at /var/www/nexttour/dist/index.cjs:74:13330
+0|nexttour  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|nexttour  |     at async /var/www/nexttour/dist/index.cjs:134:37949
+0|nexttour  |     at async zZ (/var/www/nexttour/dist/index.cjs:134:115553)
+0|nexttour  |     at async /var/www/nexttour/dist/index.cjs:274:27501
+0|nexttour  | 10:06:42 PM [express] serving on port 5000
