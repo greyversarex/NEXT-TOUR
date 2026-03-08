@@ -53,7 +53,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
   return (
     <Link href={`/tours/${tour.id}`}>
       <div
-        className="group relative rounded-2xl overflow-hidden bg-white dark:bg-card border border-transparent cursor-pointer flex flex-col
+        className="group relative rounded-2xl overflow-hidden bg-white dark:bg-card border border-transparent cursor-pointer
           shadow-[0_2px_16px_rgba(0,0,0,0.07)]
           hover:shadow-[0_32px_80px_-8px_rgba(0,0,0,0.30)]
           hover:-translate-y-2.5
@@ -61,30 +61,25 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
           transition-all duration-500"
         data-testid={`card-tour-${tour.id}`}
       >
-        {/* Top accent bar — slides in on hover */}
+        {/* Top accent bar */}
         <div className="absolute top-0 left-0 right-0 h-[3px] z-20 overflow-hidden rounded-t-2xl">
           <div className="h-full bg-gradient-to-r from-primary via-cyan-400 to-sky-300 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
         </div>
 
-        {/* ── IMAGE ─────────────────────────────────────────── */}
-        {/* 16:10 ratio — wider & more cinematic than 4:3 */}
-        <div className="relative overflow-hidden" style={{ aspectRatio: "16/10" }}>
+        {/* ── IMAGE — fixed 180px height ── */}
+        <div className="relative h-[180px] overflow-hidden shrink-0">
           <img
             src={tour.mainImage || "/images/hero-banner.png"}
             alt={title}
             className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.12]"
           />
-
-          {/* Persistent bottom fade for text legibility */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-
-          {/* Hover brightening sheen */}
           <div
             className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-600"
             style={{ background: "linear-gradient(135deg, transparent 20%, rgba(255,255,255,0.07) 50%, transparent 80%)" }}
           />
 
-          {/* ── Badges top-left ── */}
+          {/* Badges top-left */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
             {tour.discountPercent > 0 && (
               <div
@@ -101,48 +96,53 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
             )}
           </div>
 
-          {/* ── Favorite button top-right ── */}
+          {/* Favorite button top-right */}
           {user && (
             <button
               onClick={handleFavorite}
               className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center
-                hover:bg-black/55 hover:scale-110 active:scale-95
-                transition-all duration-200"
+                hover:bg-black/55 hover:scale-110 active:scale-95 transition-all duration-200"
               data-testid={`button-fav-${tour.id}`}
             >
               <Heart className={`h-4 w-4 transition-colors ${favState ? "fill-red-400 text-red-400" : "text-white"}`} />
             </button>
           )}
 
-          {/* ── Duration pill — bottom-left ── */}
+          {/* Duration pill bottom-left */}
           <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold rounded-full px-2.5 py-1">
             <Clock className="h-3 w-3 opacity-80" />
             {tour.duration} {t("дн.", "d.")}
           </div>
-
         </div>
 
-        {/* ── TEXT CONTENT ──────────────────────────────────── */}
-        <div className="p-5 flex flex-col">
-          {locationLabel && (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1.5">
-              <MapPin className="h-3 w-3 shrink-0 text-primary/70" />
-              <span className="truncate">{locationLabel}</span>
-            </div>
-          )}
+        {/* ── TEXT CONTENT — fixed layout ── */}
+        <div className="p-4">
+
+          {/* Location — 1 line, fixed height */}
+          <div className="h-5 flex items-center gap-1 mb-1.5 overflow-hidden">
+            {locationLabel ? (
+              <>
+                <MapPin className="h-3 w-3 shrink-0 text-primary/70" />
+                <span className="text-xs text-muted-foreground truncate">{locationLabel}</span>
+              </>
+            ) : null}
+          </div>
+
+          {/* Title — 2 lines, fixed height */}
           <h3
-            className="font-bold text-base leading-snug mb-1.5 line-clamp-2 group-hover:text-primary transition-colors duration-200"
+            className="font-bold text-base leading-snug line-clamp-2 h-[2.75rem] mb-2 group-hover:text-primary transition-colors duration-200 overflow-hidden"
             data-testid={`text-tour-title-${tour.id}`}
           >
             {title}
           </h3>
-          <p className="text-sm text-muted-foreground line-clamp-2 mb-4 leading-relaxed">
+
+          {/* Description — 2 lines, fixed height */}
+          <p className="text-sm text-muted-foreground line-clamp-2 h-[2.5rem] leading-relaxed overflow-hidden">
             {description}
           </p>
 
-          {/* ── Price row ── */}
-          <div className="flex items-end justify-between pt-4 mt-3 border-t border-border/50">
-            {/* Price block — elevated on hover */}
+          {/* ── Price row — always at same position ── */}
+          <div className="flex items-center justify-between pt-3 mt-3 border-t border-border/50">
             <div className="flex flex-col">
               <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-0.5">
                 {t("от", "from")}
@@ -154,8 +154,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
                   </span>
                 )}
                 <span
-                  className="text-3xl font-extrabold leading-none bg-gradient-to-br from-primary to-cyan-500 bg-clip-text text-transparent
-                    transition-all duration-300"
+                  className="text-2xl font-extrabold leading-none bg-gradient-to-br from-primary to-cyan-500 bg-clip-text text-transparent"
                   data-testid={`text-tour-price-${tour.id}`}
                 >
                   ${discountedPrice.toFixed(0)}
@@ -166,7 +165,6 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
               </div>
             </div>
 
-            {/* Arrow — slides in on hover */}
             <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-primary/8 text-primary
               group-hover:bg-primary group-hover:text-white
               opacity-0 translate-x-1 group-hover:opacity-100 group-hover:translate-x-0
