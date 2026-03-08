@@ -59,7 +59,7 @@ export default function Header() {
                   <Plane className="h-4 w-4 text-white -rotate-45" />
                 </div>
                 <span className="text-xl font-extrabold tracking-tight text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
-                  TravelPro
+                  NEXT TOUR
                 </span>
               </span>
             </Link>

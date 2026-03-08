@@ -46,7 +46,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
       <aside className="w-56 bg-sidebar border-r border-sidebar-border shrink-0 overflow-y-auto">
         <div className="p-4 border-b border-sidebar-border">
           <Link href="/admin">
-            <span className="font-bold text-primary text-sm cursor-pointer">✈ TravelPro Admin</span>
+            <span className="font-bold text-primary text-sm cursor-pointer">✈ NEXT TOUR Admin</span>
           </Link>
         </div>
         <nav className="p-2">

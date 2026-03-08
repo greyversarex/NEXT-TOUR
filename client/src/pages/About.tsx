@@ -21,7 +21,7 @@ export default function About() {
             <Award className="h-4 w-4" />
             {t("Наша компания", "About Us")}
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">{t("О компании TravelPro", "About TravelPro")}</h1>
+          <h1 className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">{t("О компании NEXT TOUR", "About NEXT TOUR")}</h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             {t(
               "Мы помогаем людям открывать мир с 2012 года. Наша миссия — сделать каждое путешествие незабываемым.",
@@ -49,8 +49,8 @@ export default function About() {
             <h2 className="text-2xl font-bold mb-4">{t("Наша история", "Our Story")}</h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
               {t(
-                "TravelPro был основан в 2012 году группой энтузиастов путешествий. Мы начинали как небольшое агентство с несколькими направлениями, а сегодня предлагаем туры более чем в 50 стран мира.",
-                "TravelPro was founded in 2012 by a group of travel enthusiasts. We started as a small agency with a few destinations, and today we offer tours to more than 50 countries."
+                "NEXT TOUR был основан в 2012 году группой энтузиастов путешествий. Мы начинали как небольшое агентство с несколькими направлениями, а сегодня предлагаем туры более чем в 50 стран мира.",
+                "NEXT TOUR was founded in 2012 by a group of travel enthusiasts. We started as a small agency with a few destinations, and today we offer tours to more than 50 countries."
               )}
             </p>
             <p className="text-muted-foreground leading-relaxed">

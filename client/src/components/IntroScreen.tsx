@@ -91,7 +91,7 @@ export default function IntroScreen() {
     };
   }, [isSuccess, intro, visible]);
 
-  const title = intro ? (lang === "ru" ? intro.titleRu : intro.titleEn) : "TravelPro";
+  const title = intro ? (lang === "ru" ? intro.titleRu : intro.titleEn) : "NEXT TOUR";
   const slogan = intro
     ? (lang === "ru" ? intro.sloganRu : intro.sloganEn)
     : t("Открой мир путешествий", "Discover the World");

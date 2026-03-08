@@ -105,7 +105,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
               ? t("Введите ваш email для сброса пароля", "Enter your email to reset password")
               : tab === "login"
                 ? t("Войдите чтобы бронировать туры", "Sign in to book your dream trips")
-                : t("Присоединяйтесь к TravelPro", "Join TravelPro today")}
+                : t("Присоединяйтесь к NEXT TOUR", "Join NEXT TOUR today")}
           </p>
         </div>
 
