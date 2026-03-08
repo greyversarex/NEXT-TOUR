@@ -429,7 +429,7 @@ function SearchSection() {
   );
 }
 
-const CARD_WIDTHS: Record<string, number> = { small: 210, medium: 272, large: 340 };
+const CARD_WIDTHS: Record<string, number> = { small: 280, medium: 340, large: 420 };
 
 function TourScrollFeed({ tours, cardWidth = "medium" }: { tours: Tour[]; cardWidth?: string }) {
   const scrollRef = useRef<HTMLDivElement>(null);

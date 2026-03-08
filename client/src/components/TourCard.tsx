@@ -1,10 +1,10 @@
 import { Link } from "wouter";
-import { Clock, Heart, ArrowRight } from "lucide-react";
+import { Clock, Heart, ArrowRight, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import type { Tour } from "@shared/schema";
+import type { Tour, Country, City } from "@shared/schema";
 import { useState } from "react";
 
 interface TourCardProps {
@@ -25,6 +25,14 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
   const discountedPrice = tour.discountPercent > 0
     ? price * (1 - tour.discountPercent / 100)
     : price;
+
+  const { data: countries = [] } = useQuery<Country[]>({ queryKey: ["/api/countries"] });
+  const { data: cities = [] } = useQuery<City[]>({ queryKey: ["/api/cities"] });
+  const country = countries.find(c => c.id === tour.countryId);
+  const city = cities.find(c => c.id === tour.cityId);
+  const countryName = country ? (lang === "ru" ? country.nameRu : country.nameEn) : null;
+  const cityName = city ? (lang === "ru" ? city.nameRu : city.nameEn) : null;
+  const locationLabel = [cityName, countryName].filter(Boolean).join(", ");
 
   const favMutation = useMutation({
     mutationFn: () => apiRequest("POST", `/api/favorites/${tour.id}`, {}),
@@ -116,13 +124,19 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
 
         {/* ── TEXT CONTENT ──────────────────────────────────── */}
         <div className="p-5 flex flex-col flex-1">
+          {locationLabel && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1.5">
+              <MapPin className="h-3 w-3 shrink-0 text-primary/70" />
+              <span className="truncate">{locationLabel}</span>
+            </div>
+          )}
           <h3
             className="font-bold text-base leading-snug mb-1.5 line-clamp-2 group-hover:text-primary transition-colors duration-200"
             data-testid={`text-tour-title-${tour.id}`}
           >
             {title}
           </h3>
-          <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-1 leading-relaxed">
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-4 leading-relaxed">
             {description}
           </p>
 
