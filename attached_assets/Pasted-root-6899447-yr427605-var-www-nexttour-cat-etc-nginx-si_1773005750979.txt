@@ -1,0 +1,227 @@
+root@6899447-yr427605:/var/www/nexttour# cat > /etc/nginx/sites-available/nexttour << 'EOF'
+server {
+    listen 80;
+    server_name 5.42.111.213;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+EOF
+
+ln -s /etc/nginx/sites-available/nexttour /etc/nginx/sites-enabled/
+nginx -t && systemctl restart nginx
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+root@6899447-yr427605:/var/www/nexttour# # Установить Node.js, PostgreSQL, Nginx
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt install -y nodejs git postgresql postgresql-contrib nginx
+
+# Создать базу
+sudo -u postgres psql -c "CREATE USER nexttour WITH PASSWORD 'StrongPass123';"
+sudo -u postgres psql -c "CREATE DATABASE nexttour OWNER nexttour;"
+
+# Клонировать проект
+git clone https://github.com/greyversarex/NEXT-TOUR /var/www/nexttour
+cd /var/www/nexttour
+
+# Создать .env
+cat > .env << 'EOF'
+DATABASE_URL=postgresql://nexttour:StrongPass123@localhost:5432/nexttour
+SESSION_SECRET=super-secret-random-string-12345
+NODE_ENV=production
+PORT=3000
+EOF
+
+# Установить, собрать, создать таблицы и заполнить данными
+npm install
+npm run build
+npm run db:push
+
+# Запустить через PM2
+npm install -g pm2
+pm2 start "npm run start" --name nexttour
+pm2 save && pm2 startup
+
+# Настроить Nginx
+cat > /etc/nginx/sites-available/nexttour << 'EOF'
+server {
+    listen 80;
+    server_name 5.42.111.213;
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+    }
+}
+EOF
+
+ln -s /etc/nginx/sites-available/nexttour /etc/nginx/sites-enabled/
+nginx -t && systemctl restart nginx
+2026-03-08 21:30:40 - Installing pre-requisites
+Hit:1 http://mirror.timeweb.ru/ubuntu noble InRelease
+Hit:2 http://zabbix.repo.timeweb.ru/ubuntu focal InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:4 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:5 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:6 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Hit:7 https://deb.nodesource.com/node_20.x nodistro InRelease
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+97 packages can be upgraded. Run 'apt list --upgradable' to see them.
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+apt-transport-https is already the newest version (2.8.3).
+ca-certificates is already the newest version (20240203).
+curl is already the newest version (8.5.0-2ubuntu10.7).
+curl set to manually installed.
+gnupg is already the newest version (2.4.4-2ubuntu17.4).
+0 upgraded, 0 newly installed, 0 to remove and 97 not upgraded.
+Hit:1 http://mirror.timeweb.ru/ubuntu noble InRelease
+Hit:2 http://zabbix.repo.timeweb.ru/ubuntu focal InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:4 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:5 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:6 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Hit:7 https://deb.nodesource.com/node_20.x nodistro InRelease
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+97 packages can be upgraded. Run 'apt list --upgradable' to see them.
+2026-03-08 21:30:48 - Repository configured successfully.
+2026-03-08 21:30:48 - To install Node.js, run: apt install nodejs -y
+2026-03-08 21:30:48 - You can use N|solid Runtime as a node.js alternative
+2026-03-08 21:30:48 - To install N|solid Runtime, run: apt install nsolid -y
+
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+nodejs is already the newest version (20.20.1-1nodesource1).
+git is already the newest version (1:2.43.0-1ubuntu7.3).
+postgresql is already the newest version (16+257build1.1).
+postgresql-contrib is already the newest version (16+257build1.1).
+nginx is already the newest version (1.24.0-2ubuntu7.6).
+0 upgraded, 0 newly installed, 0 to remove and 97 not upgraded.
+ERROR:  role "nexttour" already exists
+ERROR:  database "nexttour" already exists
+fatal: destination path '/var/www/nexttour' already exists and is not an empty directory.
+
+up to date, audited 496 packages in 4s
+
+77 packages are looking for funding
+  run `npm fund` for details
+
+4 vulnerabilities (1 low, 1 moderate, 2 high)
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+
+> rest-express@1.0.0 build
+> tsx script/build.ts
+
+building client...
+vite v7.3.0 building client environment for production...
+transforming (4) src/App.tsx
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3205 modules transformed.
+
+> rest-express@1.0.0 db:push
+> drizzle-kit push
+
+No config path provided, using default 'drizzle.config.ts'
+Reading config file '/var/www/nexttour/drizzle.config.ts'
+Using 'pg' driver for database querying
+[⣷] Pulling schema from database...
+error: password authentication failed for user "nexttour"
+    at /var/www/nexttour/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.query (/var/www/nexttour/node_modules/drizzle-kit/bin.cjs:80622:26)
+    at async fromDatabase2 (/var/www/nexttour/node_modules/drizzle-kit/bin.cjs:19276:25) {
+  length: 104,
+  severity: 'FATAL',
+  code: '28P01',
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'auth.c',
+  line: '331',
+  routine: 'auth_failed'
+}
+
+changed 133 packages in 16s
+
+13 packages are looking for funding
+  run `npm fund` for details
+[PM2] Starting /usr/bin/bash in fork_mode (1 instance)
+[PM2] Done.
+┌────┬─────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name        │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼─────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ nexttour    │ default     │ N/A     │ fork    │ 5503     │ 63m    │ 0    │ online    │ 0%       │ 11.6mb   │ root     │ disabled │
+│ 1  │ nexttour    │ default     │ N/A     │ fork    │ 6924     │ 0s     │ 0    │ online    │ 0%       │ 256.0kb  │ root     │ disabled │
+└────┴─────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+[PM2] Saving current process list...
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+[PM2] Init System found: systemd
+Platform systemd
+Template
+[Unit]
+Description=PM2 process manager
+Documentation=https://pm2.keymetrics.io/
+After=network.target
+
+[Service]
+Type=forking
+User=root
+LimitNOFILE=infinity
+LimitNPROC=infinity
+LimitCORE=infinity
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+Environment=PM2_HOME=/root/.pm2
+PIDFile=/root/.pm2/pm2.pid
+Restart=on-failure
+
+ExecStart=/usr/lib/node_modules/pm2/bin/pm2 resurrect
+ExecReload=/usr/lib/node_modules/pm2/bin/pm2 reload all
+ExecStop=/usr/lib/node_modules/pm2/bin/pm2 kill
+
+[Install]
+WantedBy=multi-user.target
+
+Target path
+/etc/systemd/system/pm2-root.service
+Command list
+[ 'systemctl enable pm2-root' ]
+[PM2] Writing init configuration in /etc/systemd/system/pm2-root.service
+[PM2] Making script booting at startup...
+[PM2] [-] Executing: systemctl enable pm2-root...
+[PM2] [v] Command successfully executed.
++---------------------------------------+
+[PM2] Freeze a process list on reboot via:
+$ pm2 save
+
+[PM2] Remove init script via:
+$ pm2 unstartup systemd
+ln: failed to create symbolic link '/etc/nginx/sites-enabled/nexttour': File exists
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+root@6899447-yr427605:/var/www/nexttour#
