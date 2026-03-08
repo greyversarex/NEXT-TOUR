@@ -1,0 +1,149 @@
+root@6899447-yr427605:/var/www/nexttour# cd /var/www/nexttour
+
+# Получить обновления
+git pull origin main
+
+# Импортировать данные (туры, страны, всё)
+psql postgresql://nexttour:StrongPass123@localhost/nexttour < client/public/uploads/nexttour_transfer_1773006761.sql
+
+# Перезапустить
+pm2 restart nexttour
+remote: Enumerating objects: 10, done.
+remote: Counting objects: 100% (10/10), done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 6 (delta 3), reused 6 (delta 3), pack-reused 0 (from 0)
+Unpacking objects: 100% (6/6), 14.72 KiB | 430.00 KiB/s, done.
+From https://github.com/greyversarex/NEXT-TOUR
+ * branch            main       -> FETCH_HEAD
+   19bf383..ca8fc7a  main       -> origin/main
+Updating 19bf383..ca8fc7a
+Fast-forward
+ client/public/uploads/nexttour_transfer_1773006761.sql | 1073 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 1073 insertions(+)
+ create mode 100644 client/public/uploads/nexttour_transfer_1773006761.sql
+SET
+SET
+SET
+SET
+SET
+ set_config
+------------
+
+(1 row)
+
+SET
+SET
+SET
+SET
+ERROR:  type "booking_status" already exists
+ERROR:  type "loyalty_level" already exists
+ERROR:  type "payment_type" already exists
+ERROR:  type "review_status" already exists
+ERROR:  type "user_role" already exists
+SET
+SET
+ERROR:  relation "banners" already exists
+ERROR:  relation "bookings" already exists
+ERROR:  relation "categories" already exists
+ERROR:  relation "cities" already exists
+ERROR:  relation "countries" already exists
+ERROR:  relation "favorites" already exists
+ERROR:  relation "hero_slides" already exists
+ERROR:  relation "intro_screen" already exists
+ERROR:  relation "news" already exists
+ERROR:  relation "password_reset_tokens" already exists
+ERROR:  relation "price_components" already exists
+ERROR:  relation "reviews" already exists
+CREATE TABLE
+ERROR:  relation "settings" already exists
+ERROR:  relation "tour_dates" already exists
+ERROR:  relation "tour_feed_items" already exists
+ERROR:  relation "tour_feeds" already exists
+ERROR:  relation "tour_itinerary" already exists
+ERROR:  relation "tour_options" already exists
+ERROR:  relation "tour_price_components" already exists
+ERROR:  relation "tours" already exists
+ERROR:  relation "users" already exists
+COPY 2
+COPY 0
+COPY 6
+ERROR:  insert or update on table "cities" violates foreign key constraint "cities_country_id_countries_id_fk"
+DETAIL:  Key (country_id)=(2a1ef1f5-cbb1-4efe-ae64-3f07d2d0e940) is not present in table "countries".
+COPY 8
+COPY 0
+COPY 2
+COPY 1
+COPY 3
+COPY 0
+COPY 5
+ERROR:  insert or update on table "reviews" violates foreign key constraint "reviews_user_id_users_id_fk"
+DETAIL:  Key (user_id)=(55906ec1-a840-4bcb-9310-e84758d68c6c) is not present in table "users".
+COPY 1
+COPY 0
+ERROR:  insert or update on table "tour_dates" violates foreign key constraint "tour_dates_tour_id_tours_id_fk"
+DETAIL:  Key (tour_id)=(d2f38f0f-7472-4ff5-8734-7ba754bb1ba3) is not present in table "tours".
+ERROR:  insert or update on table "tour_feed_items" violates foreign key constraint "tour_feed_items_feed_id_tour_feeds_id_fk"
+DETAIL:  Key (feed_id)=(d9d86597-0079-4a9d-910d-c97e55582f03) is not present in table "tour_feeds".
+COPY 3
+ERROR:  insert or update on table "tour_itinerary" violates foreign key constraint "tour_itinerary_tour_id_tours_id_fk"
+DETAIL:  Key (tour_id)=(d2f38f0f-7472-4ff5-8734-7ba754bb1ba3) is not present in table "tours".
+ERROR:  insert or update on table "tour_options" violates foreign key constraint "tour_options_tour_id_tours_id_fk"
+DETAIL:  Key (tour_id)=(d2f38f0f-7472-4ff5-8734-7ba754bb1ba3) is not present in table "tours".
+COPY 0
+ERROR:  insert or update on table "tours" violates foreign key constraint "tours_city_id_cities_id_fk"
+DETAIL:  Key (city_id)=(27948356-9ad8-469a-b380-36b567b1690e) is not present in table "cities".
+COPY 3
+ERROR:  multiple primary keys for table "banners" are not allowed
+ERROR:  multiple primary keys for table "bookings" are not allowed
+ERROR:  multiple primary keys for table "categories" are not allowed
+ERROR:  multiple primary keys for table "cities" are not allowed
+ERROR:  multiple primary keys for table "countries" are not allowed
+ERROR:  multiple primary keys for table "favorites" are not allowed
+ERROR:  multiple primary keys for table "hero_slides" are not allowed
+ERROR:  multiple primary keys for table "intro_screen" are not allowed
+ERROR:  multiple primary keys for table "news" are not allowed
+ERROR:  multiple primary keys for table "password_reset_tokens" are not allowed
+ERROR:  relation "password_reset_tokens_token_unique" already exists
+ERROR:  multiple primary keys for table "price_components" are not allowed
+ERROR:  multiple primary keys for table "reviews" are not allowed
+ALTER TABLE
+ERROR:  relation "settings_key_unique" already exists
+ERROR:  multiple primary keys for table "settings" are not allowed
+ERROR:  multiple primary keys for table "tour_dates" are not allowed
+ERROR:  multiple primary keys for table "tour_feed_items" are not allowed
+ERROR:  multiple primary keys for table "tour_feeds" are not allowed
+ERROR:  multiple primary keys for table "tour_itinerary" are not allowed
+ERROR:  multiple primary keys for table "tour_options" are not allowed
+ERROR:  multiple primary keys for table "tour_price_components" are not allowed
+ERROR:  multiple primary keys for table "tours" are not allowed
+ERROR:  relation "users_email_unique" already exists
+ERROR:  multiple primary keys for table "users" are not allowed
+ERROR:  relation "users_username_unique" already exists
+ERROR:  constraint "bookings_tour_date_id_tour_dates_id_fk" for relation "bookings" already exists
+ERROR:  constraint "bookings_tour_id_tours_id_fk" for relation "bookings" already exists
+ERROR:  constraint "bookings_user_id_users_id_fk" for relation "bookings" already exists
+ERROR:  constraint "cities_country_id_countries_id_fk" for relation "cities" already exists
+ERROR:  constraint "favorites_tour_id_tours_id_fk" for relation "favorites" already exists
+ERROR:  constraint "favorites_user_id_users_id_fk" for relation "favorites" already exists
+ERROR:  constraint "password_reset_tokens_user_id_users_id_fk" for relation "password_reset_tokens" already exists
+ERROR:  constraint "reviews_tour_id_tours_id_fk" for relation "reviews" already exists
+ERROR:  constraint "reviews_user_id_users_id_fk" for relation "reviews" already exists
+ERROR:  constraint "tour_dates_tour_id_tours_id_fk" for relation "tour_dates" already exists
+ERROR:  constraint "tour_feed_items_feed_id_tour_feeds_id_fk" for relation "tour_feed_items" already exists
+ERROR:  constraint "tour_feed_items_tour_id_tours_id_fk" for relation "tour_feed_items" already exists
+ERROR:  constraint "tour_itinerary_tour_id_tours_id_fk" for relation "tour_itinerary" already exists
+ERROR:  constraint "tour_options_tour_id_tours_id_fk" for relation "tour_options" already exists
+ERROR:  constraint "tour_price_components_component_id_price_components_id_fk" for relation "tour_price_components" already exists
+ERROR:  constraint "tour_price_components_tour_id_tours_id_fk" for relation "tour_price_components" already exists
+ERROR:  constraint "tours_category_id_categories_id_fk" for relation "tours" already exists
+ERROR:  constraint "tours_city_id_cities_id_fk" for relation "tours" already exists
+ERROR:  constraint "tours_country_id_countries_id_fk" for relation "tours" already exists
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [nexttour](ids: [ 0 ])
+[PM2] [nexttour](0) ✓
+┌────┬─────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name        │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼─────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ nexttour    │ default     │ N/A     │ fork    │ 8449     │ 0s     │ 32   │ online    │ 0%       │ 3.4mb    │ root     │ disabled │
+└────┴─────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+root@6899447-yr427605:/var/www/nexttour#
