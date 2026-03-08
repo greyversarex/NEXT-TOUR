@@ -626,7 +626,7 @@ function DestinationsSection() {
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className={`rounded-2xl ${i === 0 ? "col-span-2 aspect-[16/9]" : i === 5 ? "col-span-2 md:col-span-3 aspect-[21/9]" : "aspect-[3/4]"}`} />
+              <Skeleton key={i} className={`rounded-2xl ${i === 0 ? "col-span-2 aspect-[16/9]" : i === 5 ? "col-span-2 md:col-span-3 aspect-[21/9]" : "aspect-[4/3]"}`} />
             ))}
           </div>
         ) : (
@@ -634,7 +634,7 @@ function DestinationsSection() {
             {destinations.map((dest, i) => {
               const size = (dest as any).cardSize || "normal";
               let wrapClass = "";
-              let aspect = "aspect-[3/4]";
+              let aspect = "aspect-[4/3]";
 
               if (size === "wide") {
                 wrapClass = "col-span-2";
