@@ -215,6 +215,18 @@ export default function CountriesAdmin() {
                   placeholder="Beaches, Islands, Corals"
                 />
               </div>
+              <div>
+                <Label>{t("Размер карточки", "Card Size")}</Label>
+                <select
+                  className="mt-1 w-full h-9 rounded-md border border-input px-3 text-sm bg-background"
+                  value={editing.cardSize || "normal"}
+                  onChange={e => setEditing((p: any) => ({ ...p, cardSize: e.target.value }))}
+                >
+                  <option value="normal">{t("Обычная (1×)", "Normal (1×)")}</option>
+                  <option value="wide">{t("Широкая (2 колонки)", "Wide (2 columns)")}</option>
+                  <option value="full">{t("Полная (3 колонки)", "Full width (3 columns)")}</option>
+                </select>
+              </div>
               <div className="flex gap-3 pt-2">
                 <Button type="submit" disabled={countryMutation.isPending}>
                   {countryMutation.isPending ? t("Сохранение...", "Saving...") : t("Сохранить", "Save")}

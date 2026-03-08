@@ -632,15 +632,16 @@ function DestinationsSection() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
             {destinations.map((dest, i) => {
+              const size = (dest as any).cardSize || "normal";
               let wrapClass = "";
               let aspect = "aspect-[3/4]";
 
-              if (i === 0) {
-                wrapClass = "col-span-2 md:col-span-2";
-                aspect = "aspect-[4/3] md:aspect-[16/9]";
-              } else if (i === destinations.length - 1 && destinations.length > 4) {
+              if (size === "wide") {
+                wrapClass = "col-span-2";
+                aspect = "aspect-[16/9]";
+              } else if (size === "full") {
                 wrapClass = "col-span-2 md:col-span-3";
-                aspect = "aspect-[2/1] md:aspect-[21/9]";
+                aspect = "aspect-[21/9]";
               }
 
               return (

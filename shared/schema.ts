@@ -33,6 +33,7 @@ export const countries = pgTable("countries", {
   countryCode: varchar("country_code", { length: 2 }),
   tagsRu: text("tags_ru").array(),
   tagsEn: text("tags_en").array(),
+  cardSize: varchar("card_size", { length: 10 }).notNull().default("normal"),
 });
 
 export const cities = pgTable("cities", {
