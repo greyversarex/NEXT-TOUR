@@ -1,0 +1,52 @@
+root@6899447-yr427605:/var/www/nexttour# pm2 logs
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-03-08T21:36:46: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-08T21:36:47: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-08T21:36:47: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-08T21:36:47: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-08T21:36:47: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-08T21:36:47: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-08T21:36:47: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-08T21:36:47: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-08T21:36:47: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-08T21:36:47: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-08T21:36:47: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-08T21:36:47: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-08T21:36:47: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-08T21:36:47: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-08T21:36:47: PM2 log: Script /usr/bin/bash had too many unstable restarts (16). Stopped. "errored"
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+0|nexttour |
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+0|nexttour |
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+0|nexttour |
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour | Node.js v20.20.1
+0|nexttour | node:internal/modules/cjs/loader:1210
+0|nexttour |   throw err;
+0|nexttour |   ^
+0|nexttour |
+0|nexttour | Error: Cannot find module '/var/www/nexttour/dist/index.cjs'
+0|nexttour |     at Module._resolveFilename (node:internal/modules/cjs/loader:1207:15)
+0|nexttour |     at Module._load (node:internal/modules/cjs/loader:1038:27)
+0|nexttour |     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)
+0|nexttour |     at node:internal/main/run_main_module:28:49 {
+0|nexttour |   code: 'MODULE_NOT_FOUND',
+0|nexttour |   requireStack: []
+0|nexttour | }
+0|nexttour |
+0|nexttour | Node.js v20.20.1
