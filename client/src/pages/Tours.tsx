@@ -290,19 +290,19 @@ export default function Tours() {
           {/* Search bar inside header */}
           <div className="mt-6 max-w-2xl">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60 pointer-events-none" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
               <input
                 type="text"
                 placeholder={t("Поиск по названию, стране, городу...", "Search by name, country, city...")}
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-white/30 bg-white/15 backdrop-blur-sm text-white placeholder:text-white/50 shadow-sm focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/50 text-sm transition-all"
+                className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-white/30 bg-white text-gray-800 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 text-sm transition-all"
                 data-testid="input-tours-search"
               />
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
                 >
                   <X className="h-4 w-4" />
                 </button>
