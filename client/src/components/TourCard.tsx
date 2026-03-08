@@ -53,7 +53,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
   return (
     <Link href={`/tours/${tour.id}`}>
       <div
-        className="group relative rounded-2xl overflow-hidden bg-white dark:bg-card border border-transparent cursor-pointer h-full flex flex-col
+        className="group relative rounded-2xl overflow-hidden bg-white dark:bg-card border border-transparent cursor-pointer flex flex-col
           shadow-[0_2px_16px_rgba(0,0,0,0.07)]
           hover:shadow-[0_32px_80px_-8px_rgba(0,0,0,0.30)]
           hover:-translate-y-2.5
@@ -123,7 +123,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
         </div>
 
         {/* ── TEXT CONTENT ──────────────────────────────────── */}
-        <div className="p-5 flex flex-col flex-1">
+        <div className="p-5 flex flex-col">
           {locationLabel && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1.5">
               <MapPin className="h-3 w-3 shrink-0 text-primary/70" />
@@ -141,7 +141,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
           </p>
 
           {/* ── Price row ── */}
-          <div className="flex items-end justify-between pt-4 mt-auto border-t border-border/50">
+          <div className="flex items-end justify-between pt-4 mt-3 border-t border-border/50">
             {/* Price block — elevated on hover */}
             <div className="flex flex-col">
               <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-0.5">
