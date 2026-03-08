@@ -273,36 +273,36 @@ export default function Tours() {
   return (
     <div className="min-h-screen">
       {/* Page header */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-cyan-50/40 dark:from-blue-950/20 dark:via-background dark:to-background border-b border-border/40">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.08),transparent_60%)] pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
+      <div className="relative overflow-hidden bg-white/15 backdrop-blur-2xl border-b border-white/20">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 relative">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center shadow-md">
               <Compass className="h-5 w-5 text-white" />
             </div>
-            <p className="text-primary font-semibold text-sm uppercase tracking-widest">{t("Каталог", "Catalog")}</p>
+            <p className="text-white/80 font-semibold text-sm uppercase tracking-widest">{t("Каталог", "Catalog")}</p>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-3 leading-tight">{t("Все туры", "All Tours")}</h1>
-          <p className="text-muted-foreground text-base max-w-xl leading-relaxed">
+          <h1 className="text-3xl md:text-4xl font-extrabold mb-3 leading-tight text-white drop-shadow-md">{t("Все туры", "All Tours")}</h1>
+          <p className="text-white/75 text-base max-w-xl leading-relaxed">
             {t("Найдите идеальное путешествие из нашей коллекции эксклюзивных маршрутов", "Find your perfect journey from our collection of exclusive routes")}
           </p>
 
           {/* Search bar inside header */}
           <div className="mt-6 max-w-2xl">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground pointer-events-none" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60 pointer-events-none" />
               <input
                 type="text"
                 placeholder={t("Поиск по названию, стране, городу...", "Search by name, country, city...")}
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-border/60 bg-white dark:bg-card shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 text-sm transition-all"
+                className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-white/30 bg-white/15 backdrop-blur-sm text-white placeholder:text-white/50 shadow-sm focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/50 text-sm transition-all"
                 data-testid="input-tours-search"
               />
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
                 >
                   <X className="h-4 w-4" />
                 </button>
