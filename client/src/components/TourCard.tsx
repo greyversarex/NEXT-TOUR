@@ -112,15 +112,6 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
             {tour.duration} {t("дн.", "d.")}
           </div>
 
-          {/* ── "View tour" CTA — floats up on hover ── */}
-          <div className="absolute bottom-0 inset-x-0 z-10 flex items-center justify-center pb-5
-            opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0
-            transition-all duration-300 pointer-events-none">
-            <span className="flex items-center gap-1.5 text-white text-sm font-bold
-              bg-white/20 backdrop-blur-sm px-5 py-2 rounded-full border border-white/30 shadow-lg">
-              {t("Смотреть тур", "View Tour")} <ArrowRight className="h-3.5 w-3.5" />
-            </span>
-          </div>
         </div>
 
         {/* ── TEXT CONTENT ──────────────────────────────────── */}
