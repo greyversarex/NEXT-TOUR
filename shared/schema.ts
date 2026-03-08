@@ -134,6 +134,7 @@ export const tourFeeds = pgTable("tour_feeds", {
   nameEn: text("name_en").notNull(),
   order: integer("order").notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),
+  cardWidth: varchar("card_width").notNull().default("medium"),
 });
 
 export const tourFeedItems = pgTable("tour_feed_items", {

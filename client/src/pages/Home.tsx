@@ -429,13 +429,16 @@ function SearchSection() {
   );
 }
 
-function TourScrollFeed({ tours }: { tours: Tour[] }) {
+const CARD_WIDTHS: Record<string, number> = { small: 210, medium: 272, large: 340 };
+
+function TourScrollFeed({ tours, cardWidth = "medium" }: { tours: Tour[]; cardWidth?: string }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const px = CARD_WIDTHS[cardWidth] ?? 272;
 
   const scroll = (dir: "left" | "right") => {
     const el = scrollRef.current;
     if (!el) return;
-    el.scrollBy({ left: dir === "left" ? -600 : 600, behavior: "smooth" });
+    el.scrollBy({ left: dir === "left" ? -(px * 2 + 20) : (px * 2 + 20), behavior: "smooth" });
   };
 
   return (
@@ -443,7 +446,7 @@ function TourScrollFeed({ tours }: { tours: Tour[] }) {
       <div ref={scrollRef} className="feed-scroll overflow-x-auto pb-3">
         <div className="flex gap-5">
           {tours.map(tour => (
-            <div key={tour.id} className="w-[272px] flex-shrink-0">
+            <div key={tour.id} className="flex-shrink-0" style={{ width: `${px}px` }}>
               <TourCard tour={tour} />
             </div>
           ))}
@@ -470,7 +473,7 @@ function TourScrollFeed({ tours }: { tours: Tour[] }) {
   );
 }
 
-function PopularToursSection({ tours }: { tours: Tour[] }) {
+function PopularToursSection({ tours, cardWidth }: { tours: Tour[]; cardWidth?: string }) {
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
@@ -489,7 +492,7 @@ function PopularToursSection({ tours }: { tours: Tour[] }) {
             </Button>
           </Link>
         </Reveal>
-        <TourScrollFeed tours={tours} />
+        <TourScrollFeed tours={tours} cardWidth={cardWidth} />
         <div className="mt-10 flex justify-center md:hidden">
           <Link href="/tours">
             <Button className="rounded-full px-8 py-5 bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm">
@@ -502,7 +505,7 @@ function PopularToursSection({ tours }: { tours: Tour[] }) {
   );
 }
 
-function HotToursSection({ tours }: { tours: Tour[] }) {
+function HotToursSection({ tours, cardWidth }: { tours: Tour[]; cardWidth?: string }) {
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
@@ -521,7 +524,7 @@ function HotToursSection({ tours }: { tours: Tour[] }) {
             </Button>
           </Link>
         </Reveal>
-        <TourScrollFeed tours={tours} />
+        <TourScrollFeed tours={tours} cardWidth={cardWidth} />
       </div>
     </section>
   );
@@ -922,6 +925,8 @@ export default function Home() {
 
   const hotTours: Tour[] = hotFeed?.tours || [];
   const popularTours: Tour[] = featuredFeed?.tours || allFeed?.tours || (feeds[0]?.tours ?? []);
+  const hotCardWidth: string = hotFeed?.cardWidth || "medium";
+  const popularCardWidth: string = (featuredFeed || allFeed || feeds[0])?.cardWidth || "medium";
 
   return (
     <div className="min-h-screen">
@@ -937,14 +942,14 @@ export default function Home() {
         </div>
       ) : (
         <>
-          <PopularToursSection tours={popularTours} />
+          <PopularToursSection tours={popularTours} cardWidth={popularCardWidth} />
           {/* Nature gap */}
           <div className="py-8 md:py-12" />
           <DestinationsSection />
           <PromoBanner banners={banners} />
           {/* Nature gap */}
           <div className="py-6 md:py-10" />
-          <HotToursSection tours={hotTours} />
+          <HotToursSection tours={hotTours} cardWidth={hotCardWidth} />
           <WhyUsSection />
           <ReviewsSection />
         </>

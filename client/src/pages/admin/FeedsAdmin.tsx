@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus, Edit, Trash2, ListPlus, X } from "lucide-react";
+import { Plus, Edit, Trash2, ListPlus, X, LayoutGrid } from "lucide-react";
 import type { Tour } from "@shared/schema";
 
 export default function FeedsAdmin() {
@@ -61,7 +61,7 @@ export default function FeedsAdmin() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-sm">{lang === "ru" ? feed.nameRu : feed.nameEn}</p>
-                <p className="text-xs text-muted-foreground">{t("Порядок:", "Order:")} {feed.order} · {feed.isActive ? t("Активна", "Active") : t("Скрыта", "Hidden")}</p>
+                <p className="text-xs text-muted-foreground">{t("Порядок:", "Order:")} {feed.order} · {feed.isActive ? t("Активна", "Active") : t("Скрыта", "Hidden")} · {t("Карточки:", "Cards:")} {feed.cardWidth === "small" ? t("узкие", "narrow") : feed.cardWidth === "large" ? t("широкие", "wide") : t("средние", "medium")}</p>
               </div>
               <div className="flex gap-1">
                 <Button variant="ghost" size="icon" onClick={() => setManageFeed(feed)} title={t("Управлять турами", "Manage tours")}><ListPlus className="h-4 w-4" /></Button>
@@ -81,6 +81,18 @@ export default function FeedsAdmin() {
               <div><Label>{t("Название (RU)", "Name (RU)")}</Label><Input value={editing.nameRu || ""} onChange={e => setEditing((p: any) => ({ ...p, nameRu: e.target.value }))} className="mt-1" required /></div>
               <div><Label>{t("Название (EN)", "Name (EN)")}</Label><Input value={editing.nameEn || ""} onChange={e => setEditing((p: any) => ({ ...p, nameEn: e.target.value }))} className="mt-1" required /></div>
               <div><Label>{t("Порядок", "Order")}</Label><Input type="number" value={editing.order || 0} onChange={e => setEditing((p: any) => ({ ...p, order: Number(e.target.value) }))} className="mt-1" /></div>
+              <div>
+                <Label className="flex items-center gap-1.5 mb-1"><LayoutGrid className="h-3.5 w-3.5" />{t("Ширина карточек", "Card Width")}</Label>
+                <Select value={editing.cardWidth || "medium"} onValueChange={v => setEditing((p: any) => ({ ...p, cardWidth: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="small">{t("Узкие — 210px", "Narrow — 210px")}</SelectItem>
+                    <SelectItem value="medium">{t("Средние — 272px", "Medium — 272px")}</SelectItem>
+                    <SelectItem value="large">{t("Широкие — 340px", "Wide — 340px")}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">{t("Определяет ширину карточек тура в этой ленте", "Sets the width of tour cards in this feed")}</p>
+              </div>
               <div className="flex gap-3 pt-2">
                 <Button type="submit" disabled={saveMutation.isPending}>{t("Сохранить", "Save")}</Button>
                 <Button type="button" variant="outline" onClick={() => setEditing(null)}>{t("Отмена", "Cancel")}</Button>
