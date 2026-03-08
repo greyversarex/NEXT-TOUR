@@ -1,0 +1,69 @@
+root@6899447-yr427605:/var/www/nexttour# cd /var/www/nexttour && git pull origin main
+
+# Очистить данные
+sudo -u postgres psql nexttour -c "TRUNCATE TABLE users, countries, cities, categories, tours, tour_dates, price_components, tour_price_components, tour_options, tour_itinerary, tour_feeds, tour_feed_items, bookings, favorites, reviews, banners, hero_slides, intro_screen, news, settings, password_reset_tokens, session CASCADE;"
+
+# Импортировать как суперпользователь
+sudo -u postgres psql nexttour < client/public/uploads/nexttour_data.sql
+
+pm2 restart nexttour
+remote: Enumerating objects: 14, done.
+remote: Counting objects: 100% (14/14), done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 8 (delta 5), reused 8 (delta 5), pack-reused 0 (from 0)
+Unpacking objects: 100% (8/8), 2.80 KiB | 318.00 KiB/s, done.
+From https://github.com/greyversarex/NEXT-TOUR
+ * branch            main       -> FETCH_HEAD
+   eba06a4..3505b9e  main       -> origin/main
+Updating eba06a4..3505b9e
+Fast-forward
+ attached_assets/Pasted-root-6899447-yr427605-var-www-nexttour-cd-var-www-nextt_1773007250655.txt | 117 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ client/public/uploads/nexttour_data.sql                                                          |  94 ++--------------------------------------------------------------------------------------------
+ 2 files changed, 119 insertions(+), 92 deletions(-)
+ create mode 100644 attached_assets/Pasted-root-6899447-yr427605-var-www-nexttour-cd-var-www-nextt_1773007250655.txt
+TRUNCATE TABLE
+SET
+SET
+SET
+SET
+SET
+ set_config
+------------
+
+(1 row)
+
+SET
+SET
+SET
+SET
+COPY 2
+COPY 6
+COPY 8
+COPY 9
+COPY 8
+COPY 16
+COPY 3
+COPY 0
+COPY 0
+COPY 2
+COPY 1
+COPY 3
+COPY 0
+COPY 5
+COPY 3
+COPY 1
+COPY 0
+COPY 3
+COPY 14
+COPY 16
+COPY 16
+COPY 0
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [nexttour](ids: [ 0 ])
+[PM2] [nexttour](0) ✓
+┌────┬─────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name        │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼─────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ nexttour    │ default     │ N/A     │ fork    │ 8594     │ 0s     │ 34   │ online    │ 0%       │ 6.8mb    │ root     │ disabled │
+└────┴─────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+root@6899447-yr427605:/var/www/nexttour#
