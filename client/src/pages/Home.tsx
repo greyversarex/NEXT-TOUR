@@ -16,6 +16,25 @@ import {
 } from "lucide-react";
 import type { Tour, Country, City } from "@shared/schema";
 
+function isVideo(url: string) {
+  return /\.(mp4|webm|mov)(\?|$)/i.test(url);
+}
+
+function MediaDisplay({ src, alt, className }: { src: string; alt: string; className: string }) {
+  if (isVideo(src)) {
+    return (
+      <video
+        src={src}
+        className={className}
+        autoPlay
+        muted
+        loop
+        playsInline
+      />
+    );
+  }
+  return <img src={src} alt={alt} className={className} />;
+}
 
 const STATS = [
   {
@@ -553,7 +572,7 @@ function DestinationCard({ dest, lang, aspectClass = "aspect-[8/9]" }: {
           transition-all duration-500 ease-out`}
         data-testid={`card-destination-${dest.id}`}
       >
-        <img
+        <MediaDisplay
           src={image}
           alt={name}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.10]"
@@ -664,7 +683,7 @@ function PromoBanner({ banners }: { banners: any[] }) {
     <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-8">
       <Reveal y={16}>
         <div className="group relative rounded-3xl overflow-hidden h-72 md:h-96 shadow-2xl hover:shadow-[0_32px_80px_rgba(0,0,0,0.28)] transition-shadow duration-500 cursor-pointer">
-          <img src={src} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
+          <MediaDisplay src={src} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
