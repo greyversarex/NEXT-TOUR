@@ -167,7 +167,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
 
             <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-primary/8 text-primary
               group-hover:bg-primary group-hover:text-white
-              opacity-0 translate-x-1 group-hover:opacity-100 group-hover:translate-x-0
+              md:opacity-0 md:translate-x-1 md:group-hover:opacity-100 md:group-hover:translate-x-0
               transition-all duration-300">
               <ArrowRight className="h-4 w-4" />
             </div>

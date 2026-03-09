@@ -161,7 +161,7 @@ function CinematicHero() {
       }} />
 
       {/* Title/subtitle — centred in upper portion */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-white" style={{ paddingBottom: "160px" }}>
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-white" style={{ paddingBottom: "clamp(80px, 20vw, 160px)" }}>
         <div className="max-w-4xl w-full">
           <div className="hero-fade-in-up-1">
             <Badge className="mb-5 bg-white/15 backdrop-blur-md text-white border-white/30 px-5 py-2 text-sm font-semibold tracking-widest uppercase">
@@ -481,21 +481,22 @@ function TourScrollFeed({ tours, cardWidth = "medium" }: { tours: Tour[]; cardWi
         </div>
       </div>
 
+      {/* Arrows: always visible on mobile, fade in on hover on desktop */}
       <button
         onClick={() => scroll("left")}
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 text-white border border-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-xl"
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white border border-white/20 backdrop-blur-sm flex items-center justify-center md:opacity-0 md:group-hover:opacity-100 transition-all duration-200 shadow-xl"
         aria-label="Scroll left"
         data-testid="button-scroll-left"
       >
-        <ChevronLeft className="h-4 w-4" />
+        <ChevronLeft className="h-5 w-5" />
       </button>
       <button
         onClick={() => scroll("right")}
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 text-white border border-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-xl"
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white border border-white/20 backdrop-blur-sm flex items-center justify-center md:opacity-0 md:group-hover:opacity-100 transition-all duration-200 shadow-xl"
         aria-label="Scroll right"
         data-testid="button-scroll-right"
       >
-        <ChevronRight className="h-4 w-4" />
+        <ChevronRight className="h-5 w-5" />
       </button>
     </div>
   );
@@ -505,14 +506,14 @@ function PopularToursSection({ tours, cardWidth }: { tours: Tour[]; cardWidth?: 
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
-    <section className="pt-28 pb-24 relative overflow-hidden">
+    <section className="pt-14 pb-12 md:pt-28 md:pb-24 relative overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Reveal className="flex items-end justify-between mb-14">
+        <Reveal className="flex items-end justify-between mb-8 md:mb-14">
           <div>
             <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
               <TrendingUp className="h-3.5 w-3.5" /> {t("Лучшие предложения", "Top Offers")}
             </p>
-            <h2 className="text-3xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Популярные туры", "Popular Tours")}</h2>
+            <h2 className="text-2xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Популярные туры", "Popular Tours")}</h2>
           </div>
           <Link href="/tours">
             <Button className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm hover:-translate-y-0.5 transition-all duration-200 shadow-lg">
@@ -521,9 +522,9 @@ function PopularToursSection({ tours, cardWidth }: { tours: Tour[]; cardWidth?: 
           </Link>
         </Reveal>
         <TourScrollFeed tours={tours} cardWidth={cardWidth} />
-        <div className="mt-10 flex justify-center md:hidden">
+        <div className="mt-8 flex justify-center md:hidden">
           <Link href="/tours">
-            <Button className="rounded-full px-8 py-5 bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm">
+            <Button className="rounded-full px-8 py-4 bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm">
               {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>
@@ -537,14 +538,14 @@ function HotToursSection({ tours, cardWidth }: { tours: Tour[]; cardWidth?: stri
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-12 md:py-24 relative overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Reveal className="flex items-end justify-between mb-14">
+        <Reveal className="flex items-end justify-between mb-8 md:mb-14">
           <div>
             <p className="text-orange-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
               <Flame className="h-4 w-4" /> {t("Акции", "Special Deals")}
             </p>
-            <h2 className="text-3xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Горящие туры", "Hot Deals")}</h2>
+            <h2 className="text-2xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Горящие туры", "Hot Deals")}</h2>
           </div>
           <Link href="/promotions">
             <Button className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm hover:-translate-y-0.5 transition-all duration-200 shadow-lg">
@@ -553,6 +554,13 @@ function HotToursSection({ tours, cardWidth }: { tours: Tour[]; cardWidth?: stri
           </Link>
         </Reveal>
         <TourScrollFeed tours={tours} cardWidth={cardWidth} />
+        <div className="mt-8 flex justify-center md:hidden">
+          <Link href="/promotions">
+            <Button className="rounded-full px-8 py-4 bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm">
+              {t("Все акции", "All Deals")} <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -618,7 +626,7 @@ function DestinationCard({ dest, lang, aspectClass = "aspect-[8/9]" }: {
               {tags.map((tag, i) => (
                 <span
                   key={i}
-                  className="text-[11px] text-white/95 bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-0.5 border border-white/25 font-medium"
+                  className="text-xs text-white/95 bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-0.5 border border-white/25 font-medium"
                 >
                   {tag}
                 </span>
@@ -638,14 +646,14 @@ function DestinationsSection() {
   const destinations = countries;
 
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-12 md:py-24 relative overflow-hidden">
       <div className="relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <Reveal className="text-center mb-16">
+        <Reveal className="text-center mb-10 md:mb-16">
           <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
             <MapPin className="h-3.5 w-3.5" /> {t("Исследуйте", "Explore")}
           </p>
-          <h2 className="text-3xl md:text-5xl font-bold mb-5 leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Направления мечты", "Dream Destinations")}</h2>
-          <p className="text-white/70 max-w-xl mx-auto text-base leading-relaxed" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.4)" }}>
+          <h2 className="text-2xl md:text-5xl font-bold mb-4 leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Направления мечты", "Dream Destinations")}</h2>
+          <p className="text-white/70 max-w-xl mx-auto text-sm md:text-base leading-relaxed" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.4)" }}>
             {t("Откройте для себя самые красивые уголки планеты с нашими эксклюзивными турами", "Discover the most beautiful corners of the planet with our exclusive tours")}
           </p>
         </Reveal>
@@ -699,12 +707,12 @@ function PromoBanner({ banners }: { banners: any[] }) {
           {/* Decorative accent line */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-cyan-400 to-primary/0" />
 
-          <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between px-10 md:px-16 py-12 gap-6">
+          <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between px-6 md:px-16 py-8 md:py-12 gap-5">
             <div className="text-white text-center md:text-left">
-              <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 mb-5 text-xs tracking-widest uppercase px-4 py-1.5">
+              <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 mb-4 text-xs tracking-widest uppercase px-4 py-1.5">
                 🔥 {t("Специальное предложение", "Special Offer")}
               </Badge>
-              <h3 className="text-3xl md:text-5xl font-extrabold mb-3 leading-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+              <h3 className="text-2xl md:text-5xl font-extrabold mb-2 leading-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
                 {titleEl}
               </h3>
               {subtitleEl && (
@@ -714,7 +722,7 @@ function PromoBanner({ banners }: { banners: any[] }) {
             <Link href={linkUrl} className="shrink-0">
               <Button
                 size="lg"
-                className="bg-white text-primary hover:bg-white/95 font-bold px-10 py-6 rounded-2xl shadow-xl text-base hover:scale-105 hover:shadow-2xl transition-all duration-200"
+                className="bg-white text-primary hover:bg-white/95 font-bold px-8 py-5 rounded-2xl shadow-xl text-base hover:scale-105 hover:shadow-2xl transition-all duration-200"
               >
                 {t("Смотреть акции", "View Offers")} <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
@@ -763,21 +771,21 @@ function ReviewsSection() {
   const rev = reviews[idx];
 
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-12 md:py-24 relative overflow-hidden">
 
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Reveal className="text-center mb-16">
+        <Reveal className="text-center mb-10 md:mb-16">
           <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
             <ThumbsUp className="h-3.5 w-3.5" /> {t("Отзывы", "Testimonials")}
           </p>
-          <h2 className="text-3xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Что говорят наши клиенты", "What Our Clients Say")}</h2>
+          <h2 className="text-2xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Что говорят наши клиенты", "What Our Clients Say")}</h2>
         </Reveal>
 
         <div className="max-w-3xl mx-auto">
           <div className={`transition-all duration-200 ${animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}>
             <div
-              className="bg-white dark:bg-card rounded-3xl p-10 md:p-14 relative"
+              className="bg-white dark:bg-card rounded-3xl p-7 md:p-14 relative"
               style={{ boxShadow: "0 12px 60px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.9) inset" }}
             >
               {/* Large decorative quote */}
@@ -896,15 +904,15 @@ function WhyUsSection() {
   ];
 
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-12 md:py-24 relative overflow-hidden">
 
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Reveal className="text-center mb-16">
+        <Reveal className="text-center mb-10 md:mb-16">
           <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>{t("Наши преимущества", "Our Advantages")}</p>
-          <h2 className="text-3xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Почему выбирают нас", "Why Choose Us")}</h2>
+          <h2 className="text-2xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Почему выбирают нас", "Why Choose Us")}</h2>
         </Reveal>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7">
           {items.map((item, i) => (
             <Reveal key={i} delay={i * 100} y={20}>
               <div
@@ -956,10 +964,10 @@ export default function Home() {
       <SearchSection />
 
       {isLoading ? (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 space-y-10">
-          <Skeleton className="h-9 w-72 mb-6" />
-          <div className="grid grid-cols-4 gap-7">
-            {[1,2,3,4].map(i => <Skeleton key={i} className="h-80 rounded-2xl" />)}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-32 space-y-10">
+          <Skeleton className="h-8 w-56 md:w-72 mb-6" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-7">
+            {[1,2,3,4].map(i => <Skeleton key={i} className="h-60 md:h-80 rounded-2xl" />)}
           </div>
         </div>
       ) : (

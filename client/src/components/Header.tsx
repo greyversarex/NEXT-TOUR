@@ -183,11 +183,11 @@ export default function Header() {
         {/* Mobile menu */}
         {menuOpen && (
           <div className="md:hidden border-t border-white/10 bg-[#0b1f3a]/97 backdrop-blur-xl">
-            <nav className="flex flex-col px-4 py-3 gap-0.5">
+            <nav className="flex flex-col px-4 py-3 gap-1">
               {navLinks.map(link => (
                 <Link key={link.href} href={link.href}>
                   <span
-                    className={`block px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 ${
+                    className={`block px-4 py-3.5 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 ${
                       isActive(link.href)
                         ? "text-white font-bold bg-white/10"
                         : "text-white/85 font-semibold hover:text-white hover:bg-white/10"
