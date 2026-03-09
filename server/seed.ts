@@ -38,13 +38,13 @@ export async function seedDatabase() {
   ]).returning();
 
   const countryRows = await db.insert(countries).values([
-    { nameRu: "Греция", nameEn: "Greece", imageUrl: TOUR_IMAGES[0] },
-    { nameRu: "Индонезия", nameEn: "Indonesia", imageUrl: TOUR_IMAGES[1] },
-    { nameRu: "Швейцария", nameEn: "Switzerland", imageUrl: TOUR_IMAGES[2] },
-    { nameRu: "Япония", nameEn: "Japan", imageUrl: TOUR_IMAGES[3] },
-    { nameRu: "Мальдивы", nameEn: "Maldives", imageUrl: TOUR_IMAGES[4] },
-    { nameRu: "Франция", nameEn: "France", imageUrl: TOUR_IMAGES[5] },
-    { nameRu: "Перу", nameEn: "Peru", imageUrl: TOUR_IMAGES[6] },
+    { nameRu: "Греция", nameEn: "Greece", imageUrl: TOUR_IMAGES[0], showOnHome: true },
+    { nameRu: "Индонезия", nameEn: "Indonesia", imageUrl: TOUR_IMAGES[1], showOnHome: true },
+    { nameRu: "Швейцария", nameEn: "Switzerland", imageUrl: TOUR_IMAGES[2], showOnHome: true },
+    { nameRu: "Япония", nameEn: "Japan", imageUrl: TOUR_IMAGES[3], showOnHome: true },
+    { nameRu: "Мальдивы", nameEn: "Maldives", imageUrl: TOUR_IMAGES[4], showOnHome: true },
+    { nameRu: "Франция", nameEn: "France", imageUrl: TOUR_IMAGES[5], showOnHome: true },
+    { nameRu: "Перу", nameEn: "Peru", imageUrl: TOUR_IMAGES[6], showOnHome: true },
   ]).returning();
 
   const [greece, indonesia, switzerland, japan, maldives, france, peru] = countryRows;
