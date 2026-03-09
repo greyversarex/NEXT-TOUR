@@ -515,9 +515,12 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // File Upload
+  // Uploads are stored in a persistent directory at the project root,
+  // outside of dist/ so they survive npm run build without requiring a redeploy.
+  const uploadsDir = path.join(process.cwd(), "uploads");
   const upload = multer({
     storage: multer.diskStorage({
-      destination: path.join(process.cwd(), "client/public/uploads"),
+      destination: uploadsDir,
       filename: (_req, file, cb) => {
         const ext = path.extname(file.originalname);
         cb(null, `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`);
