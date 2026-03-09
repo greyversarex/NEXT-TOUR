@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -21,16 +21,25 @@ function isVideo(url: string) {
 }
 
 function MediaDisplay({ src, alt, className }: { src: string; alt: string; className: string }) {
+  const [ready, setReady] = useState(false);
+
   if (isVideo(src)) {
     return (
-      <video
-        src={src}
-        className={className}
-        autoPlay
-        muted
-        loop
-        playsInline
-      />
+      <>
+        {!ready && (
+          <div className="absolute inset-0 bg-gray-900" />
+        )}
+        <video
+          src={src}
+          className={`${className} transition-opacity duration-700 ${ready ? "opacity-100" : "opacity-0"}`}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          onCanPlay={() => setReady(true)}
+        />
+      </>
     );
   }
   return <img src={src} alt={alt} className={className} />;
