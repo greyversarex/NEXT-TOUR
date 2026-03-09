@@ -191,13 +191,13 @@ function CinematicHero() {
         <>
           <button
             onClick={() => setCurrent(c => (c - 1 + heroImages.length) % heroImages.length)}
-            className="absolute left-5 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/25 backdrop-blur-sm text-white hover:bg-black/45 transition-all hover:scale-110"
+            className="hidden md:flex absolute left-5 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/25 backdrop-blur-sm text-white hover:bg-black/45 transition-all hover:scale-110 items-center justify-center"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
           <button
             onClick={() => setCurrent(c => (c + 1) % heroImages.length)}
-            className="absolute right-5 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/25 backdrop-blur-sm text-white hover:bg-black/45 transition-all hover:scale-110"
+            className="hidden md:flex absolute right-5 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/25 backdrop-blur-sm text-white hover:bg-black/45 transition-all hover:scale-110 items-center justify-center"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
