@@ -116,16 +116,16 @@ export default function IntroScreen() {
       }}
     >
       {hasMedia ? (
-        intro!.videoUrl!.toLowerCase().endsWith(".gif") ? (
+        /\.(mp4|webm|mov)(\?|$)/i.test(intro!.videoUrl!) ? (
+          <video
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+            autoPlay muted loop playsInline src={intro!.videoUrl!}
+          />
+        ) : (
           <img
             src={intro!.videoUrl!}
             alt=""
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-          />
-        ) : (
-          <video
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-            autoPlay muted loop playsInline src={intro!.videoUrl!}
           />
         )
       ) : null}

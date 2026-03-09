@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, X, Loader2 } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 interface ImageUploadProps {
@@ -9,6 +8,10 @@ interface ImageUploadProps {
   onChange: (url: string) => void;
   placeholder?: string;
   className?: string;
+}
+
+function isVideo(url: string) {
+  return /\.(mp4|webm|mov)(\?|$)/i.test(url);
 }
 
 export function ImageUpload({ value, onChange, placeholder = "https://...", className }: ImageUploadProps) {
@@ -53,9 +56,29 @@ export function ImageUpload({ value, onChange, placeholder = "https://...", clas
         {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
         {uploading ? "..." : "Загрузить"}
       </Button>
-      <input ref={ref} type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
+      <input
+        ref={ref}
+        type="file"
+        accept="image/*,video/mp4,video/webm,video/quicktime"
+        className="hidden"
+        onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])}
+      />
       {value && (
-        <img src={value} alt="" className="h-10 w-14 object-cover rounded border border-border shrink-0" onError={e => (e.currentTarget.style.display = "none")} />
+        isVideo(value) ? (
+          <video
+            src={value}
+            className="h-10 w-14 object-cover rounded border border-border shrink-0"
+            muted
+            playsInline
+          />
+        ) : (
+          <img
+            src={value}
+            alt=""
+            className="h-10 w-14 object-cover rounded border border-border shrink-0"
+            onError={e => (e.currentTarget.style.display = "none")}
+          />
+        )
       )}
     </div>
   );

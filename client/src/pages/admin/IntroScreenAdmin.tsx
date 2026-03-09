@@ -127,10 +127,10 @@ export default function IntroScreenAdmin() {
           <Card>
             <CardContent className="pt-6">
               <p className="text-sm font-semibold mb-3">{t("Предпросмотр фона", "Background Preview")}</p>
-              {form.videoUrl.toLowerCase().endsWith(".gif") ? (
-                <img src={form.videoUrl} alt="preview" className="w-full rounded-lg max-h-60 object-cover bg-black" />
-              ) : (
+              {/\.(mp4|webm|mov)(\?|$)/i.test(form.videoUrl) ? (
                 <video src={form.videoUrl} controls className="w-full rounded-lg max-h-60 object-cover bg-black" />
+              ) : (
+                <img src={form.videoUrl} alt="preview" className="w-full rounded-lg max-h-60 object-cover bg-black" />
               )}
             </CardContent>
           </Card>

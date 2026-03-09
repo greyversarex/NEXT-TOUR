@@ -524,10 +524,10 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       },
     }),
     fileFilter: (_req, file, cb) => {
-      const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+      const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif", "video/mp4", "video/quicktime", "video/webm"];
       cb(null, allowed.includes(file.mimetype));
     },
-    limits: { fileSize: 5 * 1024 * 1024 },
+    limits: { fileSize: 200 * 1024 * 1024 },
   });
 
   app.post("/api/upload", requireAuth, upload.single("file"), (req, res) => {

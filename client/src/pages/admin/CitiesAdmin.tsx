@@ -10,6 +10,7 @@ import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import { ImageUpload } from "@/components/ui/image-upload";
 import type { Country, City } from "@shared/schema";
 
 export default function CitiesAdmin() {
@@ -139,13 +140,14 @@ export default function CitiesAdmin() {
                 />
               </div>
               <div>
-                <Label>{t("Изображение (URL)", "Image URL")}</Label>
-                <Input 
-                  value={editing.imageUrl || ""} 
-                  onChange={e => setEditing((p: any) => ({ ...p, imageUrl: e.target.value }))} 
-                  className="mt-1"
-                  data-testid="input-image-url"
-                />
+                <Label>{t("Изображение / Видео", "Image / Video")}</Label>
+                <div className="mt-1">
+                  <ImageUpload
+                    value={editing.imageUrl || ""}
+                    onChange={v => setEditing((p: any) => ({ ...p, imageUrl: v }))}
+                    placeholder="https:// или загрузите файл"
+                  />
+                </div>
               </div>
               <div className="flex gap-3 pt-2">
                 <Button type="submit" disabled={cityMutation.isPending} data-testid="button-save-city">
