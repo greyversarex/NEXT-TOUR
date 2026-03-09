@@ -1,5 +1,17 @@
 # TravelPro — Replit.md
 
+## ВАЖНО — Рабочий процесс
+
+Этот репозиторий является **рабочей копией продакшен-проекта**. Все изменения, сделанные здесь, в итоге попадают на живой сервер через Git. Это означает:
+
+- **Каждая задача требует максимально качественного, полного и ответственного выполнения**
+- Никаких временных заглушек, половинчатых решений или "потом доделаем"
+- Перед любым изменением — понять последствия. Протестировать результат.
+- База данных на продакшене реальная — любые миграции схемы проводить с осторожностью
+- Код должен быть чистым, предсказуемым и поддерживаемым
+
+---
+
 ## Overview
 
 TravelPro is a bilingual (Russian/English) travel booking platform. It lets users browse tours, view promotions and news, make bookings, and manage their profile with a loyalty system. Admins get a full dashboard to manage tours, bookings, reviews, users, banners, hero slides, news, and more.
