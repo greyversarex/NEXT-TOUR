@@ -182,7 +182,7 @@ export default function IntroScreen() {
           >
             <div style={{ position: "relative" }}>
               <div style={{
-                width: 100, height: 100, borderRadius: "50%",
+                width: 130, height: 130, borderRadius: "50%",
                 background: "#ffffff",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 boxShadow: "0 0 40px rgba(59,130,246,0.5), 0 0 80px rgba(59,130,246,0.2)",
@@ -192,7 +192,7 @@ export default function IntroScreen() {
                   src="/images/nexttour-logo-color.png"
                   alt="Next Tour"
                   style={{
-                    width: 76, height: "auto",
+                    width: 100, height: "auto",
                   }}
                 />
               </div>
