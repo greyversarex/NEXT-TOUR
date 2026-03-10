@@ -6,7 +6,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, X, Globe, User, LogOut, Settings, Heart, BookOpen, ShieldCheck, Plane } from "lucide-react";
+import { Menu, X, Globe, User, LogOut, Settings, Heart, BookOpen, ShieldCheck } from "lucide-react";
 import AuthModal from "./AuthModal";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
@@ -51,16 +51,12 @@ export default function Header() {
           <div className="flex items-center justify-between h-[68px]">
             {/* Logo */}
             <Link href="/">
-              <span
-                className="flex items-center gap-2 cursor-pointer"
-                data-testid="link-logo"
-              >
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center shadow-sm">
-                  <Plane className="h-4 w-4 text-white -rotate-45" />
-                </div>
-                <span className="text-xl font-extrabold tracking-tight text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
-                  NEXT TOUR
-                </span>
+              <span className="flex items-center cursor-pointer" data-testid="link-logo">
+                <img
+                  src="/images/nexttour-logo-final.png"
+                  alt="Next Tour"
+                  className="h-12 w-auto"
+                />
               </span>
             </Link>
 
