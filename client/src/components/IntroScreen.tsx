@@ -38,7 +38,7 @@ function useTypingEffect(text: string, started: boolean, speed = 45) {
 export default function IntroScreen() {
   const { t, lang } = useI18n();
   // Shown immediately and synchronously — no flash of site content
-  const [visible, setVisible] = useState(() => !sessionStorage.getItem("intro_shown"));
+  const [visible, setVisible] = useState(true);
   const [hiding, setHiding] = useState(false);
   const [phase, setPhase] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -82,7 +82,6 @@ export default function IntroScreen() {
       setHiding(true);
       setTimeout(() => {
         setVisible(false);
-        sessionStorage.setItem("intro_shown", "1");
       }, 900);
     }, DURATION);
     return () => {
