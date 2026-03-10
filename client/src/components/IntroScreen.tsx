@@ -189,11 +189,10 @@ export default function IntroScreen() {
                 overflow: "hidden",
               }}>
                 <img
-                  src="/images/nexttour-logo-final.png"
+                  src="/images/nexttour-logo-color.png"
                   alt="Next Tour"
                   style={{
-                    width: 72, height: "auto",
-                    filter: "brightness(0)",
+                    width: 76, height: "auto",
                   }}
                 />
               </div>
