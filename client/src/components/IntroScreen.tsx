@@ -35,11 +35,11 @@ function useTypingEffect(text: string, started: boolean, speed = 45) {
   return displayed;
 }
 
+type Status = "checking" | "active" | "hiding" | "gone";
+
 export default function IntroScreen() {
   const { t, lang } = useI18n();
-  // Shown immediately and synchronously — no flash of site content
-  const [visible, setVisible] = useState(true);
-  const [hiding, setHiding] = useState(false);
+  const [status, setStatus] = useState<Status>("checking");
   const [phase, setPhase] = useState(0);
   const [progress, setProgress] = useState(0);
   const animStarted = useRef(false);
@@ -56,18 +56,17 @@ export default function IntroScreen() {
   });
 
   useEffect(() => {
-    if (!visible) return;
     if (!isSuccess) return;
 
-    // API says intro is disabled — hide immediately without animation
     if (!intro?.isActive) {
-      setVisible(false);
-      return;
+      setStatus("hiding");
+      const t = setTimeout(() => setStatus("gone"), 300);
+      return () => clearTimeout(t);
     }
 
-    // Prevent double-starting animation
     if (animStarted.current) return;
     animStarted.current = true;
+    setStatus("active");
 
     const t1 = setTimeout(() => setPhase(1), 200);
     const t2 = setTimeout(() => setPhase(2), 900);
@@ -79,34 +78,32 @@ export default function IntroScreen() {
       if (elapsed < DURATION) requestAnimationFrame(tick);
     });
     const hide = setTimeout(() => {
-      setHiding(true);
-      setTimeout(() => {
-        setVisible(false);
-      }, 900);
+      setStatus("hiding");
+      setTimeout(() => setStatus("gone"), 900);
     }, DURATION);
     return () => {
       clearTimeout(t1); clearTimeout(t2); clearTimeout(t3);
       clearTimeout(hide); cancelAnimationFrame(raf);
     };
-  }, [isSuccess, intro, visible]);
+  }, [isSuccess, intro]);
 
+  const isHiding = status === "hiding";
+  const isActive = status === "active";
+  const hasMedia = !!intro?.videoUrl;
   const title = intro ? (lang === "ru" ? intro.titleRu : intro.titleEn) : "NEXT TOUR";
   const slogan = intro
     ? (lang === "ru" ? intro.sloganRu : intro.sloganEn)
     : t("Открой мир путешествий", "Discover the World");
-
   const typedSlogan = useTypingEffect(slogan, phase >= 3, 40);
 
-  if (!visible) return null;
-
-  const hasMedia = !!intro?.videoUrl;
+  if (status === "gone") return null;
 
   return (
     <div
       style={{
         position: "fixed", inset: 0, zIndex: 9999,
-        opacity: hiding ? 0 : 1,
-        transition: "opacity 0.9s cubic-bezier(0.4,0,0.2,1)",
+        opacity: isHiding ? 0 : 1,
+        transition: isHiding ? "opacity 0.3s ease" : "opacity 0.9s cubic-bezier(0.4,0,0.2,1)",
         background: hasMedia
           ? "#000"
           : "linear-gradient(135deg, #020d1f 0%, #0b1f3a 45%, #0d2847 70%, #051020 100%)",
@@ -114,7 +111,7 @@ export default function IntroScreen() {
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
       }}
     >
-      {hasMedia ? (
+      {isActive && hasMedia ? (
         /\.(mp4|webm|mov)(\?|$)/i.test(intro!.videoUrl!) ? (
           <video
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
@@ -129,13 +126,11 @@ export default function IntroScreen() {
         )
       ) : null}
 
-      {/* Dark overlay for text readability — only when media is present */}
-      {hasMedia && (
+      {isActive && hasMedia && (
         <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.52)", zIndex: 1 }} />
       )}
 
-      {/* Stars and glow orbs — only without media */}
-      {!hasMedia && (
+      {isActive && !hasMedia && (
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
           {particles.map(p => (
             <div
@@ -173,122 +168,126 @@ export default function IntroScreen() {
         </div>
       )}
 
-      <div style={{ position: "relative", zIndex: 10, textAlign: "center", padding: "0 24px", maxWidth: 680 }}>
+      {isActive && (
+        <div style={{ position: "relative", zIndex: 10, textAlign: "center", padding: "0 24px", maxWidth: 680 }}>
 
-        <div
-          style={{
-            display: "flex", alignItems: "center", justifyContent: "center",
-            marginBottom: 32,
-            opacity: phase >= 1 ? 1 : 0,
-            transform: phase >= 1 ? "scale(1) translateY(0)" : "scale(0.6) translateY(20px)",
-            transition: "opacity 0.8s cubic-bezier(0.34,1.56,0.64,1), transform 0.8s cubic-bezier(0.34,1.56,0.64,1)",
-          }}
-        >
-          <div style={{ position: "relative" }}>
-            <div style={{
-              width: 88, height: 88, borderRadius: "50%",
-              background: "linear-gradient(135deg, #1d4ed8 0%, #3b82f6 50%, #60a5fa 100%)",
+          <div
+            style={{
               display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: "0 0 40px rgba(59,130,246,0.5), 0 0 80px rgba(59,130,246,0.2)",
-              animation: "logo-spin 20s linear infinite",
-            }}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-              </svg>
+              marginBottom: 32,
+              opacity: phase >= 1 ? 1 : 0,
+              transform: phase >= 1 ? "scale(1) translateY(0)" : "scale(0.6) translateY(20px)",
+              transition: "opacity 0.8s cubic-bezier(0.34,1.56,0.64,1), transform 0.8s cubic-bezier(0.34,1.56,0.64,1)",
+            }}
+          >
+            <div style={{ position: "relative" }}>
+              <div style={{
+                width: 88, height: 88, borderRadius: "50%",
+                background: "linear-gradient(135deg, #1d4ed8 0%, #3b82f6 50%, #60a5fa 100%)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                boxShadow: "0 0 40px rgba(59,130,246,0.5), 0 0 80px rgba(59,130,246,0.2)",
+                animation: "logo-spin 20s linear infinite",
+              }}>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              </div>
+              <div style={{
+                position: "absolute", inset: -8, borderRadius: "50%",
+                border: "1.5px solid rgba(96,165,250,0.4)",
+                animation: "ring-pulse 2s ease-in-out infinite",
+              }} />
+              <div style={{
+                position: "absolute", inset: -18, borderRadius: "50%",
+                border: "1px solid rgba(96,165,250,0.2)",
+                animation: "ring-pulse 2s 0.5s ease-in-out infinite",
+              }} />
             </div>
-            <div style={{
-              position: "absolute", inset: -8, borderRadius: "50%",
-              border: "1.5px solid rgba(96,165,250,0.4)",
-              animation: "ring-pulse 2s ease-in-out infinite",
-            }} />
-            <div style={{
-              position: "absolute", inset: -18, borderRadius: "50%",
-              border: "1px solid rgba(96,165,250,0.2)",
-              animation: "ring-pulse 2s 0.5s ease-in-out infinite",
-            }} />
+          </div>
+
+          <div
+            style={{
+              fontSize: "clamp(2.8rem, 8vw, 5rem)",
+              fontWeight: 800,
+              letterSpacing: "-0.02em",
+              lineHeight: 1,
+              marginBottom: 16,
+              opacity: phase >= 2 ? 1 : 0,
+              transform: phase >= 2 ? "translateY(0)" : "translateY(28px)",
+              transition: "opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1)",
+            }}
+          >
+            <span style={{
+              background: "linear-gradient(135deg, #ffffff 0%, #93c5fd 50%, #60a5fa 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>
+              {title}
+            </span>
+          </div>
+
+          <div
+            style={{
+              height: 2, width: phase >= 2 ? "100%" : "0%",
+              background: "linear-gradient(90deg, transparent, #3b82f6, #60a5fa, #3b82f6, transparent)",
+              margin: "0 auto 24px",
+              transition: "width 0.8s cubic-bezier(0.22,1,0.36,1)",
+              borderRadius: 2,
+            }}
+          />
+
+          <div
+            style={{
+              fontSize: "clamp(1rem, 3vw, 1.35rem)",
+              color: "rgba(219,234,254,0.88)",
+              fontWeight: 300,
+              letterSpacing: "0.08em",
+              minHeight: "2em",
+              opacity: phase >= 3 ? 1 : 0,
+              transition: "opacity 0.5s ease",
+            }}
+          >
+            {typedSlogan}
+            {phase >= 3 && typedSlogan.length < slogan.length && (
+              <span style={{
+                display: "inline-block", width: 2, height: "1em",
+                background: "#60a5fa", marginLeft: 2,
+                animation: "cursor-blink 0.7s step-end infinite", verticalAlign: "text-bottom",
+              }} />
+            )}
+          </div>
+
+          <div style={{ marginTop: 48, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+            {[0, 1, 2].map(i => (
+              <div key={i} style={{
+                width: 6, height: 6, borderRadius: "50%",
+                background: "#3b82f6",
+                animation: `dot-bounce 1.4s ${i * 0.2}s ease-in-out infinite`,
+                opacity: 0.7,
+              }} />
+            ))}
           </div>
         </div>
+      )}
 
-        <div
-          style={{
-            fontSize: "clamp(2.8rem, 8vw, 5rem)",
-            fontWeight: 800,
-            letterSpacing: "-0.02em",
-            lineHeight: 1,
-            marginBottom: 16,
-            opacity: phase >= 2 ? 1 : 0,
-            transform: phase >= 2 ? "translateY(0)" : "translateY(28px)",
-            transition: "opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1)",
-          }}
-        >
-          <span style={{
-            background: "linear-gradient(135deg, #ffffff 0%, #93c5fd 50%, #60a5fa 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-          }}>
-            {title}
-          </span>
-        </div>
-
-        <div
-          style={{
-            height: 2, width: phase >= 2 ? "100%" : "0%",
-            background: "linear-gradient(90deg, transparent, #3b82f6, #60a5fa, #3b82f6, transparent)",
-            margin: "0 auto 24px",
-            transition: "width 0.8s cubic-bezier(0.22,1,0.36,1)",
-            borderRadius: 2,
-          }}
-        />
-
-        <div
-          style={{
-            fontSize: "clamp(1rem, 3vw, 1.35rem)",
-            color: "rgba(219,234,254,0.88)",
-            fontWeight: 300,
-            letterSpacing: "0.08em",
-            minHeight: "2em",
-            opacity: phase >= 3 ? 1 : 0,
-            transition: "opacity 0.5s ease",
-          }}
-        >
-          {typedSlogan}
-          {phase >= 3 && typedSlogan.length < slogan.length && (
-            <span style={{
-              display: "inline-block", width: 2, height: "1em",
-              background: "#60a5fa", marginLeft: 2,
-              animation: "cursor-blink 0.7s step-end infinite", verticalAlign: "text-bottom",
-            }} />
-          )}
-        </div>
-
-        <div style={{ marginTop: 48, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-          {[0, 1, 2].map(i => (
-            <div key={i} style={{
-              width: 6, height: 6, borderRadius: "50%",
-              background: "#3b82f6",
-              animation: `dot-bounce 1.4s ${i * 0.2}s ease-in-out infinite`,
-              opacity: 0.7,
-            }} />
-          ))}
-        </div>
-      </div>
-
-      <div style={{
-        position: "absolute", bottom: 0, left: 0, right: 0, height: 3, zIndex: 11,
-        background: "rgba(255,255,255,0.08)",
-      }}>
+      {isActive && (
         <div style={{
-          height: "100%",
-          width: `${progress * 100}%`,
-          background: "linear-gradient(90deg, #1d4ed8, #3b82f6, #60a5fa)",
-          boxShadow: "0 0 12px rgba(96,165,250,0.8)",
-          transition: "width 0.1s linear",
-          borderRadius: "0 2px 2px 0",
-        }} />
-      </div>
+          position: "absolute", bottom: 0, left: 0, right: 0, height: 3, zIndex: 11,
+          background: "rgba(255,255,255,0.08)",
+        }}>
+          <div style={{
+            height: "100%",
+            width: `${progress * 100}%`,
+            background: "linear-gradient(90deg, #1d4ed8, #3b82f6, #60a5fa)",
+            boxShadow: "0 0 12px rgba(96,165,250,0.8)",
+            transition: "width 0.1s linear",
+            borderRadius: "0 2px 2px 0",
+          }} />
+        </div>
+      )}
 
       <style>{`
         @keyframes float-star {
