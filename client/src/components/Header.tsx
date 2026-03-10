@@ -52,11 +52,20 @@ export default function Header() {
             {/* Logo */}
             <Link href="/">
               <span className="flex items-center cursor-pointer" data-testid="link-logo">
-                <img
-                  src="/images/nexttour-logo-final.png"
-                  alt="Next Tour"
-                  className="h-12 w-auto"
-                />
+                <div style={{
+                  width: 44, height: 44, borderRadius: "50%",
+                  background: "#ffffff",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  overflow: "hidden",
+                  boxShadow: "0 0 12px rgba(59,130,246,0.45)",
+                  flexShrink: 0,
+                }}>
+                  <img
+                    src="/images/nexttour-logo-color.png"
+                    alt="Next Tour"
+                    style={{ width: 34, height: "auto" }}
+                  />
+                </div>
               </span>
             </Link>
 
