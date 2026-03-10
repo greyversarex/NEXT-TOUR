@@ -51,7 +51,7 @@ export default function Header() {
           <div className="flex items-center justify-between h-[68px]">
             {/* Logo */}
             <Link href="/">
-              <span className="flex items-center cursor-pointer" data-testid="link-logo">
+              <span className="flex items-center gap-2.5 cursor-pointer" data-testid="link-logo">
                 <div style={{
                   width: 44, height: 44, borderRadius: "50%",
                   background: "#ffffff",
@@ -66,6 +66,21 @@ export default function Header() {
                     style={{ width: 34, height: "auto" }}
                   />
                 </div>
+                <span style={{
+                  fontFamily: "'Montserrat', sans-serif",
+                  fontWeight: 800,
+                  fontSize: "1.15rem",
+                  letterSpacing: "0.12em",
+                  background: "linear-gradient(135deg, #ffffff 0%, #93c5fd 60%, #60a5fa 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  textTransform: "uppercase",
+                  lineHeight: 1,
+                  userSelect: "none",
+                }}>
+                  NEXT TOUR
+                </span>
               </span>
             </Link>
 
