@@ -182,17 +182,20 @@ export default function IntroScreen() {
           >
             <div style={{ position: "relative" }}>
               <div style={{
-                width: 88, height: 88, borderRadius: "50%",
-                background: "linear-gradient(135deg, #1d4ed8 0%, #3b82f6 50%, #60a5fa 100%)",
+                width: 100, height: 100, borderRadius: "50%",
+                background: "#ffffff",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 boxShadow: "0 0 40px rgba(59,130,246,0.5), 0 0 80px rgba(59,130,246,0.2)",
-                animation: "logo-spin 20s linear infinite",
+                overflow: "hidden",
               }}>
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="2" y1="12" x2="22" y2="12"/>
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                </svg>
+                <img
+                  src="/images/nexttour-logo-final.png"
+                  alt="Next Tour"
+                  style={{
+                    width: 72, height: "auto",
+                    filter: "brightness(0)",
+                  }}
+                />
               </div>
               <div style={{
                 position: "absolute", inset: -8, borderRadius: "50%",
@@ -297,10 +300,6 @@ export default function IntroScreen() {
         @keyframes pulse-glow {
           0%, 100% { transform: scale(1); opacity: 0.6; }
           50% { transform: scale(1.15); opacity: 1; }
-        }
-        @keyframes logo-spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
         }
         @keyframes ring-pulse {
           0%, 100% { transform: scale(1); opacity: 1; }
