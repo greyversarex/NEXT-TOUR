@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c1c36"/>
+      <stop offset="100%" stop-color="#1a3360"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffe280"/>
+      <stop offset="50%" stop-color="#f5b120"/>
+      <stop offset="100%" stop-color="#c8820e"/>
+    </linearGradient>
+    <linearGradient id="blueN" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#60c8ff"/>
+      <stop offset="100%" stop-color="#1a7fd4"/>
+    </linearGradient>
+  </defs>
+
+  <text x="8" y="46" font-family="Georgia, 'Times New Roman', serif" font-size="36" font-weight="bold" fill="url(#gold)" letter-spacing="-1">NT</text>
+</svg>

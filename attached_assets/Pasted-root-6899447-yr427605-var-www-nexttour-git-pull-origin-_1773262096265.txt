@@ -1,0 +1,103 @@
+root@6899447-yr427605:/var/www/nexttour# git pull origin main
+./deploy.sh
+remote: Enumerating objects: 7, done.
+remote: Counting objects: 100% (7/7), done.
+remote: Compressing objects: 100% (1/1), done.
+remote: Total 4 (delta 3), reused 4 (delta 3), pack-reused 0 (from 0)
+Unpacking objects: 100% (4/4), 1.41 KiB | 90.00 KiB/s, done.
+From https://github.com/greyversarex/NEXT-TOUR
+ * branch            main       -> FETCH_HEAD
+   5ec4cbf..742c1fe  main       -> origin/main
+Updating 5ec4cbf..742c1fe
+Fast-forward
+ deploy.sh      | 8 ++++++--
+ vite.config.ts | 6 ++++++
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+╔══════════════════════════════════════╗
+║        NEXT TOUR  —  DEPLOY          ║
+║  2026-03-11 20:42:47               ║
+╚══════════════════════════════════════╝
+
+
+▶ 1/5  git pull origin main
+From https://github.com/greyversarex/NEXT-TOUR
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+✓ Код обновлён
+
+▶ 2/5  npm install
+
+up to date, audited 506 packages in 4s
+
+78 packages are looking for funding
+  run `npm fund` for details
+
+4 vulnerabilities (1 low, 1 moderate, 2 high)
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+✓ Зависимости установлены
+
+▶ 3/5  Сборка клиента (Vite)
+building client...
+vite v7.3.0 building client environment for production...
+transforming (4) src/App.tsx
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3211 modules transformed.
+✗ Ошибка на шаге: Vite build
+root@6899447-yr427605:/var/www/nexttour# pm2 logs
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-11T18:51:40: PM2 log: Script /usr/bin/bash had too many unstable restarts (16). Stopped. "errored"
+PM2        | 2026-03-11T19:03:37: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-11T19:03:37: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-11T19:15:31: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-03-11T19:15:31: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-03-11T19:15:31: PM2 log: pid=63955 msg=process killed
+PM2        | 2026-03-11T19:15:31: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-11T19:15:31: PM2 log: App [nexttour:0] online
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+0|nexttour |
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+0|nexttour | [seed] Database already seeded, skipping.
+0|nexttour | 7:03:38 PM [express] serving on port 3000
+0|nexttour |
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+0|nexttour | [seed] Database already seeded, skipping.
+0|nexttour | 7:15:31 PM [express] serving on port 3000
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour |   internalQuery: undefined,
+0|nexttour |   where: undefined,
+0|nexttour |   schema: undefined,
+0|nexttour |   table: undefined,
+0|nexttour |   column: undefined,
+0|nexttour |   dataType: undefined,
+0|nexttour |   constraint: undefined,
+0|nexttour |   file: 'parse_relation.c',
+0|nexttour |   line: '3722',
+0|nexttour |   routine: 'errorMissingColumn'
+0|nexttour | }
+0|nexttour | Error: ENOENT: no such file or directory, stat '/var/www/nexttour/dist/public/index.html'
+0|nexttour | Error: ENOENT: no such file or directory, stat '/var/www/nexttour/dist/public/index.html'
+0|nexttour | Error: ENOENT: no such file or directory, stat '/var/www/nexttour/dist/public/index.html'
+0|nexttour | Error: ENOENT: no such file or directory, stat '/var/www/nexttour/dist/public/index.html'
+
