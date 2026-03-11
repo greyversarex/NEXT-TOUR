@@ -11,4 +11,7 @@ export default defineConfig({
   dbCredentials: {
     url: process.env.DATABASE_URL,
   },
+  // Таблица "session" создаётся автоматически пакетом connect-pg-simple
+  // для хранения Express-сессий. Drizzle не должен её трогать.
+  tablesFilter: ["!session"],
 });
