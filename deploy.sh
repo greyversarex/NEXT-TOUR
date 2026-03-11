@@ -7,9 +7,11 @@ RED='\033[0;31m'
 CYAN='\033[0;36m'
 RESET='\033[0m'
 
-WITH_DB=false
+# По умолчанию схема синхронизируется всегда.
+# Передай --skip-db чтобы пропустить синхронизацию базы (только если 100% уверен что схема не менялась).
+SKIP_DB=false
 for arg in "$@"; do
-  [[ "$arg" == "--with-db" ]] && WITH_DB=true
+  [[ "$arg" == "--skip-db" ]] && SKIP_DB=true
 done
 
 step() {
@@ -46,15 +48,16 @@ export NODE_OPTIONS="--max-old-space-size=1024"
 npm run build 2>&1 || fail "npm run build"
 ok "Проект собран"
 
-if [ "$WITH_DB" = true ]; then
-  step "4/4  npm run db:push  (миграция схемы)"
-  npm run db:push || fail "npm run db:push"
-  ok "База данных синхронизирована"
+if [ "$SKIP_DB" = true ]; then
+  echo -e "\n${YELLOW}⚠  Синхронизация БД пропущена (--skip-db).${RESET}"
+  echo -e "${YELLOW}   Убедись что схема не менялась с прошлого деплоя!${RESET}"
 else
-  echo -e "\n${YELLOW}ℹ  db:push пропущен (используй --with-db для миграции схемы)${RESET}"
+  step "4/4  Синхронизация схемы БД"
+  npm run db:push || fail "npm run db:push"
+  ok "Схема базы данных синхронизирована"
 fi
 
-step "pm2 restart nexttour"
+step "Перезапуск сервера"
 pm2 restart nexttour || fail "pm2 restart"
 ok "Сервер перезапущен"
 
