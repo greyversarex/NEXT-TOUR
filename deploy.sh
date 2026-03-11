@@ -34,25 +34,32 @@ echo "║  $(date '+%Y-%m-%d %H:%M:%S')               ║"
 echo "╚══════════════════════════════════════╝"
 echo -e "${RESET}"
 
-step "1/4  git pull origin main"
+step "1/5  git pull origin main"
 git pull origin main || fail "git pull"
 ok "Код обновлён"
 
-step "2/4  npm install"
+step "2/5  npm install"
 npm install || fail "npm install"
 ok "Зависимости установлены"
 
-step "3/4  npm run build"
-# NODE_OPTIONS увеличивает heap Node.js до 1GB — необходимо для больших бандлов
-export NODE_OPTIONS="--max-old-space-size=1024"
-npm run build 2>&1 || fail "npm run build"
-ok "Проект собран"
+# Сборка разбита на два отдельных процесса:
+# — клиент (Vite) — тяжёлый, требует много RAM → получает до 4 GB
+# — сервер (esbuild) — лёгкий → запускается после, с чистой памятью
+# Раздельные процессы важны: после Vite Node.js освобождает всю heap перед запуском esbuild.
+
+step "3/5  Сборка клиента (Vite)"
+NODE_OPTIONS="--max-old-space-size=4096" npx tsx script/build-client.ts 2>&1 || fail "Vite build"
+ok "Клиент собран"
+
+step "4/5  Сборка сервера (esbuild)"
+NODE_OPTIONS="--max-old-space-size=512" npx tsx script/build-server.ts 2>&1 || fail "esbuild"
+ok "Сервер собран"
 
 if [ "$SKIP_DB" = true ]; then
   echo -e "\n${YELLOW}⚠  Синхронизация БД пропущена (--skip-db).${RESET}"
   echo -e "${YELLOW}   Убедись что схема не менялась с прошлого деплоя!${RESET}"
 else
-  step "4/4  Синхронизация схемы БД"
+  step "5/5  Синхронизация схемы БД"
   npm run db:push || fail "npm run db:push"
   ok "Схема базы данных синхронизирована"
 fi
