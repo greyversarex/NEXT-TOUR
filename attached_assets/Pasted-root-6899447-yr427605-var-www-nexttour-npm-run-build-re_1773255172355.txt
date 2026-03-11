@@ -1,0 +1,111 @@
+root@6899447-yr427605:/var/www/nexttour# npm run build
+
+> rest-express@1.0.0 build
+> tsx script/build.ts
+
+building client...
+vite v7.3.0 building client environment for production...
+transforming (5) ../node_modules/wouter/esm/index.js
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3210 modules transformed.
+root@6899447-yr427605:/var/www/nexttour# ./deploy.sh
+
+╔══════════════════════════════════════╗
+║        NEXT TOUR  —  DEPLOY          ║
+║  2026-03-11 18:29:13               ║
+╚══════════════════════════════════════╝
+
+
+▶ 1/4  git pull origin main
+From https://github.com/greyversarex/NEXT-TOUR
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+✓ Код обновлён
+
+▶ 2/4  npm install
+
+up to date, audited 506 packages in 5s
+
+78 packages are looking for funding
+  run `npm fund` for details
+
+4 vulnerabilities (1 low, 1 moderate, 2 high)
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+✓ Зависимости установлены
+
+▶ 3/4  npm run build
+
+> rest-express@1.0.0 build
+> tsx script/build.ts
+
+building client...
+vite v7.3.0 building client environment for production...
+
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3210 modules transformed.
+✗ Ошибка на шаге: npm run build
+root@6899447-yr427605:/var/www/nexttour# pm2 restart all
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [all](ids: [ 0 ])
+[PM2] [nexttour](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ nexttour           │ fork     │ 26   │ online    │ 0%       │ 256.0kb  │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+root@6899447-yr427605:/var/www/nexttour# pm2 logs
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-03-11T18:51:39: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-11T18:51:39: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-11T18:51:39: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-11T18:51:39: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-11T18:51:40: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-11T18:51:40: PM2 log: Script /usr/bin/bash had too many unstable restarts (16). Stopped. "errored"
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+0|nexttour |
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+0|nexttour |
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+0|nexttour |
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour | Node.js v20.20.1
+0|nexttour | node:internal/modules/cjs/loader:1210
+0|nexttour |   throw err;
+0|nexttour |   ^
+0|nexttour |
+0|nexttour | Error: Cannot find module '/var/www/nexttour/dist/index.cjs'
+0|nexttour |     at Module._resolveFilename (node:internal/modules/cjs/loader:1207:15)
+0|nexttour |     at Module._load (node:internal/modules/cjs/loader:1038:27)
+0|nexttour |     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)
+0|nexttour |     at node:internal/main/run_main_module:28:49 {
+0|nexttour |   code: 'MODULE_NOT_FOUND',
+0|nexttour |   requireStack: []
+0|nexttour | }
+0|nexttour |
+0|nexttour | Node.js v20.20.1

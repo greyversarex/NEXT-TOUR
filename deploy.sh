@@ -41,7 +41,9 @@ npm install || fail "npm install"
 ok "Зависимости установлены"
 
 step "3/4  npm run build"
-npm run build || fail "npm run build"
+# NODE_OPTIONS увеличивает heap Node.js до 1GB — необходимо для больших бандлов
+export NODE_OPTIONS="--max-old-space-size=1024"
+npm run build 2>&1 || fail "npm run build"
 ok "Проект собран"
 
 if [ "$WITH_DB" = true ]; then
