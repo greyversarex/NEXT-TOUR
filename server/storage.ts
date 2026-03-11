@@ -23,7 +23,9 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByProviderId(provider: string, providerId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  upsertOAuthUser(profile: { provider: string; providerId: string; email: string; name: string; avatar?: string }): Promise<User>;
   updateUser(id: string, data: Partial<User>): Promise<User | undefined>;
   getAllUsers(): Promise<User[]>;
 
@@ -166,10 +168,59 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async getUserByProviderId(provider: string, providerId: string) {
+    const [user] = await db.select().from(users).where(
+      and(eq(users.provider, provider), eq(users.providerId, providerId))
+    );
+    return user;
+  }
+
   async createUser(data: InsertUser) {
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = data.password ? await bcrypt.hash(data.password, 10) : null;
     const [user] = await db.insert(users).values({ ...data, password: hashedPassword }).returning();
     return user;
+  }
+
+  async upsertOAuthUser(profile: { provider: string; providerId: string; email: string; name: string; avatar?: string }) {
+    // Check if user exists by provider+id
+    let user = await this.getUserByProviderId(profile.provider, profile.providerId);
+    if (user) {
+      // Update avatar/name if changed
+      const [updated] = await db.update(users).set({
+        name: profile.name,
+        avatar: profile.avatar || user.avatar,
+      }).where(eq(users.id, user.id)).returning();
+      return updated;
+    }
+    // Check if email already exists (link accounts)
+    user = await this.getUserByEmail(profile.email);
+    if (user) {
+      const [updated] = await db.update(users).set({
+        provider: profile.provider,
+        providerId: profile.providerId,
+        avatar: profile.avatar || user.avatar,
+      }).where(eq(users.id, user.id)).returning();
+      return updated;
+    }
+    // Create new user
+    const base = profile.email.split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g, "_");
+    let username = base;
+    let attempt = 0;
+    while (await this.getUserByUsername(username)) {
+      attempt++;
+      username = `${base}_${Math.floor(1000 + Math.random() * 9000)}`;
+      if (attempt > 10) username = `${base}_${Date.now()}`;
+    }
+    const [created] = await db.insert(users).values({
+      email: profile.email,
+      username,
+      name: profile.name,
+      password: null,
+      avatar: profile.avatar || null,
+      provider: profile.provider,
+      providerId: profile.providerId,
+    }).returning();
+    return created;
   }
 
   async updateUser(id: string, data: Partial<User>) {

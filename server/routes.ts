@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import session from "express-session";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as FacebookStrategy } from "passport-facebook";
 import connectPgSimple from "connect-pg-simple";
 import { Pool } from "pg";
 import bcrypt from "bcryptjs";
@@ -51,11 +53,48 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     try {
       const user = await storage.getUserByEmail(email);
       if (!user) return done(null, false, { message: "Invalid credentials" });
+      if (!user.password) return done(null, false, { message: "This account uses social login. Please sign in with Google, Facebook, or Mail.ru." });
       const valid = await bcrypt.compare(password, user.password);
       if (!valid) return done(null, false, { message: "Invalid credentials" });
       return done(null, user);
     } catch (e) { return done(e); }
   }));
+
+  // Google OAuth
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    const appUrl = process.env.APP_URL || "http://localhost:5000";
+    passport.use(new GoogleStrategy({
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: `${appUrl}/api/auth/google/callback`,
+    }, async (_accessToken, _refreshToken, profile, done) => {
+      try {
+        const email = profile.emails?.[0]?.value || `${profile.id}@google.com`;
+        const avatar = profile.photos?.[0]?.value;
+        const user = await storage.upsertOAuthUser({ provider: "google", providerId: profile.id, email, name: profile.displayName, avatar });
+        done(null, user);
+      } catch (e) { done(e as Error); }
+    }));
+  }
+
+  // Facebook OAuth
+  if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
+    const appUrl = process.env.APP_URL || "http://localhost:5000";
+    passport.use(new FacebookStrategy({
+      clientID: process.env.FACEBOOK_APP_ID,
+      clientSecret: process.env.FACEBOOK_APP_SECRET,
+      callbackURL: `${appUrl}/api/auth/facebook/callback`,
+      profileFields: ["id", "emails", "name", "picture"],
+    }, async (_accessToken, _refreshToken, profile, done) => {
+      try {
+        const email = profile.emails?.[0]?.value || `${profile.id}@facebook.com`;
+        const name = [profile.name?.givenName, profile.name?.familyName].filter(Boolean).join(" ") || profile.displayName;
+        const avatar = profile.photos?.[0]?.value;
+        const user = await storage.upsertOAuthUser({ provider: "facebook", providerId: profile.id, email, name, avatar });
+        done(null, user);
+      } catch (e) { done(e as Error); }
+    }));
+  }
 
   passport.serializeUser((user: any, done) => done(null, user.id));
   passport.deserializeUser(async (id: string, done) => {
@@ -129,6 +168,82 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       res.json(safeUser);
     } catch (e: any) {
       res.status(400).json({ message: e.message });
+    }
+  });
+
+  // Endpoint to check which OAuth providers are configured
+  app.get("/api/auth/providers", (_req, res) => {
+    res.json({
+      google: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
+      facebook: !!(process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET),
+      mailru: !!(process.env.MAILRU_APP_ID && process.env.MAILRU_APP_SECRET),
+    });
+  });
+
+  // Google OAuth routes
+  app.get("/api/auth/google", (req, res, next) => {
+    if (!process.env.GOOGLE_CLIENT_ID) return res.status(503).json({ message: "Google OAuth not configured" });
+    passport.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
+  });
+
+  app.get("/api/auth/google/callback",
+    passport.authenticate("google", { failureRedirect: "/?auth=error&provider=google" }),
+    (req, res) => res.redirect("/?auth=success")
+  );
+
+  // Facebook OAuth routes
+  app.get("/api/auth/facebook", (req, res, next) => {
+    if (!process.env.FACEBOOK_APP_ID) return res.status(503).json({ message: "Facebook OAuth not configured" });
+    passport.authenticate("facebook", { scope: ["email"] })(req, res, next);
+  });
+
+  app.get("/api/auth/facebook/callback",
+    passport.authenticate("facebook", { failureRedirect: "/?auth=error&provider=facebook" }),
+    (req, res) => res.redirect("/?auth=success")
+  );
+
+  // Mail.ru OAuth routes (manual OAuth2 flow since no official passport strategy)
+  app.get("/api/auth/mailru", (req, res) => {
+    const clientId = process.env.MAILRU_APP_ID;
+    if (!clientId) return res.status(503).json({ message: "Mail.ru OAuth not configured" });
+    const appUrl = process.env.APP_URL || `http://localhost:5000`;
+    const redirectUri = encodeURIComponent(`${appUrl}/api/auth/mailru/callback`);
+    res.redirect(`https://oauth.mail.ru/login?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=userinfo`);
+  });
+
+  app.get("/api/auth/mailru/callback", async (req, res) => {
+    try {
+      const { code } = req.query;
+      if (!code) return res.redirect("/?auth=error&provider=mailru");
+      const clientId = process.env.MAILRU_APP_ID!;
+      const clientSecret = process.env.MAILRU_APP_SECRET!;
+      const appUrl = process.env.APP_URL || `http://localhost:5000`;
+      const redirectUri = `${appUrl}/api/auth/mailru/callback`;
+      // Exchange code for token
+      const tokenRes = await fetch("https://oauth.mail.ru/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ code: String(code), client_id: clientId, client_secret: clientSecret, redirect_uri: redirectUri, grant_type: "authorization_code" }),
+      });
+      const tokenData = await tokenRes.json() as any;
+      if (!tokenData.access_token) return res.redirect("/?auth=error&provider=mailru");
+      // Get user info
+      const userRes = await fetch(`https://oauth.mail.ru/userinfo?access_token=${tokenData.access_token}`);
+      const profile = await userRes.json() as any;
+      const user = await storage.upsertOAuthUser({
+        provider: "mailru",
+        providerId: profile.id,
+        email: profile.email,
+        name: profile.name || `${profile.first_name || ""} ${profile.last_name || ""}`.trim(),
+        avatar: profile.image,
+      });
+      req.login(user, (err) => {
+        if (err) return res.redirect("/?auth=error&provider=mailru");
+        res.redirect("/?auth=success");
+      });
+    } catch (e) {
+      console.error("[mailru oauth]", e);
+      res.redirect("/?auth=error&provider=mailru");
     }
   });
 

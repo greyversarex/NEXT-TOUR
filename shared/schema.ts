@@ -16,8 +16,10 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   username: text("username").notNull().unique(),
   name: text("name").notNull(),
-  password: text("password").notNull(),
+  password: text("password"),
   avatar: text("avatar"),
+  provider: text("provider").notNull().default("local"),
+  providerId: text("provider_id"),
   role: userRoleEnum("role").notNull().default("user"),
   loyaltyLevel: loyaltyLevelEnum("loyalty_level").notNull().default("beginner"),
   bookingsCount: integer("bookings_count").notNull().default(0),
@@ -233,7 +235,11 @@ export const settings = pgTable("settings", {
 });
 
 // Insert Schemas
-export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, loyaltyLevel: true, bookingsCount: true, discountsLeft: true });
+export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, loyaltyLevel: true, bookingsCount: true, discountsLeft: true }).extend({
+  password: z.string().optional(),
+  provider: z.string().optional(),
+  providerId: z.string().optional(),
+});
 export const insertCountrySchema = createInsertSchema(countries).omit({ id: true });
 export const insertCitySchema = createInsertSchema(cities).omit({ id: true });
 export const insertCategorySchema = createInsertSchema(categories).omit({ id: true });
