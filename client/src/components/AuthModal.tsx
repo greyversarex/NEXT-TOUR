@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Eye, EyeOff, Plane, Mail, Lock, User, AtSign } from "lucide-react";
+import { Loader2, Eye, EyeOff, Plane, Mail, Lock, User } from "lucide-react";
 
 interface AuthModalProps {
   open: boolean;
@@ -25,7 +25,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
   const [resetInfo, setResetInfo] = useState<{ resetUrl: string; emailSent: boolean } | null>(null);
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
-  const [registerData, setRegisterData] = useState({ name: "", email: "", username: "", password: "" });
+  const [registerData, setRegisterData] = useState({ name: "", email: "", password: "" });
   const [forgotEmail, setForgotEmail] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -47,7 +47,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
     setLoading(true);
     try {
       await register(registerData);
-      toast({ title: t("Регистрация успешна!", "Registration successful!") });
+      toast({ title: t("Регистрация успешна!", "Registration successful!"), description: t("Добро пожаловать в NEXT TOUR!", "Welcome to NEXT TOUR!") });
       onClose();
     } catch (err: any) {
       toast({ title: t("Ошибка регистрации", "Registration failed"), description: err?.message || t("Попробуйте снова", "Please try again"), variant: "destructive" });
@@ -72,7 +72,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
         title: t("Запрос отправлен", "Request sent"),
         description: data.emailSent
           ? t("Письмо со ссылкой для сброса отправлено на ваш email", "A password reset link has been sent to your email")
-          : t("Ссылка для сброса сгенерирована (демо-режим)", "Reset link generated (demo mode)"),
+          : t("Ссылка для сброса сгенерирована", "Reset link generated"),
       });
     } catch (err: any) {
       toast({ title: t("Ошибка", "Error"), description: err.message, variant: "destructive" });
@@ -96,7 +96,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             <Plane className="h-7 w-7 text-white" />
           </div>
           <h2 className="text-xl font-bold">
-            {mode === "forgotPassword" 
+            {mode === "forgotPassword"
               ? t("Восстановление пароля", "Password Recovery")
               : tab === "login" ? t("Вход в аккаунт", "Sign In") : t("Создать аккаунт", "Create Account")}
           </h2>
@@ -136,17 +136,17 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="login-password" className="text-sm font-medium">{t("Пароль", "Password")}</Label>
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      className="px-0 h-auto text-xs text-primary border-none hover:bg-transparent"
-                      onClick={() => setMode("forgotPassword")}
-                    >
-                      {t("Забыли пароль?", "Forgot password?")}
-                    </Button>
-                  </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="login-password" className="text-sm font-medium">{t("Пароль", "Password")}</Label>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="px-0 h-auto text-xs text-primary border-none hover:bg-transparent"
+                        onClick={() => setMode("forgotPassword")}
+                      >
+                        {t("Забыли пароль?", "Forgot password?")}
+                      </Button>
+                    </div>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -176,36 +176,19 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
 
               <TabsContent value="register">
                 <form onSubmit={handleRegister} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="reg-name" className="text-sm font-medium">{t("Имя", "Full Name")}</Label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="reg-name"
-                          data-testid="input-reg-name"
-                          placeholder={t("Иван Петров", "John Smith")}
-                          className="pl-9"
-                          value={registerData.name}
-                          onChange={e => setRegisterData(p => ({ ...p, name: e.target.value }))}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="reg-username" className="text-sm font-medium">{t("Логин", "Username")}</Label>
-                      <div className="relative">
-                        <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="reg-username"
-                          data-testid="input-reg-username"
-                          placeholder="ivan_petrov"
-                          className="pl-9"
-                          value={registerData.username}
-                          onChange={e => setRegisterData(p => ({ ...p, username: e.target.value }))}
-                          required
-                        />
-                      </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="reg-name" className="text-sm font-medium">{t("Ваше имя", "Full Name")}</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="reg-name"
+                        data-testid="input-reg-name"
+                        placeholder={t("Иван Петров", "John Smith")}
+                        className="pl-9"
+                        value={registerData.name}
+                        onChange={e => setRegisterData(p => ({ ...p, name: e.target.value }))}
+                        required
+                      />
                     </div>
                   </div>
                   <div className="space-y-1.5">
@@ -226,6 +209,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="reg-password" className="text-sm font-medium">{t("Пароль", "Password")}</Label>
+                    <p className="text-xs text-muted-foreground">{t("Минимум 6 символов", "Minimum 6 characters")}</p>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -251,6 +235,9 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                     {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                     {t("Зарегистрироваться", "Create Account")}
                   </Button>
+                  <p className="text-center text-xs text-muted-foreground">
+                    {t("Регистрируясь, вы соглашаетесь с условиями использования", "By registering, you agree to our Terms of Service")}
+                  </p>
                 </form>
               </TabsContent>
             </Tabs>
@@ -258,6 +245,12 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             <div className="space-y-4">
               {!resetInfo ? (
                 <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    {t(
+                      "Введите email, указанный при регистрации. Мы отправим вам ссылку для сброса пароля.",
+                      "Enter the email you registered with. We'll send you a password reset link."
+                    )}
+                  </p>
                   <div className="space-y-1.5">
                     <Label htmlFor="forgot-email" className="text-sm font-medium">{t("Email", "Email")}</Label>
                     <div className="relative">
@@ -276,15 +269,15 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                   </div>
                   <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={loading} data-testid="button-forgot-submit">
                     {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    {t("Сбросить пароль", "Reset Password")}
+                    {t("Отправить ссылку", "Send Reset Link")}
                   </Button>
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    className="w-full" 
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full"
                     onClick={() => setMode("auth")}
                   >
-                    {t("Назад ко входу", "Back to login")}
+                    {t("← Назад ко входу", "← Back to login")}
                   </Button>
                 </form>
               ) : (
@@ -305,7 +298,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                   ) : (
                     <>
                       <div className="p-4 bg-primary/10 rounded-lg text-sm text-left break-all">
-                        <p className="font-semibold mb-2">{t("Демо-режим: Ссылка для сброса", "Demo Mode: Reset Link")}:</p>
+                        <p className="font-semibold mb-2">{t("Ссылка для сброса пароля", "Password Reset Link")}:</p>
                         <code className="text-primary block p-2 bg-white rounded border select-all cursor-pointer" onClick={() => {
                           window.location.href = resetInfo.resetUrl;
                           onClose();

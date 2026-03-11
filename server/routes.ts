@@ -8,7 +8,7 @@ import { Pool } from "pg";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import path from "path";
-import { sendPasswordResetEmail } from "./email";
+import { sendPasswordResetEmail, sendWelcomeEmail } from "./email";
 import multer from "multer";
 import { storage } from "./storage";
 import {
@@ -68,16 +68,29 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Auth
   app.post("/api/auth/register", async (req, res) => {
     try {
-      const data = insertUserSchema.parse(req.body);
+      // Auto-generate username from email if not provided
+      const body = { ...req.body };
+      if (!body.username) {
+        const base = (body.email || "").split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g, "_");
+        let candidate = base;
+        let attempt = 0;
+        while (await storage.getUserByUsername(candidate)) {
+          attempt++;
+          candidate = `${base}_${Math.floor(1000 + Math.random() * 9000)}`;
+          if (attempt > 10) candidate = `${base}_${Date.now()}`;
+        }
+        body.username = candidate;
+      }
+      const data = insertUserSchema.parse(body);
       const existing = await storage.getUserByEmail(data.email);
       if (existing) return res.status(400).json({ message: "Email already registered" });
-      const existingUser = await storage.getUserByUsername(data.username);
-      if (existingUser) return res.status(400).json({ message: "Username already taken" });
       const user = await storage.createUser(data);
       const { password: _, ...safeUser } = user;
       req.login(user, (err) => {
         if (err) return res.status(500).json({ message: "Login failed" });
         res.json(safeUser);
+        // Send welcome email after successful registration (non-blocking)
+        sendWelcomeEmail(data.email, data.name || data.username).catch(() => {});
       });
     } catch (e: any) {
       res.status(400).json({ message: e.message || "Registration failed" });

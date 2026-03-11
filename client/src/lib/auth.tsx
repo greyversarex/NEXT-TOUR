@@ -7,7 +7,7 @@ interface AuthContextType {
   user: Omit<User, "password"> | null | undefined;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (data: { email: string; username: string; name: string; password: string }) => Promise<void>;
+  register: (data: { email: string; name: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const registerMutation = useMutation({
-    mutationFn: (data: { email: string; username: string; name: string; password: string }) =>
+    mutationFn: (data: { email: string; name: string; password: string }) =>
       apiRequest("POST", "/api/auth/register", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await loginMutation.mutateAsync({ email, password });
   };
 
-  const register = async (data: { email: string; username: string; name: string; password: string }) => {
+  const register = async (data: { email: string; name: string; password: string }) => {
     await registerMutation.mutateAsync(data);
   };
 
