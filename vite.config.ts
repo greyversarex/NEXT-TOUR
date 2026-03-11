@@ -31,6 +31,12 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
     chunkSizeWarningLimit: 600,
+    // Ограничиваем параллельную обработку файлов Rollup.
+    // По умолчанию Rollup обрабатывает файлы параллельно (кол-во CPU × N),
+    // что даёт огромный пик потребления памяти. На серверах с ≤ 2 GB это
+    // приводит к OOM-kill. Значение 3 снижает пик ~в 5 раз без ощутимого
+    // замедления сборки.
+    maxParallelFileOps: 3,
     rollupOptions: {
       output: {
         manualChunks(id) {

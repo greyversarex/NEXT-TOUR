@@ -48,11 +48,15 @@ ok "Зависимости установлены"
 # Раздельные процессы важны: после Vite Node.js освобождает всю heap перед запуском esbuild.
 
 step "3/5  Сборка клиента (Vite)"
-NODE_OPTIONS="--max-old-space-size=4096" npx tsx script/build-client.ts 2>&1 || fail "Vite build"
+# NODE_ENV=production: включает production-режим Vite (меньше overhead)
+# --max-old-space-size=1536: лимит heap JS. На сервере с 2 GB это оставляет ~500 MB
+# для ОС и других процессов. Node.js агрессивно GC-ит до достижения лимита —
+# пик потребления памяти гораздо ниже чем при 4096 (который вызывает OOM-kill от ядра).
+NODE_ENV=production NODE_OPTIONS="--max-old-space-size=1536" npx tsx script/build-client.ts 2>&1 || fail "Vite build"
 ok "Клиент собран"
 
 step "4/5  Сборка сервера (esbuild)"
-NODE_OPTIONS="--max-old-space-size=512" npx tsx script/build-server.ts 2>&1 || fail "esbuild"
+NODE_ENV=production NODE_OPTIONS="--max-old-space-size=512" npx tsx script/build-server.ts 2>&1 || fail "esbuild"
 ok "Сервер собран"
 
 if [ "$SKIP_DB" = true ]; then
