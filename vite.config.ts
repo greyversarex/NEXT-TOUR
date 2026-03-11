@@ -31,46 +31,6 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
     chunkSizeWarningLimit: 600,
-    // Ограничиваем параллельную обработку файлов Rollup.
-    // По умолчанию Rollup обрабатывает файлы параллельно (кол-во CPU × N),
-    // что даёт огромный пик потребления памяти. На серверах с ≤ 2 GB это
-    // приводит к OOM-kill. Значение 3 снижает пик ~в 5 раз без ощутимого
-    // замедления сборки.
-    maxParallelFileOps: 3,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          // Recharts — только в admin/statistics, тяжёлая (~200KB)
-          if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-")) {
-            return "vendor-charts";
-          }
-          // Radix UI компоненты — общие UI-примитивы
-          if (id.includes("node_modules/@radix-ui")) {
-            return "vendor-radix";
-          }
-          // React и core runtime
-          if (id.includes("node_modules/react") || id.includes("node_modules/react-dom")) {
-            return "vendor-react";
-          }
-          // Framer Motion — анимации
-          if (id.includes("node_modules/framer-motion")) {
-            return "vendor-motion";
-          }
-          // Tanstack Query
-          if (id.includes("node_modules/@tanstack")) {
-            return "vendor-query";
-          }
-          // date-fns
-          if (id.includes("node_modules/date-fns")) {
-            return "vendor-dates";
-          }
-          // Прочие node_modules — общий vendor чанк
-          if (id.includes("node_modules")) {
-            return "vendor-misc";
-          }
-        },
-      },
-    },
   },
   server: {
     fs: {
