@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
@@ -31,6 +32,7 @@ export default function TourDetail() {
   const [currentImg, setCurrentImg] = useState(0);
   const [authOpen, setAuthOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [sidebarOptions, setSidebarOptions] = useState<string[]>([]);
 
   const { data, isLoading } = useQuery<any>({
     queryKey: [`/api/tours/${id}/full`],
@@ -63,7 +65,7 @@ export default function TourDetail() {
     );
   }
 
-  const { tour, dates, itinerary, reviews, isFavorite, country, city, category } = data;
+  const { tour, dates, options, itinerary, reviews, isFavorite, country, city, category } = data;
   const title = lang === "ru" ? tour.titleRu : tour.titleEn;
   const description = lang === "ru" ? tour.descriptionRu : tour.descriptionEn;
   const included = lang === "ru" ? tour.includedRu : tour.includedEn;
@@ -386,6 +388,46 @@ export default function TourDetail() {
                   </p>
                 )}
 
+                {options.length > 0 && (
+                  <div className="mb-5">
+                    <p className="text-sm font-semibold mb-3 flex items-center gap-1.5">
+                      <Tag className="h-4 w-4 text-primary" />
+                      {t("Дополнительно:", "Add-ons:")}
+                    </p>
+                    <div className="space-y-1.5 rounded-2xl border border-border/50 p-3 bg-muted/30">
+                      {options.map((opt: any) => {
+                        const checked = sidebarOptions.includes(opt.id);
+                        return (
+                          <label
+                            key={opt.id}
+                            className={`flex items-center justify-between gap-2 cursor-pointer rounded-xl px-3 py-2 transition-all duration-200 ${checked ? "bg-primary/10 border border-primary/20" : "hover:bg-muted border border-transparent"}`}
+                            data-testid={`checkbox-addon-${opt.id}`}
+                          >
+                            <span className="flex items-center gap-2.5 text-sm">
+                              <Checkbox
+                                checked={checked}
+                                onCheckedChange={v =>
+                                  setSidebarOptions(prev =>
+                                    v ? [...prev, opt.id] : prev.filter(x => x !== opt.id)
+                                  )
+                                }
+                              />
+                              {lang === "ru" ? opt.nameRu : opt.nameEn}
+                            </span>
+                            <span className={`text-xs font-bold shrink-0 ${checked ? "text-primary" : "text-muted-foreground"}`}>
+                              +${Number(opt.price).toFixed(0)}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                    {sidebarOptions.length > 0 && (
+                      <p className="text-xs text-primary font-semibold mt-2.5 text-right">
+                        +${options.filter((o: any) => sidebarOptions.includes(o.id)).reduce((s: number, o: any) => s + Number(o.price), 0).toFixed(0)} {t("доп. опции", "add-ons")}
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 <Button
                   className="w-full h-12 rounded-2xl font-bold text-base shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
@@ -419,6 +461,8 @@ export default function TourDetail() {
         <BookingModal
           tour={tour}
           dates={dates}
+          options={options}
+          preselectedOptions={sidebarOptions}
           onClose={() => setBookingOpen(false)}
         />
       )}
@@ -509,7 +553,7 @@ function CounterField({ label, subLabel, value, min, max, onChange }: { label: s
   );
 }
 
-function BookingModal({ tour, dates, onClose }: any) {
+function BookingModal({ tour, dates, options, preselectedOptions = [], onClose }: any) {
   const { t, lang } = useI18n();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -518,11 +562,15 @@ function BookingModal({ tour, dates, onClose }: any) {
   const [selectedDateId, setSelectedDateId] = useState(dates[0]?.id || "");
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(preselectedOptions);
   const [paymentType, setPaymentType] = useState<"prepay" | "full">("full");
 
   const basePrice = Number(tour.basePrice) * (1 - tour.discountPercent / 100);
+  const optionsTotal = options
+    .filter((o: any) => selectedOptions.includes(o.id))
+    .reduce((sum: number, o: any) => sum + Number(o.price), 0);
   const travelers = adults + children * 0.5;
-  const totalPrice = basePrice * travelers;
+  const totalPrice = (basePrice + optionsTotal) * travelers;
   const toPay = paymentType === "prepay" ? totalPrice * 0.3 : totalPrice;
 
   const mutation = useMutation({
@@ -541,7 +589,7 @@ function BookingModal({ tour, dates, onClose }: any) {
       tourDateId: selectedDateId || null,
       adults,
       children,
-      selectedOptions: [],
+      selectedOptions,
       totalPrice: totalPrice.toFixed(2),
       paymentType,
     });
@@ -614,6 +662,38 @@ function BookingModal({ tour, dates, onClose }: any) {
               </div>
             </div>
 
+            {options.length > 0 && (
+              <div>
+                <p className="text-sm font-semibold mb-2 flex items-center gap-1.5">
+                  <Tag className="h-4 w-4 text-primary" />
+                  {t("Дополнительные опции", "Add-ons")}
+                </p>
+                <div className="rounded-xl border border-border divide-y divide-border overflow-hidden">
+                  {options.map((opt: any) => {
+                    const checked = selectedOptions.includes(opt.id);
+                    return (
+                      <label
+                        key={opt.id}
+                        className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${checked ? "bg-primary/8" : "hover:bg-muted/60"}`}
+                        data-testid={`modal-addon-${opt.id}`}
+                      >
+                        <Checkbox
+                          checked={checked}
+                          onCheckedChange={v => setSelectedOptions(prev =>
+                            v ? [...prev, opt.id] : prev.filter(id => id !== opt.id)
+                          )}
+                        />
+                        <span className="flex-1 text-sm">{lang === "ru" ? opt.nameRu : opt.nameEn}</span>
+                        <span className={`text-sm font-semibold ${checked ? "text-primary" : "text-muted-foreground"}`}>
+                          +${Number(opt.price).toFixed(0)}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div>
               <p className="text-sm font-semibold mb-3">{t("Способ оплаты", "Payment Option")}</p>
               <div className="grid grid-cols-2 gap-3">
@@ -647,6 +727,12 @@ function BookingModal({ tour, dates, onClose }: any) {
                 <span>{t("Базовая цена", "Base price")} × {travelers}</span>
                 <span>${(basePrice * travelers).toFixed(0)}</span>
               </div>
+              {optionsTotal > 0 && (
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>{t("Дополнительные опции", "Add-ons")} × {travelers}</span>
+                  <span>+${(optionsTotal * travelers).toFixed(0)}</span>
+                </div>
+              )}
               {paymentType === "prepay" && (
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>{t("Полная стоимость", "Full amount")}</span>

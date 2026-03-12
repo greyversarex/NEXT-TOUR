@@ -15,7 +15,7 @@ import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { Plus, Edit, Trash2, Eye, CalendarDays, Route } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Tour, Country, Category } from "@shared/schema";
@@ -131,6 +131,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
   });
 
   const [localDates, setLocalDates] = useState<any[]>([]);
+  const [localOptions, setLocalOptions] = useState<any[]>([]);
   const [localItinerary, setLocalItinerary] = useState<any[]>([]);
 
   const set = (key: string, val: any) => setForm(p => ({ ...p, [key]: val }));
@@ -146,9 +147,10 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
       );
       const saved = await res.json();
       const tourId = saved.id;
-      if (!isEdit && (localDates.length || localItinerary.length)) {
+      if (!isEdit && (localDates.length || localOptions.length || localItinerary.length)) {
         await Promise.all([
           ...localDates.map(d => apiRequest("POST", `/api/tours/${tourId}/dates`, { ...d, tourId })),
+          ...localOptions.map(o => apiRequest("POST", `/api/tours/${tourId}/options`, { ...o, tourId })),
           ...localItinerary.map(i => apiRequest("POST", `/api/tours/${tourId}/itinerary`, { ...i, tourId })),
         ]);
       }
@@ -182,6 +184,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
           <TabsList className="w-full mb-2">
             <TabsTrigger value="info" className="flex-1">{t("Основное", "Info")}</TabsTrigger>
             <TabsTrigger value="dates" className="flex-1 gap-1"><CalendarDays className="h-3.5 w-3.5" />{t("Даты", "Dates")}</TabsTrigger>
+            <TabsTrigger value="options" className="flex-1 gap-1"><ListChecks className="h-3.5 w-3.5" />{t("Опции", "Options")}</TabsTrigger>
             <TabsTrigger value="itinerary" className="flex-1 gap-1"><Route className="h-3.5 w-3.5" />{t("Программа", "Itinerary")}</TabsTrigger>
           </TabsList>
 
@@ -250,6 +253,12 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
               {saveBtn}
             </TabsContent>
 
+            <TabsContent value="options" className="pt-2">
+              {isEdit
+                ? <OptionsManager tourId={tour.id} />
+                : <LocalOptionsManager options={localOptions} setOptions={setLocalOptions} />}
+              {saveBtn}
+            </TabsContent>
 
             <TabsContent value="itinerary" className="pt-2">
               {isEdit
@@ -297,6 +306,39 @@ function LocalDatesManager({ dates, setDates }: { dates: any[]; setDates: (d: an
   );
 }
 
+
+function LocalOptionsManager({ options, setOptions }: { options: any[]; setOptions: (o: any[]) => void }) {
+  const { t, lang } = useI18n();
+  const [form, setForm] = useState({ nameRu: "", nameEn: "", price: 0 });
+  const add = () => {
+    if (!form.nameRu) return;
+    setOptions([...options, { ...form, id: "local-" + Date.now() + "-" + Math.random().toString(36).slice(2) }]);
+    setForm({ nameRu: "", nameEn: "", price: 0 });
+  };
+  return (
+    <div className="space-y-4">
+      <div className="border rounded-xl p-4 space-y-3 bg-muted/30">
+        <p className="text-sm font-semibold">{t("Новая опция", "New Option")}</p>
+        <div className="grid grid-cols-3 gap-3">
+          <div><Label className="text-xs">{t("Название (RU)", "Name (RU)")}</Label><Input value={form.nameRu} onChange={e => setForm(p => ({ ...p, nameRu: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Название (EN)", "Name (EN)")}</Label><Input value={form.nameEn} onChange={e => setForm(p => ({ ...p, nameEn: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Цена ($)", "Price ($)")}</Label><Input type="number" value={form.price} onChange={e => setForm(p => ({ ...p, price: Number(e.target.value) }))} className="mt-1 h-9 text-sm" min={0} /></div>
+        </div>
+        <Button type="button" size="sm" onClick={add}>{t("Добавить", "Add")}</Button>
+      </div>
+      {options.length === 0 ? <p className="text-sm text-muted-foreground text-center py-4">{t("Нет опций", "No options yet")}</p> : (
+        <div className="space-y-2">
+          {options.map((o: any) => (
+            <div key={o.id} className="flex items-center justify-between p-3 border rounded-lg">
+              <div><p className="text-sm font-medium">{lang === "ru" ? o.nameRu : o.nameEn}</p><p className="text-xs text-muted-foreground">+${o.price}</p></div>
+              <Button type="button" variant="ghost" size="icon" className="text-destructive" onClick={() => setOptions(options.filter((x: any) => x.id !== o.id))}><Trash2 className="h-3.5 w-3.5" /></Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function LocalItineraryManager({ items, setItems }: { items: any[]; setItems: (i: any[]) => void }) {
   const { t, lang } = useI18n();
@@ -435,6 +477,77 @@ function DatesManager({ tourId }: { tourId: string }) {
   );
 }
 
+
+function OptionsManager({ tourId }: { tourId: string }) {
+  const { t, lang } = useI18n();
+  const { toast } = useToast();
+  const qc = useQueryClient();
+  const { data: options = [], isLoading } = useQuery<any[]>({ queryKey: [`/api/tours/${tourId}/options`] });
+  const [form, setForm] = useState({ nameRu: "", nameEn: "", price: 0 });
+  const [editing, setEditing] = useState<any>(null);
+
+  const addMutation = useMutation({
+    mutationFn: (d: any) => apiRequest("POST", `/api/tours/${tourId}/options`, d),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/options`] }); setForm({ nameRu: "", nameEn: "", price: 0 }); toast({ title: t("Опция добавлена", "Option added") }); },
+  });
+  const editMutation = useMutation({
+    mutationFn: (d: any) => apiRequest("PUT", `/api/tour-options/${d.id}`, d),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/options`] }); setEditing(null); },
+  });
+  const delMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/tour-options/${id}`, {}),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/options`] }),
+  });
+
+  const activeForm = editing || form;
+  const setF = (k: string, v: any) => editing ? setEditing((p: any) => ({ ...p, [k]: v })) : setForm(p => ({ ...p, [k]: v }));
+
+  return (
+    <div className="space-y-4">
+      <div className="border rounded-xl p-4 space-y-3 bg-muted/30">
+        <p className="text-sm font-semibold">{editing ? t("Редактировать опцию", "Edit Option") : t("Новая опция", "New Option")}</p>
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <Label className="text-xs">{t("Название (RU)", "Name (RU)")}</Label>
+            <Input value={activeForm.nameRu} onChange={e => setF("nameRu", e.target.value)} className="mt-1 h-9 text-sm" />
+          </div>
+          <div>
+            <Label className="text-xs">{t("Название (EN)", "Name (EN)")}</Label>
+            <Input value={activeForm.nameEn} onChange={e => setF("nameEn", e.target.value)} className="mt-1 h-9 text-sm" />
+          </div>
+          <div>
+            <Label className="text-xs">{t("Цена ($)", "Price ($)")}</Label>
+            <Input type="number" value={activeForm.price} onChange={e => setF("price", Number(e.target.value))} className="mt-1 h-9 text-sm" min={0} />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button type="button" size="sm" onClick={() => editing ? editMutation.mutate(editing) : addMutation.mutate({ ...form, tourId })}>
+            {editing ? t("Сохранить", "Save") : t("Добавить", "Add")}
+          </Button>
+          {editing && <Button type="button" size="sm" variant="outline" onClick={() => setEditing(null)}>{t("Отмена", "Cancel")}</Button>}
+        </div>
+      </div>
+      {isLoading ? <p className="text-sm text-muted-foreground">{t("Загрузка...", "Loading...")}</p> : options.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-4">{t("Нет опций", "No options yet")}</p>
+      ) : (
+        <div className="space-y-2">
+          {options.map((o: any) => (
+            <div key={o.id} className="flex items-center justify-between p-3 border rounded-lg">
+              <div>
+                <p className="text-sm font-medium">{lang === "ru" ? o.nameRu : o.nameEn}</p>
+                <p className="text-xs text-muted-foreground">+${Number(o.price).toFixed(0)}</p>
+              </div>
+              <div className="flex gap-1">
+                <Button type="button" variant="ghost" size="icon" onClick={() => setEditing(o)}><Edit className="h-3.5 w-3.5" /></Button>
+                <Button type="button" variant="ghost" size="icon" className="text-destructive" onClick={() => delMutation.mutate(o.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function ItineraryManager({ tourId }: { tourId: string }) {
   const { t, lang } = useI18n();
