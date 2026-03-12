@@ -127,26 +127,24 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
           </p>
 
           <div className="flex items-center justify-between pt-2 sm:pt-3 mt-2 sm:mt-3 border-t border-border/50">
-            <div className="flex flex-col">
-              <p className="text-[8px] sm:text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-0.5">
+            <div className="flex items-baseline gap-1 flex-wrap">
+              <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">
                 {t("от", "from")}
-              </p>
-              <div className="flex items-baseline gap-1">
-                {tour.discountPercent > 0 && (
-                  <span className="text-xs text-muted-foreground/70 line-through font-medium">
-                    ${price.toFixed(0)}
-                  </span>
-                )}
-                <span
-                  className="text-lg sm:text-xl font-extrabold leading-none bg-gradient-to-br from-primary to-cyan-500 bg-clip-text text-transparent"
-                  data-testid={`text-tour-price-${tour.id}`}
-                >
-                  ${discountedPrice.toFixed(0)}
+              </span>
+              {tour.discountPercent > 0 && (
+                <span className="text-xs text-muted-foreground/70 line-through font-medium">
+                  ${price.toFixed(0)}
                 </span>
-                <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">
-                  / {t("чел.", "p.")}
-                </span>
-              </div>
+              )}
+              <span
+                className="text-lg sm:text-xl font-extrabold leading-none bg-gradient-to-br from-primary to-cyan-500 bg-clip-text text-transparent"
+                data-testid={`text-tour-price-${tour.id}`}
+              >
+                ${discountedPrice.toFixed(0)}
+              </span>
+              <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">
+                / {t("чел.", "p.")}
+              </span>
             </div>
 
             <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-primary/8 text-primary
