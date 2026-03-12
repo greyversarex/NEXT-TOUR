@@ -1,5 +1,6 @@
 import { useI18n } from "@/lib/i18n";
 import { MapPin, Phone, Mail, Clock, Award, Shield, Plane, Star, Headphones } from "lucide-react";
+import officePhoto from "@assets/Generated_Image_March_13,_2026_-_2_05AM_1773349755149.png";
 
 export default function About() {
   const { t } = useI18n();
@@ -82,7 +83,7 @@ export default function About() {
           </div>
           <div>
             <img
-              src="/images/hero-banner.png"
+              src={officePhoto}
               alt={t("О компании NEXT TOUR", "About NEXT TOUR")}
               className="w-full rounded-2xl object-cover h-64 sm:h-72 shadow-lg"
             />
