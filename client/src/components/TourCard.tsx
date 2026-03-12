@@ -128,7 +128,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
 
           <div className="flex items-center justify-between pt-2 sm:pt-3 mt-2 sm:mt-3 border-t border-border/50">
             <div className="flex items-baseline gap-1 flex-wrap">
-              <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">
+              <span className="text-[10px] sm:text-xs text-muted-foreground font-bold">
                 {t("от", "from")}
               </span>
               {tour.discountPercent > 0 && (
