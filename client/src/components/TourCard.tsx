@@ -121,7 +121,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
             {title}
           </h3>
 
-          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 leading-relaxed hidden sm:block">
+          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 leading-relaxed overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
             {description}
           </p>
 
