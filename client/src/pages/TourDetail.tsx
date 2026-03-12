@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Clock, MapPin, Star, Heart, Users, CheckCircle,
-  XCircle, ChevronLeft, ChevronRight, Calendar, Tag, Loader2
+  XCircle, ChevronLeft, ChevronRight, Calendar, Tag, Loader2, ChevronDown
 } from "lucide-react";
 import AuthModal from "@/components/AuthModal";
 import TourCard from "@/components/TourCard";
@@ -33,6 +33,9 @@ export default function TourDetail() {
   const [authOpen, setAuthOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [sidebarOptions, setSidebarOptions] = useState<string[]>([]);
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const [datesOpen, setDatesOpen] = useState(!isMobile);
+  const [addonsOpen, setAddonsOpen] = useState(!isMobile);
 
   const { data, isLoading } = useQuery<any>({
     queryKey: [`/api/tours/${id}/full`],
@@ -388,68 +391,89 @@ export default function TourDetail() {
                 )}
               </div>
 
-              <div className="bg-card p-5">
+              <div className="bg-card p-4 md:p-5">
                 {dates.length > 0 ? (
-                  <div className="space-y-2 mb-5">
-                    <p className="text-sm font-semibold flex items-center gap-1.5 mb-3">
+                  <div className="mb-3 md:mb-5">
+                    <button
+                      type="button"
+                      className="text-sm font-semibold flex items-center gap-1.5 mb-3 w-full md:cursor-default"
+                      onClick={() => setDatesOpen(p => !p)}
+                      data-testid="toggle-dates"
+                    >
                       <Calendar className="h-4 w-4 text-primary" />
                       {t("Доступные даты:", "Available dates:")}
-                    </p>
-                    {dates.slice(0, 3).map((d: any) => (
-                      <div key={d.id} className="flex justify-between items-center text-sm bg-muted/60 rounded-xl px-3.5 py-2.5 border border-border/40">
-                        <span className="flex items-center gap-1.5 text-foreground/80">
-                          {format(new Date(d.startDate), "dd MMM")} – {format(new Date(d.endDate), "dd MMM yyyy")}
-                        </span>
-                        <Badge variant="secondary" className="text-xs rounded-full">
-                          {d.maxPeople - d.bookedCount} {t("мест", "spots")}
-                        </Badge>
-                      </div>
-                    ))}
+                      <ChevronDown className={`h-4 w-4 ml-auto md:hidden transition-transform ${datesOpen ? "rotate-180" : ""}`} />
+                    </button>
+                    <div className={`space-y-2 ${datesOpen ? "" : "hidden md:block"}`}>
+                      {dates.slice(0, 3).map((d: any) => (
+                        <div key={d.id} className="flex justify-between items-center text-sm bg-muted/60 rounded-xl px-3.5 py-2 md:py-2.5 border border-border/40">
+                          <span className="flex items-center gap-1.5 text-foreground/80">
+                            {format(new Date(d.startDate), "dd MMM")} – {format(new Date(d.endDate), "dd MMM yyyy")}
+                          </span>
+                          <Badge variant="secondary" className="text-xs rounded-full">
+                            {d.maxPeople - d.bookedCount} {t("мест", "spots")}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground mb-5 p-3 bg-muted/40 rounded-xl">
+                  <p className="text-sm text-muted-foreground mb-3 md:mb-5 p-3 bg-muted/40 rounded-xl">
                     {t("Уточняйте даты у менеджера", "Contact us for available dates")}
                   </p>
                 )}
 
                 {options.length > 0 && (
-                  <div className="mb-5">
-                    <p className="text-sm font-semibold mb-3 flex items-center gap-1.5">
+                  <div className="mb-3 md:mb-5">
+                    <button
+                      type="button"
+                      className="text-sm font-semibold flex items-center gap-1.5 mb-3 w-full md:cursor-default"
+                      onClick={() => setAddonsOpen(p => !p)}
+                      data-testid="toggle-addons"
+                    >
                       <Tag className="h-4 w-4 text-primary" />
                       {t("Дополнительно:", "Add-ons:")}
-                    </p>
-                    <div className="space-y-1.5 rounded-2xl border border-border/50 p-3 bg-muted/30">
-                      {options.map((opt: any) => {
-                        const checked = sidebarOptions.includes(opt.id);
-                        return (
-                          <label
-                            key={opt.id}
-                            className={`flex items-center justify-between gap-2 cursor-pointer rounded-xl px-3 py-2 transition-all duration-200 ${checked ? "bg-primary/10 border border-primary/20" : "hover:bg-muted border border-transparent"}`}
-                            data-testid={`checkbox-addon-${opt.id}`}
-                          >
-                            <span className="flex items-center gap-2.5 text-sm">
-                              <Checkbox
-                                checked={checked}
-                                onCheckedChange={v =>
-                                  setSidebarOptions(prev =>
-                                    v ? [...prev, opt.id] : prev.filter(x => x !== opt.id)
-                                  )
-                                }
-                              />
-                              {lang === "ru" ? opt.nameRu : opt.nameEn}
-                            </span>
-                            <span className={`text-xs font-bold shrink-0 ${checked ? "text-primary" : "text-muted-foreground"}`}>
-                              +${Number(opt.price).toFixed(0)}
-                            </span>
-                          </label>
-                        );
-                      })}
+                      {sidebarOptions.length > 0 && !addonsOpen && (
+                        <span className="text-xs text-primary font-bold md:hidden">
+                          +${options.filter((o: any) => sidebarOptions.includes(o.id)).reduce((s: number, o: any) => s + Number(o.price), 0).toFixed(0)}
+                        </span>
+                      )}
+                      <ChevronDown className={`h-4 w-4 ml-auto md:hidden transition-transform ${addonsOpen ? "rotate-180" : ""}`} />
+                    </button>
+                    <div className={`${addonsOpen ? "" : "hidden md:block"}`}>
+                      <div className="space-y-1.5 rounded-2xl border border-border/50 p-2 md:p-3 bg-muted/30">
+                        {options.map((opt: any) => {
+                          const checked = sidebarOptions.includes(opt.id);
+                          return (
+                            <label
+                              key={opt.id}
+                              className={`flex items-center justify-between gap-2 cursor-pointer rounded-xl px-3 py-1.5 md:py-2 transition-all duration-200 ${checked ? "bg-primary/10 border border-primary/20" : "hover:bg-muted border border-transparent"}`}
+                              data-testid={`checkbox-addon-${opt.id}`}
+                            >
+                              <span className="flex items-center gap-2.5 text-sm">
+                                <Checkbox
+                                  checked={checked}
+                                  onCheckedChange={v =>
+                                    setSidebarOptions(prev =>
+                                      v ? [...prev, opt.id] : prev.filter(x => x !== opt.id)
+                                    )
+                                  }
+                                />
+                                {lang === "ru" ? opt.nameRu : opt.nameEn}
+                              </span>
+                              <span className={`text-xs font-bold shrink-0 ${checked ? "text-primary" : "text-muted-foreground"}`}>
+                                +${Number(opt.price).toFixed(0)}
+                              </span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                      {sidebarOptions.length > 0 && (
+                        <p className="text-xs text-primary font-semibold mt-2.5 text-right">
+                          +${options.filter((o: any) => sidebarOptions.includes(o.id)).reduce((s: number, o: any) => s + Number(o.price), 0).toFixed(0)} {t("доп. опции", "add-ons")}
+                        </p>
+                      )}
                     </div>
-                    {sidebarOptions.length > 0 && (
-                      <p className="text-xs text-primary font-semibold mt-2.5 text-right">
-                        +${options.filter((o: any) => sidebarOptions.includes(o.id)).reduce((s: number, o: any) => s + Number(o.price), 0).toFixed(0)} {t("доп. опции", "add-ons")}
-                      </p>
-                    )}
                   </div>
                 )}
 
