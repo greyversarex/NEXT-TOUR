@@ -33,7 +33,6 @@ const CategoriesAdmin    = lazy(() => import("@/pages/admin/CategoriesAdmin"));
 const FeedsAdmin         = lazy(() => import("@/pages/admin/FeedsAdmin"));
 const NewsAdmin          = lazy(() => import("@/pages/admin/NewsAdmin"));
 const BannersAdmin       = lazy(() => import("@/pages/admin/BannersAdmin"));
-const PriceComponentsAdmin = lazy(() => import("@/pages/admin/PriceComponentsAdmin"));
 const HeroSlidesAdmin    = lazy(() => import("@/pages/admin/HeroSlidesAdmin"));
 const StatisticsAdmin    = lazy(() => import("@/pages/admin/StatisticsAdmin"));
 const LoyaltyAdmin       = lazy(() => import("@/pages/admin/LoyaltyAdmin"));
@@ -92,9 +91,6 @@ function Router() {
       </Route>
       <Route path="/admin/banners">
         {() => <Suspense fallback={<AdminFallback />}><BannersAdmin /></Suspense>}
-      </Route>
-      <Route path="/admin/price-components">
-        {() => <Suspense fallback={<AdminFallback />}><PriceComponentsAdmin /></Suspense>}
       </Route>
       <Route path="/admin/hero-slides">
         {() => <Suspense fallback={<AdminFallback />}><HeroSlidesAdmin /></Suspense>}

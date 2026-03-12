@@ -4,7 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   LayoutDashboard, Map, Building2, Tag, Image, Layers,
-  Users, BookOpen, MessageSquare, Newspaper, Package,
+  Users, BookOpen, MessageSquare, Newspaper,
   PlusCircle, ChevronRight, Settings, Globe, BarChart3,
   Award, Monitor
 } from "lucide-react";
@@ -17,7 +17,6 @@ const navItems = [
   { href: "/admin/countries", label: "Countries", labelRu: "Страны", icon: Map },
   { href: "/admin/cities", label: "Cities", labelRu: "Города", icon: Building2 },
   { href: "/admin/categories", label: "Categories", labelRu: "Категории", icon: Tag },
-  { href: "/admin/price-components", label: "Price Components", labelRu: "Компоненты", icon: Package },
   { href: "/admin/banners", label: "Banners", labelRu: "Баннеры", icon: Image },
   { href: "/admin/feeds", label: "Tour Feeds", labelRu: "Ленты", icon: Layers },
   { href: "/admin/hero-slides", label: "Hero Slides", labelRu: "Слайды", icon: Image },
