@@ -278,7 +278,7 @@ function LocalDatesManager({ dates, setDates }: { dates: any[]; setDates: (d: an
   const [form, setForm] = useState({ startDate: "", endDate: "", maxPeople: 20 });
   const add = () => {
     if (!form.startDate || !form.endDate) return;
-    setDates([...dates, { ...form, id: crypto.randomUUID() }]);
+    setDates([...dates, { ...form, id: "local-" + Date.now() + "-" + Math.random().toString(36).slice(2) }]);
     setForm({ startDate: "", endDate: "", maxPeople: 20 });
   };
   return (
@@ -311,7 +311,7 @@ function LocalOptionsManager({ options, setOptions }: { options: any[]; setOptio
   const [form, setForm] = useState({ nameRu: "", nameEn: "", price: 0 });
   const add = () => {
     if (!form.nameRu) return;
-    setOptions([...options, { ...form, id: crypto.randomUUID() }]);
+    setOptions([...options, { ...form, id: "local-" + Date.now() + "-" + Math.random().toString(36).slice(2) }]);
     setForm({ nameRu: "", nameEn: "", price: 0 });
   };
   return (
@@ -344,7 +344,7 @@ function LocalItineraryManager({ items, setItems }: { items: any[]; setItems: (i
   const [form, setForm] = useState({ dayNumber: 1, titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationHours: "" as any });
   const add = () => {
     if (!form.titleRu) return;
-    setItems([...items, { ...form, durationHours: form.durationHours ? Number(form.durationHours) : null, id: crypto.randomUUID() }]);
+    setItems([...items, { ...form, durationHours: form.durationHours ? Number(form.durationHours) : null, id: "local-" + Date.now() + "-" + Math.random().toString(36).slice(2) }]);
     setForm({ dayNumber: items.length + 2, titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationHours: "" });
   };
   return (
