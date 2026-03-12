@@ -1,85 +1,138 @@
 import { useI18n } from "@/lib/i18n";
-import { MapPin, Phone, Mail, Clock, Award, Users, Globe, Heart } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Award, Users, Globe, Heart, Shield, Plane, Star, Headphones } from "lucide-react";
 
 export default function About() {
   const { t } = useI18n();
 
   const stats = [
-    { icon: Globe, value: "50+", label: t("Стран", "Countries") },
-    { icon: Users, value: "10,000+", label: t("Довольных клиентов", "Happy Clients") },
-    { icon: Award, value: "12", label: t("Лет опыта", "Years of Experience") },
-    { icon: Heart, value: "98%", label: t("Рекомендуют нас", "Recommend Us") },
+    { icon: Globe, value: "30+", label: t("Стран", "Countries") },
+    { icon: Users, value: "5,000+", label: t("Довольных клиентов", "Happy Clients") },
+    { icon: Award, value: "8", label: t("Лет опыта", "Years of Experience") },
+    { icon: Heart, value: "97%", label: t("Рекомендуют нас", "Recommend Us") },
+  ];
+
+  const values = [
+    {
+      icon: Shield,
+      titleRu: "Надёжность",
+      titleEn: "Reliability",
+      descRu: "Мы работаем только с проверенными партнёрами и несём полную ответственность за каждое бронирование.",
+      descEn: "We work only with trusted partners and take full responsibility for every booking.",
+    },
+    {
+      icon: Headphones,
+      titleRu: "Поддержка 24/7",
+      titleEn: "24/7 Support",
+      descRu: "Наши менеджеры на связи в любое время — до, во время и после поездки.",
+      descEn: "Our managers are available at any time — before, during, and after your trip.",
+    },
+    {
+      icon: Star,
+      titleRu: "Индивидуальный подход",
+      titleEn: "Personal Approach",
+      descRu: "Мы подбираем туры с учётом ваших пожеланий, бюджета и предпочтений.",
+      descEn: "We select tours based on your preferences, budget, and wishes.",
+    },
+    {
+      icon: Plane,
+      titleRu: "Лучшие цены",
+      titleEn: "Best Prices",
+      descRu: "Прямые контракты с отелями и авиакомпаниями позволяют нам предлагать выгодные цены.",
+      descEn: "Direct contracts with hotels and airlines allow us to offer competitive prices.",
+    },
   ];
 
   return (
     <div className="min-h-screen">
-      {/* Hero header */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50/30 dark:from-blue-950/20 dark:via-background dark:to-background border-b border-border/40 mb-12">
+      <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50/30 dark:from-blue-950/20 dark:via-background dark:to-background border-b border-border/40 mb-8 sm:mb-12">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_center,rgba(99,102,241,0.08),transparent_60%)] pointer-events-none" />
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 text-center">
           <div className="inline-flex items-center gap-2 bg-primary/8 text-primary border border-primary/20 rounded-full px-4 py-1.5 text-sm font-semibold mb-5">
             <Award className="h-4 w-4" />
             {t("Наша компания", "About Us")}
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">{t("О компании NEXT TOUR", "About NEXT TOUR")}</h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
             {t(
-              "Мы помогаем людям открывать мир с 2012 года. Наша миссия — сделать каждое путешествие незабываемым.",
-              "We help people discover the world since 2012. Our mission is to make every journey unforgettable."
+              "Ваш надёжный партнёр в мире путешествий. Организуем незабываемые туры по всему миру с 2017 года.",
+              "Your reliable partner in the world of travel. Organizing unforgettable tours worldwide since 2017."
             )}
           </p>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
           {stats.map(({ icon: Icon, value, label }) => (
-            <div key={label} className="bg-card border border-card-border rounded-2xl p-6 text-center hover-elevate transition-all duration-300 hover:-translate-y-1">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                <Icon className="h-6 w-6 text-primary" />
+            <div key={label} className="bg-card border border-card-border rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center hover-elevate transition-all duration-300 hover:-translate-y-1">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
-              <div className="text-3xl font-extrabold text-primary">{value}</div>
-              <div className="text-sm text-muted-foreground mt-1">{label}</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-primary">{value}</div>
+              <div className="text-xs sm:text-sm text-muted-foreground mt-1">{label}</div>
             </div>
           ))}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-10 mb-16">
+        <div className="grid md:grid-cols-2 gap-8 sm:gap-10 mb-12 sm:mb-16">
           <div>
-            <h2 className="text-2xl font-bold mb-4">{t("Наша история", "Our Story")}</h2>
-            <p className="text-muted-foreground leading-relaxed mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4">{t("О нас", "About Us")}</h2>
+            <p className="text-muted-foreground leading-relaxed mb-4 text-sm sm:text-base">
               {t(
-                "NEXT TOUR был основан в 2012 году группой энтузиастов путешествий. Мы начинали как небольшое агентство с несколькими направлениями, а сегодня предлагаем туры более чем в 50 стран мира.",
-                "NEXT TOUR was founded in 2012 by a group of travel enthusiasts. We started as a small agency with a few destinations, and today we offer tours to more than 50 countries."
+                "NEXT TOUR — туристическая компания из Душанбе, основанная в 2017 году. Мы специализируемся на организации групповых и индивидуальных туров по самым популярным направлениям мира: от пляжного отдыха в Юго-Восточной Азии до экскурсионных программ по Европе и Ближнему Востоку.",
+                "NEXT TOUR is a travel company from Dushanbe, founded in 2017. We specialize in organizing group and individual tours to the world's most popular destinations: from beach holidays in Southeast Asia to sightseeing programs across Europe and the Middle East."
               )}
             </p>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed mb-4 text-sm sm:text-base">
               {t(
-                "Наша команда — это профессионалы, влюблённые в путешествия. Мы лично проверяем каждый тур и отель, чтобы гарантировать вам лучший опыт.",
-                "Our team are professionals who love travel. We personally check every tour and hotel to guarantee you the best experience."
+                "За годы работы мы помогли тысячам клиентов организовать идеальный отдых. Наша команда опытных менеджеров лично знает каждое направление и подберёт тур, который подойдёт именно вам — будь то романтическое путешествие, семейный отдых или приключение с друзьями.",
+                "Over the years, we have helped thousands of clients organize the perfect vacation. Our team of experienced managers personally knows every destination and will find a tour that suits you — whether it's a romantic trip, a family holiday, or an adventure with friends."
+              )}
+            </p>
+            <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
+              {t(
+                "Мы работаем напрямую с авиакомпаниями, отелями и принимающими сторонами, что позволяет нам гарантировать лучшие цены и качество обслуживания на каждом этапе вашего путешествия.",
+                "We work directly with airlines, hotels, and local partners, which allows us to guarantee the best prices and service quality at every stage of your journey."
               )}
             </p>
           </div>
           <div>
             <img
               src="/images/hero-banner.png"
-              alt="About"
-              className="w-full rounded-2xl object-cover h-64 shadow-lg"
+              alt={t("О компании NEXT TOUR", "About NEXT TOUR")}
+              className="w-full rounded-2xl object-cover h-64 sm:h-72 shadow-lg"
             />
           </div>
         </div>
 
-        <div className="bg-card border border-card-border rounded-2xl p-8">
-          <h2 className="text-2xl font-bold mb-6 text-center">{t("Контакты", "Contact Us")}</h2>
-          <div className="grid md:grid-cols-2 gap-8">
+        <div className="mb-12 sm:mb-16">
+          <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">{t("Почему выбирают нас", "Why Choose Us")}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            {values.map((item, i) => (
+              <div key={i} className="flex gap-4 bg-card border border-card-border rounded-xl sm:rounded-2xl p-5 sm:p-6 hover-elevate transition-all duration-300 hover:-translate-y-1">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <item.icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm sm:text-base mb-1">{t(item.titleRu, item.titleEn)}</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{t(item.descRu, item.descEn)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-card border border-card-border rounded-xl sm:rounded-2xl p-6 sm:p-8">
+          <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">{t("Контакты", "Contact Us")}</h2>
+          <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                   <MapPin className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium">{t("Адрес", "Address")}</p>
-                  <p className="text-muted-foreground text-sm">{t("г. Москва, ул. Тверская, д. 12, офис 34", "Moscow, Tverskaya St. 12, Office 34")}</p>
+                  <p className="font-medium text-sm sm:text-base">{t("Адрес", "Address")}</p>
+                  <p className="text-muted-foreground text-xs sm:text-sm">{t("г. Душанбе, ул. Гаффора Валаматзаде, 8/1", "Dushanbe, Gaffor Valamatzade St. 8/1")}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -87,8 +140,8 @@ export default function About() {
                   <Phone className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium">{t("Телефон", "Phone")}</p>
-                  <p className="text-muted-foreground text-sm">+7 (495) 123-45-67</p>
+                  <p className="font-medium text-sm sm:text-base">{t("Телефон", "Phone")}</p>
+                  <a href="tel:+992988988087" className="text-muted-foreground text-xs sm:text-sm hover:text-primary transition-colors">+992 988 988 087</a>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -96,8 +149,8 @@ export default function About() {
                   <Mail className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium">Email</p>
-                  <p className="text-muted-foreground text-sm">info@travelpro.ru</p>
+                  <p className="font-medium text-sm sm:text-base">Email</p>
+                  <a href="mailto:nexttour23@gmail.com" className="text-muted-foreground text-xs sm:text-sm hover:text-primary transition-colors">nexttour23@gmail.com</a>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -105,19 +158,20 @@ export default function About() {
                   <Clock className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium">{t("Часы работы", "Working Hours")}</p>
-                  <p className="text-muted-foreground text-sm">{t("Пн–Пт: 9:00–19:00, Сб: 10:00–16:00", "Mon–Fri: 9:00–19:00, Sat: 10:00–16:00")}</p>
+                  <p className="font-medium text-sm sm:text-base">{t("Часы работы", "Working Hours")}</p>
+                  <p className="text-muted-foreground text-xs sm:text-sm">{t("Пн–Сб: 9:00–18:00", "Mon–Sat: 9:00–18:00")}</p>
                 </div>
               </div>
             </div>
-            <div className="rounded-xl overflow-hidden border border-border h-52">
+            <div className="rounded-xl overflow-hidden border border-border h-52 sm:h-60">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2245.2827338655744!2d37.60573761590082!3d55.764789980548166!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46b54a4b5e7a9527%3A0x88fff9d4862a2c0c!2sTverskaya+St%2C+12%2C+Moscow!5e0!3m2!1sen!2sru!4v1605000000000!5m2!1sen!2sru"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3057.8!2d68.7738!3d38.5598!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38b5d17e5db5b1f7%3A0x6c06d1fa43d6e7e0!2sDushanbe!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
                 loading="lazy"
-                title="Office location"
+                title={t("Расположение офиса", "Office location")}
+                data-testid="iframe-about-map"
               />
             </div>
           </div>

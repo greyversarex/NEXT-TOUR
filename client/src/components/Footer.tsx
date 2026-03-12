@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         <div className="rounded-xl overflow-hidden shadow-2xl border border-white/10 h-[180px] sm:h-[260px] w-full">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2245.3726684082543!2d37.61551!3d55.75584!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46b54a50b315e573%3A0xa886bf5a3d9b2e68!2z0JzQvtGB0LrQstCw!5e0!3m2!1sru!2sru!4v1709904000000!5m2!1sru!2sru"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3057.8!2d68.7738!3d38.5598!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38b5d17e5db5b1f7%3A0x6c06d1fa43d6e7e0!2sDushanbe!5e0!3m2!1sru!2s!4v1700000000000!5m2!1sru!2s"
             width="100%"
             height="100%"
             style={{ border: 0 }}
