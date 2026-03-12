@@ -1,0 +1,122 @@
+root@6899447-yr427605:/var/www/nexttour# git pull origin main
+remote: Enumerating objects: 14, done.
+remote: Counting objects: 100% (14/14), done.
+remote: Compressing objects: 100% (4/4), done.
+remote: Total 14 (delta 10), reused 14 (delta 10), pack-reused 0 (from 0)
+Unpacking objects: 100% (14/14), 48.88 KiB | 368.00 KiB/s, done.
+From https://github.com/greyversarex/NEXT-TOUR
+ * branch            main       -> FETCH_HEAD
+   f200abc..c1cb46a  main       -> origin/main
+Updating f200abc..c1cb46a
+Fast-forward
+ ...www-nexttour-cat-etc-nginx-si_1773335484402.txt |  58 +++++++++
+ deploy.sh                                          |  31 ++---
+ dist/index.cjs                                     | 130 ++++++++++-----------
+ ecosystem.config.js                                |  13 +++
+ server/index.ts                                    |   7 ++
+ server/routes.ts                                   |  24 ++--
+ 6 files changed, 168 insertions(+), 95 deletions(-)
+ create mode 100644 attached_assets/Pasted-root-6899447-yr427605-var-www-nexttour-cat-etc-nginx-si_1773335484402.txt
+ create mode 100644 ecosystem.config.js
+root@6899447-yr427605:/var/www/nexttour# cd /var/www/nexttour && ./deploy.sh    
+╔══════════════════════════════════════╗
+║        NEXT TOUR  —  DEPLOY          ║
+║  2026-03-12 18:10:29               ║
+╚══════════════════════════════════════╝
+
+
+▶ 1/4  git pull origin main
+From https://github.com/greyversarex/NEXT-TOUR
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+✓ Исходный код обновлён
+
+▶ 2/4  npm install
+
+up to date, audited 505 packages in 2s
+
+79 packages are looking for funding
+  run `npm fund` for details
+
+4 vulnerabilities (1 low, 1 moderate, 2 high)
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+✓ Зависимости установлены
+
+▶ 3/4  npm run build
+
+> rest-express@1.0.0 build
+> tsx script/build.ts
+
+building client...
+vite v7.3.1 building client environment for production...
+transforming (6) ../node_modules/@tanstack/react-query/build/modern/index.j
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3215 modules transformed.
+../dist/public/index.html                                 3.99 kB │ gzip:   1.50 kB
+../dist/public/assets/index-BcT2w_Mm.css                120.87 kB │ gzip:  18.83 kB
+../dist/public/assets/save-ClsDZijS.js                    0.32 kB │ gzip:   0.23 kB
+../dist/public/assets/textarea-CdxfmaZQ.js                0.50 kB │ gzip:   0.33 kB
+../dist/public/assets/trash-2-CNkvqkRw.js                 0.72 kB │ gzip:   0.41 kB
+../dist/public/assets/image-upload-DXtAfytX.js            1.99 kB │ gzip:   1.08 kB
+../dist/public/assets/switch-V2akGTBf.js                  2.34 kB │ gzip:   1.19 kB
+../dist/public/assets/UsersAdmin-pM80r-NX.js              2.45 kB │ gzip:   1.13 kB
+../dist/public/assets/CategoriesAdmin-DXqYDfpU.js         2.49 kB │ gzip:   1.11 kB
+../dist/public/assets/PriceComponentsAdmin-B4esmJcB.js    2.59 kB │ gzip:   1.13 kB
+../dist/public/assets/Dashboard-4Hd7AzPI.js               2.60 kB │ gzip:   1.16 kB
+../dist/public/assets/ReviewsAdmin-D1uv2R1e.js            3.68 kB │ gzip:   1.58 kB
+../dist/public/assets/BannersAdmin-583VjzDu.js            3.86 kB │ gzip:   1.55 kB
+../dist/public/assets/NewsAdmin-DZzOoPtu.js               4.00 kB │ gzip:   1.58 kB
+../dist/public/assets/CitiesAdmin-C16RI9lg.js             4.06 kB │ gzip:   1.65 kB
+../dist/public/assets/IntroScreenAdmin-B0yL4mpF.js        4.19 kB │ gzip:   1.72 kB
+../dist/public/assets/HeroSlidesAdmin-DMQd9mM8.js         5.37 kB │ gzip:   1.82 kB
+../dist/public/assets/AdminLayout-DAHoQyya.js             5.80 kB │ gzip:   2.29 kB
+../dist/public/assets/FeedsAdmin-IOFjVfWC.js              6.35 kB │ gzip:   2.32 kB
+../dist/public/assets/CountriesAdmin-e5h0AmJf.js          9.68 kB │ gzip:   2.91 kB
+../dist/public/assets/BookingsAdmin--z0DE_7l.js          20.06 kB │ gzip:   5.94 kB
+../dist/public/assets/ToursAdmin-SZGrFP-F.js             29.46 kB │ gzip:   5.91 kB
+../dist/public/assets/LoyaltyAdmin-vNUxIjnG.js           33.78 kB │ gzip:  11.99 kB
+../dist/public/assets/StatisticsAdmin-DjULC7iT.js       399.49 kB │ gzip: 110.06 kB
+../dist/public/assets/index-BKSd-WEW.js                 564.97 kB │ gzip: 173.59 kB
+✓ built in 26.50s
+building server...
+
+  dist/index.cjs  1.6mb ⚠️
+
+⚡ Done in 1742ms
+✓ Проект собран
+
+▶ 4/4  Синхронизация схемы БД
+
+> rest-express@1.0.0 db:push
+> drizzle-kit push
+
+No config path provided, using default 'drizzle.config.ts'
+Reading config file '/var/www/nexttour/drizzle.config.ts'
+Using 'pg' driver for database querying
+[✓] Pulling schema from database...
+[✓] Changes applied
+✓ Схема базы данных синхронизирована
+
+▶ Создание директории для загрузок
+✓ Директория uploads готова
+
+▶ Перезапуск сервера
+[PM2][ERROR] File ecosystem.config.js malformated
+ReferenceError: module is not defined in ES module scope
+This file is being treated as an ES module because it has a '.js' file extension and '/var/www/nexttour/package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+    at file:///var/www/nexttour/ecosystem.config.js:1:1
+    at ModuleJobSync.runSync (node:internal/modules/esm/module_job:437:37)
+    at ModuleLoader.importSyncForRequire (node:internal/modules/esm/loader:389:47)
+    at loadESMFromCJS (node:internal/modules/cjs/loader:1363:24)
+    at Module._compile (node:internal/modules/cjs/loader:1503:5)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+    at Module.load (node:internal/modules/cjs/loader:1266:32)
+    at Module._load (node:internal/modules/cjs/loader:1091:12)
+    at Module.require (node:internal/modules/cjs/loader:1289:19)
+    at require (node:internal/modules/helpers:182:18)
+✗ Ошибка на шаге: pm2 startOrRestart
+root@6899447-yr427605:/var/www/nexttour#

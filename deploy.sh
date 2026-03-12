@@ -57,7 +57,7 @@ mkdir -p uploads
 ok "Директория uploads готова"
 
 step "Перезапуск сервера"
-pm2 startOrRestart ecosystem.config.js --env production || fail "pm2 startOrRestart"
+pm2 startOrRestart ecosystem.config.cjs --env production || fail "pm2 startOrRestart"
 pm2 save
 ok "Сервер перезапущен (PORT=3000)"
 
