@@ -15,19 +15,18 @@ export default function Promotions() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero header */}
-      <div className="relative overflow-hidden border-b border-border/40" style={{ background: "linear-gradient(135deg, hsl(25 85% 97%) 0%, hsl(40 90% 97%) 40%, hsl(0 0% 100%) 100%)" }}>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(249,115,22,0.10),transparent_60%)] pointer-events-none" />
-        <div className="absolute w-64 h-64 rounded-full bg-orange-200/40 blur-[80px] -top-16 -right-16 pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Hero header — glass */}
+      <div className="relative overflow-hidden bg-white/15 backdrop-blur-2xl border-b border-white/20">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 relative">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 flex items-center justify-center shadow-md">
               <Sparkles className="h-5 w-5 text-white" />
             </div>
-            <p className="text-orange-500 font-semibold text-sm uppercase tracking-widest">{t("Специальные предложения", "Special Offers")}</p>
+            <p className="text-white/80 font-semibold text-sm uppercase tracking-widest">{t("Специальные предложения", "Special Offers")}</p>
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold mb-3 leading-tight">{t("Акции и скидки", "Promotions & Deals")}</h1>
-          <p className="text-muted-foreground text-base md:text-lg max-w-xl leading-relaxed">
+          <h1 className="text-3xl md:text-4xl font-extrabold mb-3 leading-tight text-white drop-shadow-md">{t("Акции и скидки", "Promotions & Deals")}</h1>
+          <p className="text-white/75 text-base max-w-xl leading-relaxed">
             {t("Лучшие цены на незабываемые путешествия — успейте забронировать", "Best prices for unforgettable journeys — book while they last")}
           </p>
         </div>

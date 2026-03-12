@@ -14,18 +14,18 @@ export default function NewsPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero header */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950/20 dark:via-background dark:to-background border-b border-border/40 mb-12">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.07),transparent_60%)] pointer-events-none" />
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Hero header — glass */}
+      <div className="relative overflow-hidden bg-white/15 backdrop-blur-2xl border-b border-white/20 mb-12">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent pointer-events-none" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 relative">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center shadow-md">
               <Calendar className="h-5 w-5 text-white" />
             </div>
-            <p className="text-muted-foreground font-semibold text-sm uppercase tracking-widest">{t("Журнал", "Journal")}</p>
+            <p className="text-white/80 font-semibold text-sm uppercase tracking-widest">{t("Журнал", "Journal")}</p>
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold mb-3 leading-tight">{t("Новости и статьи", "News & Articles")}</h1>
-          <p className="text-muted-foreground text-base md:text-lg max-w-xl leading-relaxed">
+          <h1 className="text-3xl md:text-4xl font-extrabold mb-3 leading-tight text-white drop-shadow-md">{t("Новости и статьи", "News & Articles")}</h1>
+          <p className="text-white/75 text-base max-w-xl leading-relaxed">
             {t("Последние новости, советы путешественникам и вдохновение для следующего приключения", "Latest news, travel tips and inspiration for your next adventure")}
           </p>
         </div>

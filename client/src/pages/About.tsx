@@ -44,15 +44,15 @@ export default function About() {
 
   return (
     <div className="min-h-screen">
-      <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50/30 dark:from-blue-950/20 dark:via-background dark:to-background border-b border-border/40 mb-8 sm:mb-12">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_center,rgba(99,102,241,0.08),transparent_60%)] pointer-events-none" />
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/8 text-primary border border-primary/20 rounded-full px-4 py-1.5 text-sm font-semibold mb-5">
+      <div className="relative overflow-hidden bg-white/15 backdrop-blur-2xl border-b border-white/20 mb-8 sm:mb-12">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent pointer-events-none" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 text-center relative">
+          <div className="inline-flex items-center gap-2 bg-white/15 text-white border border-white/25 rounded-full px-4 py-1.5 text-sm font-semibold mb-5 backdrop-blur-sm">
             <Award className="h-4 w-4" />
             {t("Наша компания", "About Us")}
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">{t("О компании NEXT TOUR", "About NEXT TOUR")}</h1>
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
+          <h1 className="text-3xl md:text-4xl font-extrabold mb-4 leading-tight text-white drop-shadow-md">{t("О компании NEXT TOUR", "About NEXT TOUR")}</h1>
+          <p className="text-base sm:text-lg md:text-xl text-white/75 max-w-2xl mx-auto leading-relaxed px-2">
             {t(
               "Ваш надёжный партнёр в мире путешествий. Организуем незабываемые туры по всему миру с 2017 года.",
               "Your reliable partner in the world of travel. Organizing unforgettable tours worldwide since 2017."
