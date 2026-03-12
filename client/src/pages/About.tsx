@@ -64,7 +64,7 @@ export default function About() {
           <img
             src={officePhoto}
             alt={t("О компании NEXT TOUR", "About NEXT TOUR")}
-            className="w-full rounded-2xl object-cover object-[center_40%] h-56 sm:h-72 md:h-80 shadow-lg mb-6"
+            className="w-full rounded-2xl object-cover object-[center_35%] h-56 sm:h-72 md:h-80 shadow-lg mb-6"
           />
           <div className="space-y-4">
             <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
