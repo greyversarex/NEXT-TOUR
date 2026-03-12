@@ -2,14 +2,14 @@ import { db } from "./db";
 import { eq, and, desc, asc, ilike, or, inArray, sql, ne } from "drizzle-orm";
 import {
   users, countries, cities, categories, tours, tourDates,
-  priceComponents, tourPriceComponents, tourOptions, tourItinerary,
+  priceComponents, tourPriceComponents, tourOptions, tourItinerary, itineraryStops,
   banners, tourFeeds, tourFeedItems, reviews, bookings, news,
   favorites, introScreen, heroSlides, passwordResetTokens, settings,
   type User, type InsertUser, type Country, type InsertCountry,
   type City, type InsertCity, type Category, type InsertCategory,
   type Tour, type InsertTour, type TourDate, type InsertTourDate,
   type PriceComponent, type InsertPriceComponent, type TourPriceComponent,
-  type TourOption, type InsertTourOption, type TourItinerary,
+  type TourOption, type InsertTourOption, type TourItinerary, type ItineraryStop,
   type Banner, type InsertBanner, type TourFeed, type TourFeedItem,
   type Review, type InsertReview, type Booking, type InsertBooking,
   type News, type InsertNews, type Favorite, type IntroScreen, type HeroSlide,
@@ -84,6 +84,13 @@ export interface IStorage {
   createItineraryItem(data: any): Promise<TourItinerary>;
   updateItineraryItem(id: string, data: Partial<TourItinerary>): Promise<TourItinerary | undefined>;
   deleteItineraryItem(id: string): Promise<void>;
+
+  // Itinerary Stops
+  getItineraryStops(dayId: string): Promise<ItineraryStop[]>;
+  getAllStopsForTour(tourId: string): Promise<ItineraryStop[]>;
+  createItineraryStop(data: any): Promise<ItineraryStop>;
+  updateItineraryStop(id: string, data: Partial<ItineraryStop>): Promise<ItineraryStop | undefined>;
+  deleteItineraryStop(id: string): Promise<void>;
 
   // Banners
   getBanners(activeOnly?: boolean): Promise<Banner[]>;
@@ -435,7 +442,37 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteItineraryItem(id: string) {
+    await db.delete(itineraryStops).where(eq(itineraryStops.itineraryDayId, id));
     await db.delete(tourItinerary).where(eq(tourItinerary.id, id));
+  }
+
+  async getItineraryStops(dayId: string) {
+    return db.select().from(itineraryStops)
+      .where(eq(itineraryStops.itineraryDayId, dayId))
+      .orderBy(asc(itineraryStops.stopOrder));
+  }
+
+  async getAllStopsForTour(tourId: string) {
+    const days = await this.getTourItinerary(tourId);
+    if (days.length === 0) return [];
+    const dayIds = days.map(d => d.id);
+    return db.select().from(itineraryStops)
+      .where(inArray(itineraryStops.itineraryDayId, dayIds))
+      .orderBy(asc(itineraryStops.stopOrder));
+  }
+
+  async createItineraryStop(data: any) {
+    const [s] = await db.insert(itineraryStops).values(data).returning();
+    return s;
+  }
+
+  async updateItineraryStop(id: string, data: Partial<ItineraryStop>) {
+    const [s] = await db.update(itineraryStops).set(data).where(eq(itineraryStops.id, id)).returning();
+    return s;
+  }
+
+  async deleteItineraryStop(id: string) {
+    await db.delete(itineraryStops).where(eq(itineraryStops.id, id));
   }
 
   async getBanners(activeOnly = false) {

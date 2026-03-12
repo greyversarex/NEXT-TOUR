@@ -120,6 +120,17 @@ export const tourItinerary = pgTable("tour_itinerary", {
   durationHours: integer("duration_hours"),
 });
 
+export const itineraryStops = pgTable("itinerary_stops", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  itineraryDayId: varchar("itinerary_day_id").notNull().references(() => tourItinerary.id, { onDelete: "cascade" }),
+  stopOrder: integer("stop_order").notNull(),
+  titleRu: text("title_ru").notNull(),
+  titleEn: text("title_en").notNull(),
+  descriptionRu: text("description_ru").notNull().default(""),
+  descriptionEn: text("description_en").notNull().default(""),
+  durationMinutes: integer("duration_minutes"),
+});
+
 export const banners = pgTable("banners", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   titleRu: text("title_ru").notNull(),
@@ -252,6 +263,7 @@ export const insertPriceComponentSchema = createInsertSchema(priceComponents).om
 export const insertTourPriceComponentSchema = createInsertSchema(tourPriceComponents).omit({ id: true });
 export const insertTourOptionSchema = createInsertSchema(tourOptions).omit({ id: true });
 export const insertTourItinerarySchema = createInsertSchema(tourItinerary).omit({ id: true });
+export const insertItineraryStopSchema = createInsertSchema(itineraryStops).omit({ id: true });
 export const insertBannerSchema = createInsertSchema(banners).omit({ id: true });
 export const insertTourFeedSchema = createInsertSchema(tourFeeds).omit({ id: true });
 export const insertTourFeedItemSchema = createInsertSchema(tourFeedItems).omit({ id: true });
@@ -281,6 +293,7 @@ export type TourPriceComponent = typeof tourPriceComponents.$inferSelect;
 export type TourOption = typeof tourOptions.$inferSelect;
 export type InsertTourOption = z.infer<typeof insertTourOptionSchema>;
 export type TourItinerary = typeof tourItinerary.$inferSelect;
+export type ItineraryStop = typeof itineraryStops.$inferSelect;
 export type Banner = typeof banners.$inferSelect;
 export type InsertBanner = z.infer<typeof insertBannerSchema>;
 export type TourFeed = typeof tourFeeds.$inferSelect;

@@ -15,7 +15,7 @@ import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route, ChevronDown, ChevronRight, MapPin, Clock } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Tour, Country, Category } from "@shared/schema";
@@ -151,8 +151,14 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
         await Promise.all([
           ...localDates.map(d => apiRequest("POST", `/api/tours/${tourId}/dates`, { ...d, tourId })),
           ...localOptions.map(o => apiRequest("POST", `/api/tours/${tourId}/options`, { ...o, tourId })),
-          ...localItinerary.map(i => apiRequest("POST", `/api/tours/${tourId}/itinerary`, { ...i, tourId })),
         ]);
+        for (const day of localItinerary) {
+          const dayRes = await apiRequest("POST", `/api/tours/${tourId}/itinerary`, { ...day, tourId });
+          const savedDay = await dayRes.json();
+          if (day.stops && day.stops.length > 0) {
+            await Promise.all(day.stops.map((s: any) => apiRequest("POST", `/api/itinerary/${savedDay.id}/stops`, { titleRu: s.titleRu, titleEn: s.titleEn, descriptionRu: s.descriptionRu || "", descriptionEn: s.descriptionEn || "", durationMinutes: s.durationMinutes, stopOrder: s.stopOrder })));
+          }
+        }
       }
       queryClient.invalidateQueries({ queryKey: ["/api/tours"] });
       toast({ title: t("Сохранено", "Saved") });
@@ -343,11 +349,29 @@ function LocalOptionsManager({ options, setOptions }: { options: any[]; setOptio
 function LocalItineraryManager({ items, setItems }: { items: any[]; setItems: (i: any[]) => void }) {
   const { t, lang } = useI18n();
   const [form, setForm] = useState({ dayNumber: 1, titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationHours: "" as any });
-  const add = () => {
+  const [expandedDay, setExpandedDay] = useState<string | null>(null);
+  const [stopForm, setStopForm] = useState({ titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationMinutes: "" as any });
+
+  const addDay = () => {
     if (!form.titleRu) return;
-    setItems([...items, { ...form, durationHours: form.durationHours ? Number(form.durationHours) : null, id: "local-" + Date.now() + "-" + Math.random().toString(36).slice(2) }]);
+    setItems([...items, { ...form, durationHours: form.durationHours ? Number(form.durationHours) : null, stops: [], id: "local-" + Date.now() + "-" + Math.random().toString(36).slice(2) }]);
     setForm({ dayNumber: items.length + 2, titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationHours: "" });
   };
+
+  const addStop = (dayId: string) => {
+    if (!stopForm.titleRu) return;
+    const day = items.find((d: any) => d.id === dayId);
+    if (!day) return;
+    const stops = day.stops || [];
+    const newStop = { ...stopForm, durationMinutes: stopForm.durationMinutes ? Number(stopForm.durationMinutes) : null, stopOrder: stops.length + 1, id: "local-stop-" + Date.now() + "-" + Math.random().toString(36).slice(2) };
+    setItems(items.map((d: any) => d.id === dayId ? { ...d, stops: [...stops, newStop] } : d));
+    setStopForm({ titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationMinutes: "" });
+  };
+
+  const removeStop = (dayId: string, stopId: string) => {
+    setItems(items.map((d: any) => d.id === dayId ? { ...d, stops: (d.stops || []).filter((s: any) => s.id !== stopId) } : d));
+  };
+
   return (
     <div className="space-y-4">
       <div className="border rounded-xl p-4 space-y-3 bg-muted/30">
@@ -364,17 +388,51 @@ function LocalItineraryManager({ items, setItems }: { items: any[]; setItems: (i
           <div><Label className="text-xs">{t("Описание (RU)", "Desc (RU)")}</Label><Textarea value={form.descriptionRu} onChange={e => setForm(p => ({ ...p, descriptionRu: e.target.value }))} className="mt-1 text-sm min-h-[60px]" /></div>
           <div><Label className="text-xs">{t("Описание (EN)", "Desc (EN)")}</Label><Textarea value={form.descriptionEn} onChange={e => setForm(p => ({ ...p, descriptionEn: e.target.value }))} className="mt-1 text-sm min-h-[60px]" /></div>
         </div>
-        <Button type="button" size="sm" onClick={add}>{t("Добавить", "Add")}</Button>
+        <Button type="button" size="sm" onClick={addDay}>{t("Добавить", "Add")}</Button>
       </div>
       {items.length === 0 ? <p className="text-sm text-muted-foreground text-center py-4">{t("Программа не добавлена", "No itinerary yet")}</p> : (
         <div className="space-y-2">
           {items.map((item: any) => (
-            <div key={item.id} className="flex items-start justify-between p-3 border rounded-lg gap-3">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold">{t("День", "Day")} {item.dayNumber}: {lang === "ru" ? item.titleRu : item.titleEn}</p>
-                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{lang === "ru" ? item.descriptionRu : item.descriptionEn}</p>
+            <div key={item.id} className="border rounded-lg overflow-hidden">
+              <div className="flex items-start justify-between p-3 gap-3 cursor-pointer" onClick={() => setExpandedDay(expandedDay === item.id ? null : item.id)}>
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  {expandedDay === item.id ? <ChevronDown className="h-4 w-4 shrink-0" /> : <ChevronRight className="h-4 w-4 shrink-0" />}
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold">{t("День", "Day")} {item.dayNumber}: {lang === "ru" ? item.titleRu : item.titleEn}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{(item.stops || []).length} {t("остановок", "stops")}</p>
+                  </div>
+                </div>
+                <Button type="button" variant="ghost" size="icon" className="text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); setItems(items.filter((x: any) => x.id !== item.id)); }}><Trash2 className="h-3.5 w-3.5" /></Button>
               </div>
-              <Button type="button" variant="ghost" size="icon" className="text-destructive shrink-0" onClick={() => setItems(items.filter((x: any) => x.id !== item.id))}><Trash2 className="h-3.5 w-3.5" /></Button>
+              {expandedDay === item.id && (
+                <div className="border-t px-3 pb-3 pt-2 space-y-3 bg-muted/20">
+                  {(item.stops || []).map((stop: any, idx: number) => (
+                    <div key={stop.id} className="flex items-start gap-2 p-2 border rounded bg-background">
+                      <MapPin className="h-3.5 w-3.5 mt-0.5 text-primary shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium">{idx + 1}. {lang === "ru" ? stop.titleRu : stop.titleEn}</p>
+                        {stop.durationMinutes && <p className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" />{stop.durationMinutes} {t("мин.", "min.")}</p>}
+                      </div>
+                      <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => removeStop(item.id, stop.id)}><Trash2 className="h-3 w-3" /></Button>
+                    </div>
+                  ))}
+                  <div className="border rounded p-3 space-y-2 bg-muted/30">
+                    <p className="text-xs font-semibold">{t("Добавить остановку", "Add Stop")}</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input placeholder={t("Название (RU)", "Title (RU)")} value={stopForm.titleRu} onChange={e => setStopForm(p => ({ ...p, titleRu: e.target.value }))} className="h-8 text-xs" />
+                      <Input placeholder={t("Название (EN)", "Title (EN)")} value={stopForm.titleEn} onChange={e => setStopForm(p => ({ ...p, titleEn: e.target.value }))} className="h-8 text-xs" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input placeholder={t("Описание (RU)", "Desc (RU)")} value={stopForm.descriptionRu} onChange={e => setStopForm(p => ({ ...p, descriptionRu: e.target.value }))} className="h-8 text-xs" />
+                      <Input placeholder={t("Описание (EN)", "Desc (EN)")} value={stopForm.descriptionEn} onChange={e => setStopForm(p => ({ ...p, descriptionEn: e.target.value }))} className="h-8 text-xs" />
+                    </div>
+                    <div className="flex gap-2 items-end">
+                      <Input type="number" placeholder={t("Минут", "Minutes")} value={stopForm.durationMinutes} onChange={e => setStopForm(p => ({ ...p, durationMinutes: e.target.value }))} className="h-8 text-xs w-24" min={1} />
+                      <Button type="button" size="sm" className="h-8 text-xs" onClick={() => addStop(item.id)}>{t("Добавить", "Add")}</Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -556,6 +614,8 @@ function ItineraryManager({ tourId }: { tourId: string }) {
   const { data: items = [], isLoading } = useQuery<any[]>({ queryKey: [`/api/tours/${tourId}/itinerary`] });
   const [form, setForm] = useState({ dayNumber: 1, titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationHours: null as number | null });
   const [editing, setEditing] = useState<any>(null);
+  const [expandedDay, setExpandedDay] = useState<string | null>(null);
+  const [stopForm, setStopForm] = useState({ titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationMinutes: "" as any });
 
   const addMutation = useMutation({
     mutationFn: (d: any) => apiRequest("POST", `/api/tours/${tourId}/itinerary`, d),
@@ -567,6 +627,14 @@ function ItineraryManager({ tourId }: { tourId: string }) {
   });
   const delMutation = useMutation({
     mutationFn: (id: string) => apiRequest("DELETE", `/api/itinerary/${id}`, {}),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/itinerary`] }),
+  });
+  const addStopMutation = useMutation({
+    mutationFn: (d: any) => apiRequest("POST", `/api/itinerary/${d.dayId}/stops`, d),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/itinerary`] }); setStopForm({ titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationMinutes: "" }); toast({ title: t("Остановка добавлена", "Stop added") }); },
+  });
+  const delStopMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/itinerary-stops/${id}`, {}),
     onSuccess: () => qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/itinerary`] }),
   });
 
@@ -619,16 +687,55 @@ function ItineraryManager({ tourId }: { tourId: string }) {
       ) : (
         <div className="space-y-2">
           {items.map((item: any) => (
-            <div key={item.id} className="flex items-start justify-between p-3 border rounded-lg gap-3">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold">{t("День", "Day")} {item.dayNumber}: {lang === "ru" ? item.titleRu : item.titleEn}</p>
-                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{lang === "ru" ? item.descriptionRu : item.descriptionEn}</p>
-                {item.durationHours && <p className="text-xs text-muted-foreground">{item.durationHours} {t("ч.", "hrs.")}</p>}
+            <div key={item.id} className="border rounded-lg overflow-hidden">
+              <div className="flex items-start justify-between p-3 gap-3 cursor-pointer" onClick={() => setExpandedDay(expandedDay === item.id ? null : item.id)}>
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  {expandedDay === item.id ? <ChevronDown className="h-4 w-4 shrink-0" /> : <ChevronRight className="h-4 w-4 shrink-0" />}
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold">{t("День", "Day")} {item.dayNumber}: {lang === "ru" ? item.titleRu : item.titleEn}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {(item.stops || []).length} {t("остановок", "stops")}
+                      {item.durationHours ? ` · ${item.durationHours} ${t("ч.", "hrs.")}` : ""}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-1 shrink-0">
+                  <Button type="button" variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setEditing(item); }}><Edit className="h-3.5 w-3.5" /></Button>
+                  <Button type="button" variant="ghost" size="icon" className="text-destructive" onClick={(e) => { e.stopPropagation(); delMutation.mutate(item.id); }}><Trash2 className="h-3.5 w-3.5" /></Button>
+                </div>
               </div>
-              <div className="flex gap-1 shrink-0">
-                <Button type="button" variant="ghost" size="icon" onClick={() => setEditing(item)}><Edit className="h-3.5 w-3.5" /></Button>
-                <Button type="button" variant="ghost" size="icon" className="text-destructive" onClick={() => delMutation.mutate(item.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
-              </div>
+              {expandedDay === item.id && (
+                <div className="border-t px-3 pb-3 pt-2 space-y-3 bg-muted/20">
+                  {(item.stops || []).map((stop: any, idx: number) => (
+                    <div key={stop.id} className="flex items-start gap-2 p-2 border rounded bg-background">
+                      <MapPin className="h-3.5 w-3.5 mt-0.5 text-primary shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium">{idx + 1}. {lang === "ru" ? stop.titleRu : stop.titleEn}</p>
+                        {(lang === "ru" ? stop.descriptionRu : stop.descriptionEn) && <p className="text-xs text-muted-foreground mt-0.5">{lang === "ru" ? stop.descriptionRu : stop.descriptionEn}</p>}
+                        {stop.durationMinutes && <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><Clock className="h-3 w-3" />{stop.durationMinutes} {t("мин.", "min.")}</p>}
+                      </div>
+                      <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => delStopMutation.mutate(stop.id)}><Trash2 className="h-3 w-3" /></Button>
+                    </div>
+                  ))}
+                  <div className="border rounded p-3 space-y-2 bg-muted/30">
+                    <p className="text-xs font-semibold">{t("Добавить остановку", "Add Stop")}</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input placeholder={t("Название (RU)", "Title (RU)")} value={stopForm.titleRu} onChange={e => setStopForm(p => ({ ...p, titleRu: e.target.value }))} className="h-8 text-xs" />
+                      <Input placeholder={t("Название (EN)", "Title (EN)")} value={stopForm.titleEn} onChange={e => setStopForm(p => ({ ...p, titleEn: e.target.value }))} className="h-8 text-xs" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input placeholder={t("Описание (RU)", "Desc (RU)")} value={stopForm.descriptionRu} onChange={e => setStopForm(p => ({ ...p, descriptionRu: e.target.value }))} className="h-8 text-xs" />
+                      <Input placeholder={t("Описание (EN)", "Desc (EN)")} value={stopForm.descriptionEn} onChange={e => setStopForm(p => ({ ...p, descriptionEn: e.target.value }))} className="h-8 text-xs" />
+                    </div>
+                    <div className="flex gap-2 items-end">
+                      <Input type="number" placeholder={t("Минут", "Minutes")} value={stopForm.durationMinutes} onChange={e => setStopForm(p => ({ ...p, durationMinutes: e.target.value }))} className="h-8 text-xs w-24" min={1} />
+                      <Button type="button" size="sm" className="h-8 text-xs" disabled={addStopMutation.isPending} onClick={() => addStopMutation.mutate({ dayId: item.id, titleRu: stopForm.titleRu, titleEn: stopForm.titleEn, descriptionRu: stopForm.descriptionRu, descriptionEn: stopForm.descriptionEn, durationMinutes: stopForm.durationMinutes ? Number(stopForm.durationMinutes) : null, stopOrder: (item.stops || []).length + 1 })}>
+                        {addStopMutation.isPending ? "..." : t("Добавить", "Add")}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

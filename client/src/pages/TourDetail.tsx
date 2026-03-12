@@ -238,20 +238,44 @@ export default function TourDetail() {
               {itinerary.length === 0 ? (
                 <p className="text-muted-foreground">{t("Программа не добавлена", "No itinerary available")}</p>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {itinerary.map((item: any) => (
-                    <div key={item.id} className="flex gap-4">
-                      <div className="shrink-0 w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
-                        {item.dayNumber}
-                      </div>
-                      <div>
-                        <h4 className="font-semibold">{lang === "ru" ? item.titleRu : item.titleEn}</h4>
-                        <p className="text-sm text-muted-foreground mt-1">{lang === "ru" ? item.descriptionRu : item.descriptionEn}</p>
-                        {item.durationHours && (
-                          <span className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                            <Clock className="h-3 w-3" /> {item.durationHours}h
-                          </span>
-                        )}
+                    <div key={item.id} className="relative">
+                      <div className="flex gap-4">
+                        <div className="shrink-0 w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                          {item.dayNumber}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{lang === "ru" ? item.titleRu : item.titleEn}</h4>
+                          {(lang === "ru" ? item.descriptionRu : item.descriptionEn) && (
+                            <p className="text-sm text-muted-foreground mt-1">{lang === "ru" ? item.descriptionRu : item.descriptionEn}</p>
+                          )}
+                          {item.durationHours && (
+                            <span className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                              <Clock className="h-3 w-3" /> {item.durationHours} {t("ч.", "hrs.")}
+                            </span>
+                          )}
+                          {item.stops && item.stops.length > 0 && (
+                            <div className="mt-3 ml-1 border-l-2 border-primary/20 pl-4 space-y-3">
+                              {item.stops.map((stop: any, idx: number) => (
+                                <div key={stop.id} className="relative">
+                                  <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-primary/40 border-2 border-background" />
+                                  <div>
+                                    <p className="text-sm font-medium">{idx + 1}. {lang === "ru" ? stop.titleRu : stop.titleEn}</p>
+                                    {(lang === "ru" ? stop.descriptionRu : stop.descriptionEn) && (
+                                      <p className="text-xs text-muted-foreground mt-0.5">{lang === "ru" ? stop.descriptionRu : stop.descriptionEn}</p>
+                                    )}
+                                    {stop.durationMinutes && (
+                                      <span className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                                        <Clock className="h-3 w-3" /> {stop.durationMinutes} {t("мин.", "min.")}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}

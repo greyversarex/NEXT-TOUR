@@ -348,16 +348,21 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   app.get("/api/tours/:id/full", async (req, res) => {
     const tour = await storage.getTour(req.params.id);
     if (!tour) return res.status(404).json({ message: "Tour not found" });
-    const [dates, priceComponents, options, itinerary, reviews, country, city, category] = await Promise.all([
+    const [dates, priceComponents, options, days, allStops, reviews, country, city, category] = await Promise.all([
       storage.getTourDates(req.params.id),
       storage.getTourPriceComponents(req.params.id),
       storage.getTourOptions(req.params.id),
       storage.getTourItinerary(req.params.id),
+      storage.getAllStopsForTour(req.params.id),
       storage.getReviews(req.params.id, "approved"),
       tour.countryId ? storage.getCountry(tour.countryId) : Promise.resolve(undefined),
       tour.cityId ? storage.getCity(tour.cityId) : Promise.resolve(undefined),
       tour.categoryId ? storage.getCategory(tour.categoryId) : Promise.resolve(undefined),
     ]);
+    const itinerary = days.map(day => ({
+      ...day,
+      stops: allStops.filter(s => s.itineraryDayId === day.id).sort((a, b) => a.stopOrder - b.stopOrder),
+    }));
     let isFavorite = false;
     if (req.user) {
       isFavorite = await storage.isFavorite((req.user as any).id, req.params.id);
@@ -424,7 +429,13 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   // Tour Itinerary
   app.get("/api/tours/:id/itinerary", async (req, res) => {
-    res.json(await storage.getTourItinerary(req.params.id));
+    const days = await storage.getTourItinerary(req.params.id);
+    const allStops = await storage.getAllStopsForTour(req.params.id);
+    const daysWithStops = days.map(day => ({
+      ...day,
+      stops: allStops.filter(s => s.itineraryDayId === day.id).sort((a, b) => a.stopOrder - b.stopOrder),
+    }));
+    res.json(daysWithStops);
   });
   app.post("/api/tours/:id/itinerary", requireAdmin, async (req, res) => {
     res.json(await storage.createItineraryItem({ ...req.body, tourId: req.params.id }));
@@ -434,6 +445,21 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
   app.delete("/api/itinerary/:id", requireAdmin, async (req, res) => {
     await storage.deleteItineraryItem(req.params.id);
+    res.json({ success: true });
+  });
+
+  // Itinerary Stops
+  app.get("/api/itinerary/:dayId/stops", async (req, res) => {
+    res.json(await storage.getItineraryStops(req.params.dayId));
+  });
+  app.post("/api/itinerary/:dayId/stops", requireAdmin, async (req, res) => {
+    res.json(await storage.createItineraryStop({ ...req.body, itineraryDayId: req.params.dayId }));
+  });
+  app.put("/api/itinerary-stops/:id", requireAdmin, async (req, res) => {
+    res.json(await storage.updateItineraryStop(req.params.id, req.body));
+  });
+  app.delete("/api/itinerary-stops/:id", requireAdmin, async (req, res) => {
+    await storage.deleteItineraryStop(req.params.id);
     res.json({ success: true });
   });
 
