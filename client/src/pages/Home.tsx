@@ -980,7 +980,6 @@ export default function Home() {
           <PromoBanner banners={banners} />
           <div className="py-2 sm:py-4 md:py-6" />
           <HotToursSection tours={hotTours} cardWidth={hotCardWidth} />
-          <WhyUsSection />
           <ReviewsSection />
         </>
       )}
