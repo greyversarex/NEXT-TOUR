@@ -706,7 +706,7 @@ function PromoBanner({ banners }: { banners: any[] }) {
   const banner = banners[0];
 
   const content = (src: string, titleEl: React.ReactNode, subtitleEl?: React.ReactNode, linkUrl = "/promotions") => (
-    <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-4 sm:py-8 mt-[0px] mb-[0px] pt-[77px] pb-[77px]">
+    <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-4 sm:py-8 pt-[77px] pb-[77px] mt-[-64px] mb-[-64px]">
       <Reveal y={16}>
         <div className="group relative rounded-2xl sm:rounded-3xl overflow-hidden h-48 sm:h-72 md:h-96 shadow-2xl hover:shadow-[0_32px_80px_rgba(0,0,0,0.28)] transition-shadow duration-500 cursor-pointer">
           <MediaDisplay src={src} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
