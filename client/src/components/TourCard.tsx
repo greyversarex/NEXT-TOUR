@@ -51,14 +51,15 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
   };
 
   return (
-    <Link href={`/tours/${tour.id}`}>
+    <Link href={`/tours/${tour.id}`} className="block h-full">
       <div
         className="group relative rounded-xl sm:rounded-2xl overflow-hidden bg-white dark:bg-card border border-transparent cursor-pointer
           shadow-[0_2px_12px_rgba(0,0,0,0.06)]
           hover:shadow-[0_24px_60px_-8px_rgba(0,0,0,0.25)]
           hover:-translate-y-1.5
           hover:border-primary/20
-          transition-all duration-500"
+          transition-all duration-500
+          flex flex-col h-full"
         data-testid={`card-tour-${tour.id}`}
       >
         <div className="absolute top-0 left-0 right-0 h-[2px] z-20 overflow-hidden rounded-t-xl sm:rounded-t-2xl">
@@ -106,7 +107,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
           </div>
         </div>
 
-        <div className="p-3 sm:p-4">
+        <div className="p-3 sm:p-4 flex flex-col flex-1">
           {locationLabel && (
             <div className="flex items-center gap-1 mb-1 overflow-hidden">
               <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0 text-primary/70" />
@@ -125,7 +126,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
             {description}
           </p>
 
-          <div className="flex items-center justify-between pt-2 sm:pt-3 mt-2 sm:mt-3 border-t border-border/50">
+          <div className="flex items-center justify-between pt-2 sm:pt-3 mt-auto border-t border-border/50">
             <div className="flex flex-col">
               <p className="text-[8px] sm:text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-0.5">
                 {t("от", "from")}

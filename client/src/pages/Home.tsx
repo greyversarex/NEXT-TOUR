@@ -481,7 +481,7 @@ function TourScrollFeed({ tours, cardWidth = "medium" }: { tours: Tour[]; cardWi
   return (
     <div className="relative group">
       <div ref={scrollRef} className="feed-scroll overflow-x-auto pb-2 sm:pb-3">
-        <div className="flex gap-3 sm:gap-5">
+        <div className="flex gap-3 sm:gap-5 items-stretch">
           {tours.map(tour => (
             <div key={tour.id} className="flex-shrink-0" style={{ width: `${px}px` }}>
               <TourCard tour={tour} />
