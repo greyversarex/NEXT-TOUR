@@ -1,4 +1,4 @@
-const CACHE_NAME = "nexttour-v1";
+const CACHE_NAME = "nexttour-v3";
 const STATIC_ASSETS = [
   "/",
   "/tours",

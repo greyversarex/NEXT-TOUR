@@ -430,6 +430,7 @@ function DatesManager({ tourId }: { tourId: string }) {
         </div>
         <div className="flex gap-2">
           <Button
+            type="button"
             size="sm"
             disabled={addMutation.isPending || editMutation.isPending}
             onClick={() => {
@@ -450,7 +451,7 @@ function DatesManager({ tourId }: { tourId: string }) {
           >
             {(addMutation.isPending || editMutation.isPending) ? t("Сохранение...", "Saving...") : editing ? t("Сохранить", "Save") : t("Добавить", "Add")}
           </Button>
-          {editing && <Button size="sm" variant="outline" onClick={() => setEditing(null)}>{t("Отмена", "Cancel")}</Button>}
+          {editing && <Button type="button" size="sm" variant="outline" onClick={() => setEditing(null)}>{t("Отмена", "Cancel")}</Button>}
         </div>
       </div>
       {isLoading ? <p className="text-sm text-muted-foreground">{t("Загрузка...", "Loading...")}</p> : dates.length === 0 ? (
@@ -464,8 +465,8 @@ function DatesManager({ tourId }: { tourId: string }) {
                 <p className="text-xs text-muted-foreground">{t("Мест:", "Spots:")} {d.maxPeople - d.bookedCount} / {d.maxPeople}</p>
               </div>
               <div className="flex gap-1">
-                <Button variant="ghost" size="icon" onClick={() => setEditing(d)}><Edit className="h-3.5 w-3.5" /></Button>
-                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => delMutation.mutate(d.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                <Button type="button" variant="ghost" size="icon" onClick={() => setEditing(d)}><Edit className="h-3.5 w-3.5" /></Button>
+                <Button type="button" variant="ghost" size="icon" className="text-destructive" onClick={() => delMutation.mutate(d.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
               </div>
             </div>
           ))}
@@ -518,10 +519,10 @@ function OptionsManager({ tourId }: { tourId: string }) {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button size="sm" onClick={() => editing ? editMutation.mutate(editing) : addMutation.mutate({ ...form, tourId })}>
+          <Button type="button" size="sm" onClick={() => editing ? editMutation.mutate(editing) : addMutation.mutate({ ...form, tourId })}>
             {editing ? t("Сохранить", "Save") : t("Добавить", "Add")}
           </Button>
-          {editing && <Button size="sm" variant="outline" onClick={() => setEditing(null)}>{t("Отмена", "Cancel")}</Button>}
+          {editing && <Button type="button" size="sm" variant="outline" onClick={() => setEditing(null)}>{t("Отмена", "Cancel")}</Button>}
         </div>
       </div>
       {isLoading ? <p className="text-sm text-muted-foreground">{t("Загрузка...", "Loading...")}</p> : options.length === 0 ? (
@@ -535,8 +536,8 @@ function OptionsManager({ tourId }: { tourId: string }) {
                 <p className="text-xs text-muted-foreground">+${Number(o.price).toFixed(0)}</p>
               </div>
               <div className="flex gap-1">
-                <Button variant="ghost" size="icon" onClick={() => setEditing(o)}><Edit className="h-3.5 w-3.5" /></Button>
-                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => delMutation.mutate(o.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                <Button type="button" variant="ghost" size="icon" onClick={() => setEditing(o)}><Edit className="h-3.5 w-3.5" /></Button>
+                <Button type="button" variant="ghost" size="icon" className="text-destructive" onClick={() => delMutation.mutate(o.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
               </div>
             </div>
           ))}
@@ -605,10 +606,10 @@ function ItineraryManager({ tourId }: { tourId: string }) {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button size="sm" onClick={() => editing ? editMutation.mutate(editing) : addMutation.mutate({ ...form, tourId })}>
+          <Button type="button" size="sm" onClick={() => editing ? editMutation.mutate(editing) : addMutation.mutate({ ...form, tourId })}>
             {editing ? t("Сохранить", "Save") : t("Добавить", "Add")}
           </Button>
-          {editing && <Button size="sm" variant="outline" onClick={() => setEditing(null)}>{t("Отмена", "Cancel")}</Button>}
+          {editing && <Button type="button" size="sm" variant="outline" onClick={() => setEditing(null)}>{t("Отмена", "Cancel")}</Button>}
         </div>
       </div>
       {isLoading ? <p className="text-sm text-muted-foreground">{t("Загрузка...", "Loading...")}</p> : items.length === 0 ? (
@@ -623,8 +624,8 @@ function ItineraryManager({ tourId }: { tourId: string }) {
                 {item.durationHours && <p className="text-xs text-muted-foreground">{item.durationHours} {t("ч.", "hrs.")}</p>}
               </div>
               <div className="flex gap-1 shrink-0">
-                <Button variant="ghost" size="icon" onClick={() => setEditing(item)}><Edit className="h-3.5 w-3.5" /></Button>
-                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => delMutation.mutate(item.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                <Button type="button" variant="ghost" size="icon" onClick={() => setEditing(item)}><Edit className="h-3.5 w-3.5" /></Button>
+                <Button type="button" variant="ghost" size="icon" className="text-destructive" onClick={() => delMutation.mutate(item.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
               </div>
             </div>
           ))}
