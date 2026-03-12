@@ -655,7 +655,7 @@ function DestinationsSection() {
   const destinations = countries;
 
   return (
-    <section className="py-6 sm:py-12 md:py-20 relative overflow-hidden text-[16px] mt-[-131px] mb-[-131px]">
+    <section className="py-6 sm:py-12 md:py-20 relative overflow-hidden text-[16px] mt-[-131px] mb-[-80px]">
       <div className="relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <Reveal className="text-center mb-6 sm:mb-10 md:mb-14">
           <p className="text-cyan-300 font-semibold text-xs sm:text-sm uppercase tracking-widest mb-1.5 sm:mb-3 flex items-center justify-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
@@ -706,7 +706,7 @@ function PromoBanner({ banners }: { banners: any[] }) {
   const banner = banners[0];
 
   const content = (src: string, titleEl: React.ReactNode, subtitleEl?: React.ReactNode, linkUrl = "/promotions") => (
-    <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-4 sm:py-8 pt-[77px] pb-[77px] mt-[-64px] mb-[-64px]">
+    <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-4 sm:py-8 pt-[77px] pb-[77px] mt-[-24px] mb-[-64px]">
       <Reveal y={16}>
         <div className="group relative rounded-2xl sm:rounded-3xl overflow-hidden h-48 sm:h-72 md:h-96 shadow-2xl hover:shadow-[0_32px_80px_rgba(0,0,0,0.28)] transition-shadow duration-500 cursor-pointer">
           <MediaDisplay src={src} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
