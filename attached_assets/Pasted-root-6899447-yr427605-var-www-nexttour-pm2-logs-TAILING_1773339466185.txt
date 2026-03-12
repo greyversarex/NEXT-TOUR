@@ -1,0 +1,52 @@
+root@6899447-yr427605:/var/www/nexttour# pm2 logs
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-03-12T18:14:16: PM2 error: Error: No matching pid found
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-12T18:14:16: PM2 error: Error [ERR_STREAM_DESTROYED]: Cannot call write after a stream was destroyed
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] exited with code [127] via signal [SIGINT]
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-12T18:14:16: PM2 error: Error [ERR_STREAM_DESTROYED]: Cannot call write after a stream was destroyed
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] exited with code [127] via signal [SIGINT]
+PM2        | 2026-03-12T18:14:16: PM2 log: Script /usr/bin/bash had too many unstable restarts (16). Stopped. "errored"
+PM2        | 2026-03-12T18:14:16: PM2 error: Error [ERR_STREAM_DESTROYED]: Cannot call write after a stream was destroyed
+PM2        | 2026-03-12T18:16:21: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-03-12T18:16:21: PM2 error: app=nexttour id=0 does not have a pid
+PM2        | 2026-03-12T18:16:21: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-12T18:16:21: PM2 log: App [nexttour:0] online
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:81:15231
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:141:37949
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:319:24858
+0|nexttour | Internal Server Error: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:81:15231
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:141:37949
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:319:20279
+0|nexttour | Internal Server Error: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:81:15231
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:141:37949
+0|nexttour |     at async Ky.getFeaturedReviews (/var/www/nexttour/dist/index.cjs:319:7267)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:319:26198
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+0|nexttour | 6:16:23 PM [express] serving on port 3000
+0|nexttour | 6:16:40 PM [express] GET /api/auth/providers 304 in 5ms :: {"google":false,"facebook":false,"mailru":false}
+0|nexttour | 6:16:40 PM [express] GET /api/intro-screen 500 in 10ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 6:16:40 PM [express] GET /api/hero-slides 500 in 28ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 6:16:40 PM [express] GET /api/countries 500 in 28ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 6:16:40 PM [express] GET /api/tour-feeds 500 in 26ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 6:16:40 PM [express] GET /api/cities 500 in 25ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 6:16:40 PM [express] GET /api/tours 500 in 23ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 6:16:40 PM [express] GET /api/auth/me 401 in 2ms :: {"message":"Not authenticated"}
+0|nexttour | 6:16:40 PM [express] GET /api/banners 500 in 21ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 6:16:40 PM [express] GET /api/countries 500 in 19ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 6:16:40 PM [express] GET /api/reviews/featured 500 in 13ms :: {"message":"SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"}
+0|nexttour | 6:17:00 PM [express] POST /api/auth/login 500 in 7ms :: {"message":"Authentication error"}
