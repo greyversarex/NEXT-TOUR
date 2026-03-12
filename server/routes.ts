@@ -43,7 +43,11 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     secret: process.env.SESSION_SECRET || "travel-platform-secret-key-2024",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 30 * 24 * 60 * 60 * 1000 },
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "lax" : false,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    },
   }));
 
   app.use(passport.initialize());

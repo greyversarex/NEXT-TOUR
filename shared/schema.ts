@@ -244,7 +244,10 @@ export const insertCountrySchema = createInsertSchema(countries).omit({ id: true
 export const insertCitySchema = createInsertSchema(cities).omit({ id: true });
 export const insertCategorySchema = createInsertSchema(categories).omit({ id: true });
 export const insertTourSchema = createInsertSchema(tours).omit({ id: true, createdAt: true });
-export const insertTourDateSchema = createInsertSchema(tourDates).omit({ id: true });
+export const insertTourDateSchema = createInsertSchema(tourDates).omit({ id: true }).extend({
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+});
 export const insertPriceComponentSchema = createInsertSchema(priceComponents).omit({ id: true });
 export const insertTourPriceComponentSchema = createInsertSchema(tourPriceComponents).omit({ id: true });
 export const insertTourOptionSchema = createInsertSchema(tourOptions).omit({ id: true });

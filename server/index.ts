@@ -8,6 +8,9 @@ import path from "path";
 const app = express();
 const httpServer = createServer(app);
 
+// Trust reverse proxy (Nginx) — required for correct IP, protocol, and session cookie behaviour
+app.set("trust proxy", 1);
+
 // Persistent uploads directory — outside of dist/ so files survive npm run build
 const uploadsDir = path.join(process.cwd(), "uploads");
 fs.mkdirSync(uploadsDir, { recursive: true });
@@ -21,6 +24,7 @@ declare module "http" {
 
 app.use(
   express.json({
+    limit: "50mb",
     verify: (req, _res, buf) => {
       req.rawBody = buf;
     },
