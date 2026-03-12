@@ -655,7 +655,7 @@ function DestinationsSection() {
   const destinations = countries;
 
   return (
-    <section className="py-6 sm:py-12 md:py-20 relative overflow-hidden">
+    <section className="py-6 sm:py-12 md:py-20 relative overflow-hidden text-[16px] mt-[-131px] mb-[-131px]">
       <div className="relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <Reveal className="text-center mb-6 sm:mb-10 md:mb-14">
           <p className="text-cyan-300 font-semibold text-xs sm:text-sm uppercase tracking-widest mb-1.5 sm:mb-3 flex items-center justify-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
