@@ -1,15 +1,9 @@
 import { useI18n } from "@/lib/i18n";
-import { MapPin, Phone, Mail, Clock, Award, Users, Globe, Heart, Shield, Plane, Star, Headphones } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Award, Shield, Plane, Star, Headphones } from "lucide-react";
 
 export default function About() {
   const { t } = useI18n();
 
-  const stats = [
-    { icon: Globe, value: "30+", label: t("Стран", "Countries") },
-    { icon: Users, value: "5,000+", label: t("Довольных клиентов", "Happy Clients") },
-    { icon: Award, value: "8", label: t("Лет опыта", "Years of Experience") },
-    { icon: Heart, value: "97%", label: t("Рекомендуют нас", "Recommend Us") },
-  ];
 
   const values = [
     {
@@ -63,17 +57,6 @@ export default function About() {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
        <div className="bg-white/90 dark:bg-card/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-xl border border-white/30">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
-          {stats.map(({ icon: Icon, value, label }) => (
-            <div key={label} className="bg-card border border-card-border rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center hover-elevate transition-all duration-300 hover:-translate-y-1">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-2 sm:mb-3">
-                <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-              </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-primary">{value}</div>
-              <div className="text-xs sm:text-sm text-muted-foreground mt-1">{label}</div>
-            </div>
-          ))}
-        </div>
 
         <div className="grid md:grid-cols-2 gap-8 sm:gap-10 mb-12 sm:mb-16">
           <div>
