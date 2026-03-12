@@ -1,0 +1,39 @@
+root@6899447-yr427605:/var/www/nexttour# pm2 logs
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-03-12T18:16:21: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-12T18:16:21: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-12T18:23:11: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-03-12T18:23:12: PM2 log: pid=78108 msg=failed to kill - retrying in 100ms
+PM2        | 2026-03-12T18:23:12: PM2 log: pid=78108 msg=failed to kill - retrying in 100ms
+PM2        | 2026-03-12T18:23:12: PM2 log: pid=78108 msg=failed to kill - retrying in 100ms
+PM2        | 2026-03-12T18:23:12: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-03-12T18:23:12: PM2 log: pid=78108 msg=process killed
+PM2        | 2026-03-12T18:23:12: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-12T18:23:12: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-12T18:24:58: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-03-12T18:24:58: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-03-12T18:24:58: PM2 log: pid=78329 msg=process killed
+PM2        | 2026-03-12T18:24:59: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-12T18:24:59: PM2 log: App [nexttour:0] online
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:81:15231
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:141:37949
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:319:24858
+0|nexttour | Internal Server Error: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:81:15231
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:141:37949
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:319:20279
+0|nexttour | Internal Server Error: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:81:15231
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:141:37949
+0|nexttour |     at async Ky.getFeaturedReviews (/var/www/nexttour/dist/index.cjs:319:7267)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:319:26198
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | � сезон в Японии: сакура 2024","titleEn":"New Season in Japan: Cherry Blossom 2024","contentRu":"Весенний сезон в Японии — это время цветения сакуры, одного из самых завораживающих природных явлений в мире. В 2024 году прогнозируется особенно красивое цветение. Лучшие места для наблюдения: парк Уэно в Токио, Философская тропа в Киото, замок Химэдзи.","contentEn":"Spring season in Japan is cherry blossom time, one of the most mesmerizing natural phenomena in the world. 2024 forecasts particularly beautiful blooming. Best viewing spots: Ueno Park in Tokyo, Philosopher's Path in Kyoto, Himeji Castle.","imageUrl":"/images/tour-tokyo.png","isPublished":true,"publishedAt":"2026-03-06T18:01:35.404Z"}]
+0|nexttour | 6:30:25 PM [express] GET /api/reviews 200 in 12ms :: [{"id":"c7f8b768-cf71-48d5-87b8-254b70d495f9","userId":"55906ec1-a840-4bcb-9310-e84758d68c6c","tourId":"d2f38f0f-7472-4ff5-8734-7ba754bb1ba3","rating":5,"textRu":"Потрясающее путешествие! Санторини — это сказка. Всё было организовано на высшем уровне, гид был замечательным. Рекомендую всем!","textEn":"Amazing trip! Santorini is a fairy tale. Everything was organized at the highest level, the guide was wonderful. I recommend it to everyone!","status":"approved","inFeaturedFeed":true,"createdAt":"2026-03-06T18:01:35.407Z","user":{"id":"55906ec1-a840-4bcb-9310-e84758d68c6c","name":"Иван Петров","avatar":null}},{"id":"9ffa74f2-c9dc-4259-8c7d-6bfa11b7529a","userId":"55906ec1-a840-4bcb-9310-e84758d68c6c","tourId":"0af41af7-b393-40f3-89f8-fda40717aa84","rating":5,"textRu":"Бали превзошёл все ожидания! Природа, культура, еда — всё на 10 из 10. TravelPro — лучшее агентство!","textEn":"Bali exceeded all expectations! Nature, culture, food — all 10 out of 10. TravelPro is the best agency!","status":"rejected","inFeaturedFeed":true,"createdAt":"2026-03-06T18:01:35.407Z","user":{"id":"55906ec1-a840-4bcb-9310-e84758d68c6c","name":"Иван Петров","avatar":null}},{"id":"cde0ee23-bc5c-48f1-820b-af25483eefce","userId":"55906ec1-a840-4bcb-9310-e84758d68c6c","tourId":"16724083-8f58-45b2-acbf-10d7a48b6b10","rating":4,"textRu":"Великолепная Швейцария! Горы, озёра, шоколад — что ещё нужно для счастья? Отличная организация тура.","textEn":"Magnificent Switzerland! Mountains, lakes, chocolate — what else does happiness need? Excellent tour organization.","status":"rejected","inFeaturedFeed":true,"createdAt":"2026-03-06T18:01:35.407Z","user":{"id":"55906ec1-a840-4bcb-9310-e84758d68c6c","name":"Иван Петров","avatar":null}}]
