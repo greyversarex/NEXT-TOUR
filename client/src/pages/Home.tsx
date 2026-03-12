@@ -133,7 +133,7 @@ function CinematicHero() {
   const slideSubtitle = slide ? (lang === "ru" ? slide.subtitleRu : slide.subtitleEn) : null;
 
   return (
-    <section className="relative w-full h-[100svh] min-h-[640px] max-h-[960px] overflow-hidden">
+    <section className="relative w-full h-[70svh] sm:h-[85svh] md:h-[100svh] min-h-[420px] sm:min-h-[520px] md:min-h-[640px] max-h-[960px] overflow-hidden">
       {/* Background images with Ken Burns zoom */}
       {heroImages.map((src, i) => (
         <div
@@ -170,13 +170,13 @@ function CinematicHero() {
           </div>
 
           <h1
-            className="hero-fade-in-up-2 text-5xl sm:text-6xl md:text-7xl font-extrabold leading-[1.05] mb-5 tracking-tight"
+            className="hero-fade-in-up-2 text-3xl sm:text-5xl md:text-7xl font-extrabold leading-[1.05] mb-3 sm:mb-5 tracking-tight"
             style={{ textShadow: "0 4px 32px rgba(0,0,0,0.5), 0 1px 0 rgba(0,0,0,0.3)" }}
           >
             {slideTitle || t("Мир ждёт тебя", "The World Awaits")}
           </h1>
 
-          <p className="hero-fade-in-up-3 text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed font-light">
+          <p className="hero-fade-in-up-3 text-sm sm:text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed font-light px-2">
             {slideSubtitle || t(
               "Незабываемые путешествия по всему миру. Премиальный сервис, лучшие цены, идеальные воспоминания.",
               "Unforgettable journeys worldwide. Premium service, best prices, perfect memories."
@@ -457,22 +457,31 @@ function SearchSection() {
   );
 }
 
-const CARD_WIDTHS: Record<string, number> = { small: 280, medium: 340, large: 420 };
+const CARD_WIDTHS: Record<string, number> = { small: 220, medium: 260, large: 320 };
+const CARD_WIDTHS_MD: Record<string, number> = { small: 280, medium: 340, large: 420 };
 
 function TourScrollFeed({ tours, cardWidth = "medium" }: { tours: Tour[]; cardWidth?: string }) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const px = CARD_WIDTHS[cardWidth] ?? 272;
+  const [isMd, setIsMd] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    setIsMd(mq.matches);
+    const h = (e: MediaQueryListEvent) => setIsMd(e.matches);
+    mq.addEventListener("change", h);
+    return () => mq.removeEventListener("change", h);
+  }, []);
+  const px = isMd ? (CARD_WIDTHS_MD[cardWidth] ?? 340) : (CARD_WIDTHS[cardWidth] ?? 260);
 
   const scroll = (dir: "left" | "right") => {
     const el = scrollRef.current;
     if (!el) return;
-    el.scrollBy({ left: dir === "left" ? -(px * 2 + 20) : (px * 2 + 20), behavior: "smooth" });
+    el.scrollBy({ left: dir === "left" ? -(px * 2 + 16) : (px * 2 + 16), behavior: "smooth" });
   };
 
   return (
     <div className="relative group">
-      <div ref={scrollRef} className="feed-scroll overflow-x-auto pb-3">
-        <div className="flex gap-5">
+      <div ref={scrollRef} className="feed-scroll overflow-x-auto pb-2 sm:pb-3">
+        <div className="flex gap-3 sm:gap-5">
           {tours.map(tour => (
             <div key={tour.id} className="flex-shrink-0" style={{ width: `${px}px` }}>
               <TourCard tour={tour} />
@@ -506,14 +515,14 @@ function PopularToursSection({ tours, cardWidth }: { tours: Tour[]; cardWidth?: 
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
-    <section className="pt-14 pb-12 md:pt-28 md:pb-24 relative overflow-hidden">
+    <section className="pt-8 pb-6 sm:pt-14 sm:pb-12 md:pt-24 md:pb-20 relative overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Reveal className="flex items-end justify-between mb-8 md:mb-14">
+        <Reveal className="flex items-end justify-between mb-5 sm:mb-8 md:mb-12">
           <div>
-            <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
-              <TrendingUp className="h-3.5 w-3.5" /> {t("Лучшие предложения", "Top Offers")}
+            <p className="text-cyan-300 font-semibold text-xs sm:text-sm uppercase tracking-widest mb-1.5 sm:mb-3 flex items-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
+              <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> {t("Лучшие предложения", "Top Offers")}
             </p>
-            <h2 className="text-2xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Популярные туры", "Popular Tours")}</h2>
+            <h2 className="text-xl sm:text-2xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Популярные туры", "Popular Tours")}</h2>
           </div>
           <Link href="/tours">
             <Button className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm hover:-translate-y-0.5 transition-all duration-200 shadow-lg">
@@ -538,14 +547,14 @@ function HotToursSection({ tours, cardWidth }: { tours: Tour[]; cardWidth?: stri
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
-    <section className="py-12 md:py-24 relative overflow-hidden">
+    <section className="py-6 sm:py-12 md:py-20 relative overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Reveal className="flex items-end justify-between mb-8 md:mb-14">
+        <Reveal className="flex items-end justify-between mb-5 sm:mb-8 md:mb-12">
           <div>
-            <p className="text-orange-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
-              <Flame className="h-4 w-4" /> {t("Акции", "Special Deals")}
+            <p className="text-orange-300 font-semibold text-xs sm:text-sm uppercase tracking-widest mb-1.5 sm:mb-3 flex items-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
+              <Flame className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> {t("Акции", "Special Deals")}
             </p>
-            <h2 className="text-2xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Горящие туры", "Hot Deals")}</h2>
+            <h2 className="text-xl sm:text-2xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Горящие туры", "Hot Deals")}</h2>
           </div>
           <Link href="/promotions">
             <Button className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm hover:-translate-y-0.5 transition-all duration-200 shadow-lg">
@@ -614,10 +623,10 @@ function DestinationCard({ dest, lang, aspectClass = "aspect-[8/9]" }: {
           </div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-5 z-10 translate-y-1 group-hover:translate-y-0 transition-transform duration-400 ease-out">
+        <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 z-10 translate-y-1 group-hover:translate-y-0 transition-transform duration-400 ease-out">
           <h3
-            className="text-white font-extrabold leading-tight mb-2.5"
-            style={{ fontSize: "clamp(1.25rem, 3vw, 1.75rem)", textShadow: "0 2px 16px rgba(0,0,0,0.5)" }}
+            className="text-white font-extrabold leading-tight mb-1 sm:mb-2.5 text-sm sm:text-lg md:text-xl"
+            style={{ textShadow: "0 2px 16px rgba(0,0,0,0.5)" }}
           >
             {name}
           </h3>
@@ -646,30 +655,30 @@ function DestinationsSection() {
   const destinations = countries;
 
   return (
-    <section className="py-12 md:py-24 relative overflow-hidden">
+    <section className="py-6 sm:py-12 md:py-20 relative overflow-hidden">
       <div className="relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <Reveal className="text-center mb-10 md:mb-16">
-          <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
-            <MapPin className="h-3.5 w-3.5" /> {t("Исследуйте", "Explore")}
+        <Reveal className="text-center mb-6 sm:mb-10 md:mb-14">
+          <p className="text-cyan-300 font-semibold text-xs sm:text-sm uppercase tracking-widest mb-1.5 sm:mb-3 flex items-center justify-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
+            <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> {t("Исследуйте", "Explore")}
           </p>
-          <h2 className="text-2xl md:text-5xl font-bold mb-4 leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Направления мечты", "Dream Destinations")}</h2>
-          <p className="text-white/70 max-w-xl mx-auto text-sm md:text-base leading-relaxed" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.4)" }}>
+          <h2 className="text-xl sm:text-2xl md:text-5xl font-bold mb-2 sm:mb-4 leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Направления мечты", "Dream Destinations")}</h2>
+          <p className="text-white/70 max-w-xl mx-auto text-xs sm:text-sm md:text-base leading-relaxed px-2" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.4)" }}>
             {t("Откройте для себя самые красивые уголки планеты с нашими эксклюзивными турами", "Discover the most beautiful corners of the planet with our exclusive tours")}
           </p>
         </Reveal>
 
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 md:gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className={`rounded-2xl ${i === 0 ? "col-span-2 aspect-[16/9]" : i === 5 ? "col-span-2 md:col-span-3 aspect-[21/9]" : "aspect-[8/9]"}`} />
+              <Skeleton key={i} className={`rounded-xl sm:rounded-2xl ${i === 0 ? "col-span-2 aspect-[16/9]" : i === 5 ? "col-span-2 md:col-span-3 aspect-[21/9]" : "aspect-[4/5] sm:aspect-[8/9]"}`} />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 md:gap-6">
             {destinations.map((dest, i) => {
               const size = (dest as any).cardSize || "normal";
               let wrapClass = "";
-              let aspect = "aspect-[8/9]";
+              let aspect = "aspect-[4/5] sm:aspect-[8/9]";
 
               if (size === "wide") {
                 wrapClass = "col-span-2";
@@ -697,9 +706,9 @@ function PromoBanner({ banners }: { banners: any[] }) {
   const banner = banners[0];
 
   const content = (src: string, titleEl: React.ReactNode, subtitleEl?: React.ReactNode, linkUrl = "/promotions") => (
-    <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-8">
+    <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-4 sm:py-8">
       <Reveal y={16}>
-        <div className="group relative rounded-3xl overflow-hidden h-72 md:h-96 shadow-2xl hover:shadow-[0_32px_80px_rgba(0,0,0,0.28)] transition-shadow duration-500 cursor-pointer">
+        <div className="group relative rounded-2xl sm:rounded-3xl overflow-hidden h-48 sm:h-72 md:h-96 shadow-2xl hover:shadow-[0_32px_80px_rgba(0,0,0,0.28)] transition-shadow duration-500 cursor-pointer">
           <MediaDisplay src={src} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
@@ -707,12 +716,12 @@ function PromoBanner({ banners }: { banners: any[] }) {
           {/* Decorative accent line */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-cyan-400 to-primary/0" />
 
-          <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between px-6 md:px-16 py-8 md:py-12 gap-5">
+          <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between px-4 sm:px-6 md:px-16 py-5 sm:py-8 md:py-12 gap-3 sm:gap-5">
             <div className="text-white text-center md:text-left">
-              <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 mb-4 text-xs tracking-widest uppercase px-4 py-1.5">
+              <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 mb-2 sm:mb-4 text-[10px] sm:text-xs tracking-widest uppercase px-3 py-1 sm:px-4 sm:py-1.5">
                 🔥 {t("Специальное предложение", "Special Offer")}
               </Badge>
-              <h3 className="text-2xl md:text-5xl font-extrabold mb-2 leading-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+              <h3 className="text-lg sm:text-2xl md:text-5xl font-extrabold mb-1 sm:mb-2 leading-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
                 {titleEl}
               </h3>
               {subtitleEl && (
@@ -771,59 +780,53 @@ function ReviewsSection() {
   const rev = reviews[idx];
 
   return (
-    <section className="py-12 md:py-24 relative overflow-hidden">
-
+    <section className="py-6 sm:py-12 md:py-20 relative overflow-hidden">
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Reveal className="text-center mb-10 md:mb-16">
-          <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
-            <ThumbsUp className="h-3.5 w-3.5" /> {t("Отзывы", "Testimonials")}
+        <Reveal className="text-center mb-6 sm:mb-10 md:mb-14">
+          <p className="text-cyan-300 font-semibold text-xs sm:text-sm uppercase tracking-widest mb-1.5 sm:mb-3 flex items-center justify-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
+            <ThumbsUp className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> {t("Отзывы", "Testimonials")}
           </p>
-          <h2 className="text-2xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Что говорят наши клиенты", "What Our Clients Say")}</h2>
+          <h2 className="text-xl sm:text-2xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Что говорят наши клиенты", "What Our Clients Say")}</h2>
         </Reveal>
 
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-2xl md:max-w-3xl mx-auto">
           <div className={`transition-all duration-200 ${animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}>
             <div
-              className="bg-white dark:bg-card rounded-3xl p-7 md:p-14 relative"
+              className="bg-white dark:bg-card rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-12 relative"
               style={{ boxShadow: "0 12px 60px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.9) inset" }}
             >
-              {/* Large decorative quote */}
-              <div className="absolute top-6 left-8 opacity-[0.07]">
-                <Quote className="h-20 w-20 text-primary fill-primary" />
+              <div className="absolute top-4 left-5 sm:top-6 sm:left-8 opacity-[0.07]">
+                <Quote className="h-12 w-12 sm:h-20 sm:w-20 text-primary fill-primary" />
               </div>
 
-              {/* Stars */}
-              <div className="flex justify-center gap-1 mb-7">
+              <div className="flex justify-center gap-0.5 sm:gap-1 mb-4 sm:mb-6">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
-                    className={`h-5 w-5 transition-colors ${i < rev.rating ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
+                    className={`h-4 w-4 sm:h-5 sm:w-5 transition-colors ${i < rev.rating ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
                     style={{ filter: i < rev.rating ? "drop-shadow(0 1px 4px rgba(251,191,36,0.4))" : undefined }}
                   />
                 ))}
               </div>
 
-              {/* Quote text */}
-              <blockquote className="text-lg md:text-2xl text-foreground/80 italic text-center leading-relaxed mb-10 font-light relative z-10">
+              <blockquote className="text-sm sm:text-lg md:text-xl text-foreground/80 italic text-center leading-relaxed mb-6 sm:mb-8 font-light relative z-10">
                 "{lang === "ru" ? rev.textRu : (rev.textEn || rev.textRu)}"
               </blockquote>
 
-              {/* Divider */}
-              <div className="w-16 h-px bg-gradient-to-r from-transparent via-border to-transparent mx-auto mb-8" />
+              <div className="w-12 sm:w-16 h-px bg-gradient-to-r from-transparent via-border to-transparent mx-auto mb-5 sm:mb-7" />
 
-              {/* Author */}
-              <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center justify-center gap-3 sm:gap-4">
                 <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-lg"
                   style={{ background: "linear-gradient(135deg, hsl(210 85% 45%), hsl(200 90% 55%))" }}
                 >
                   {rev.user?.name?.[0] || "?"}
                 </div>
                 <div className="text-left">
-                  <div className="font-bold text-foreground text-base">{rev.user?.name}</div>
-                  <div className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
+                  <div className="font-bold text-foreground text-sm sm:text-base">{rev.user?.name}</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground mt-0.5 flex items-center gap-1">
+                    <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                     {lang === "ru" ? rev.tour?.titleRu : rev.tour?.titleEn}
                   </div>
                 </div>
@@ -904,33 +907,32 @@ function WhyUsSection() {
   ];
 
   return (
-    <section className="py-12 md:py-24 relative overflow-hidden">
-
+    <section className="py-6 sm:py-12 md:py-20 relative overflow-hidden">
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Reveal className="text-center mb-10 md:mb-16">
-          <p className="text-cyan-300 font-semibold text-sm uppercase tracking-widest mb-3" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>{t("Наши преимущества", "Our Advantages")}</p>
-          <h2 className="text-2xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Почему выбирают нас", "Why Choose Us")}</h2>
+        <Reveal className="text-center mb-6 sm:mb-10 md:mb-14">
+          <p className="text-cyan-300 font-semibold text-xs sm:text-sm uppercase tracking-widest mb-1.5 sm:mb-3" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>{t("Наши преимущества", "Our Advantages")}</p>
+          <h2 className="text-xl sm:text-2xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Почему выбирают нас", "Why Choose Us")}</h2>
         </Reveal>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 md:gap-7">
           {items.map((item, i) => (
             <Reveal key={i} delay={i * 100} y={20}>
               <div
                 className={`group bg-black/30 backdrop-blur-sm border border-white/20
-                  rounded-2xl p-8 text-center h-full
+                  rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 text-center h-full
                   shadow-[0_2px_16px_rgba(0,0,0,0.20)]
                   hover:shadow-[0_16px_48px_rgba(0,0,0,0.35)]
                   hover:bg-black/40 hover:border-white/30
-                  hover:-translate-y-2
+                  hover:-translate-y-1.5
                   transition-all duration-300 ease-out`}
               >
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${item.gradient} shadow-lg mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
-                  <item.Icon className="h-7 w-7 text-white" />
+                <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${item.gradient} shadow-lg mb-3 sm:mb-5 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                  <item.Icon className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-white" />
                 </div>
-                <h3 className="font-bold text-lg mb-3 text-white group-hover:text-cyan-200 transition-colors duration-200">
+                <h3 className="font-bold text-sm sm:text-base md:text-lg mb-1.5 sm:mb-2 text-white group-hover:text-cyan-200 transition-colors duration-200">
                   {t(item.titleRu, item.titleEn)}
                 </h3>
-                <p className="text-sm text-white/65 leading-relaxed">
+                <p className="text-xs sm:text-sm text-white/65 leading-relaxed">
                   {t(item.descRu, item.descEn)}
                 </p>
               </div>
@@ -973,12 +975,10 @@ export default function Home() {
       ) : (
         <>
           <PopularToursSection tours={popularTours} cardWidth={popularCardWidth} />
-          {/* Nature gap */}
-          <div className="py-8 md:py-12" />
+          <div className="py-2 sm:py-6 md:py-8" />
           <DestinationsSection />
           <PromoBanner banners={banners} />
-          {/* Nature gap */}
-          <div className="py-6 md:py-10" />
+          <div className="py-2 sm:py-4 md:py-6" />
           <HotToursSection tours={hotTours} cardWidth={hotCardWidth} />
           <WhyUsSection />
           <ReviewsSection />

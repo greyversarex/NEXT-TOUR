@@ -53,123 +53,106 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
   return (
     <Link href={`/tours/${tour.id}`}>
       <div
-        className="group relative rounded-2xl overflow-hidden bg-white dark:bg-card border border-transparent cursor-pointer
-          shadow-[0_2px_16px_rgba(0,0,0,0.07)]
-          hover:shadow-[0_32px_80px_-8px_rgba(0,0,0,0.30)]
-          hover:-translate-y-2.5
+        className="group relative rounded-xl sm:rounded-2xl overflow-hidden bg-white dark:bg-card border border-transparent cursor-pointer
+          shadow-[0_2px_12px_rgba(0,0,0,0.06)]
+          hover:shadow-[0_24px_60px_-8px_rgba(0,0,0,0.25)]
+          hover:-translate-y-1.5
           hover:border-primary/20
           transition-all duration-500"
         data-testid={`card-tour-${tour.id}`}
       >
-        {/* Top accent bar */}
-        <div className="absolute top-0 left-0 right-0 h-[3px] z-20 overflow-hidden rounded-t-2xl">
+        <div className="absolute top-0 left-0 right-0 h-[2px] z-20 overflow-hidden rounded-t-xl sm:rounded-t-2xl">
           <div className="h-full bg-gradient-to-r from-primary via-cyan-400 to-sky-300 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
         </div>
 
-        {/* ── IMAGE — fixed 180px height ── */}
-        <div className="relative h-[180px] overflow-hidden shrink-0">
+        <div className="relative h-[140px] sm:h-[160px] overflow-hidden shrink-0">
           <img
             src={tour.mainImage || "/images/hero-banner.png"}
             alt={title}
-            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.12]"
+            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-          <div
-            className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-600"
-            style={{ background: "linear-gradient(135deg, transparent 20%, rgba(255,255,255,0.07) 50%, transparent 80%)" }}
-          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-          {/* Badges top-left */}
-          <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-col gap-1 z-10">
             {tour.discountPercent > 0 && (
               <div
-                className="flex items-center gap-1 bg-gradient-to-r from-red-500 to-rose-600 text-white text-xs font-bold px-2.5 py-1 rounded-xl shadow-lg"
+                className="flex items-center gap-0.5 bg-gradient-to-r from-red-500 to-rose-600 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg shadow-md"
                 data-testid={`badge-discount-${tour.id}`}
               >
                 -{tour.discountPercent}%
               </div>
             )}
             {tour.isHot && (
-              <div className="flex items-center gap-1 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-xl shadow-lg">
+              <div className="flex items-center gap-0.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg shadow-md">
                 🔥 {t("Горящий", "Hot")}
               </div>
             )}
           </div>
 
-          {/* Favorite button top-right */}
           {user && (
             <button
               onClick={handleFavorite}
-              className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center
+              className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center
                 hover:bg-black/55 hover:scale-110 active:scale-95 transition-all duration-200"
               data-testid={`button-fav-${tour.id}`}
             >
-              <Heart className={`h-4 w-4 transition-colors ${favState ? "fill-red-400 text-red-400" : "text-white"}`} />
+              <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 transition-colors ${favState ? "fill-red-400 text-red-400" : "text-white"}`} />
             </button>
           )}
 
-          {/* Duration pill bottom-left */}
-          <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold rounded-full px-2.5 py-1">
-            <Clock className="h-3 w-3 opacity-80" />
+          <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 z-10 flex items-center gap-1 bg-black/40 backdrop-blur-sm text-white text-[10px] sm:text-xs font-semibold rounded-full px-2 py-0.5 sm:px-2.5 sm:py-1">
+            <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3 opacity-80" />
             {tour.duration} {t("дн.", "d.")}
           </div>
         </div>
 
-        {/* ── TEXT CONTENT — fixed layout ── */}
-        <div className="p-4">
+        <div className="p-3 sm:p-4">
+          {locationLabel && (
+            <div className="flex items-center gap-1 mb-1 overflow-hidden">
+              <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0 text-primary/70" />
+              <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{locationLabel}</span>
+            </div>
+          )}
 
-          {/* Location — 1 line, fixed height */}
-          <div className="h-5 flex items-center gap-1 mb-1.5 overflow-hidden">
-            {locationLabel ? (
-              <>
-                <MapPin className="h-3 w-3 shrink-0 text-primary/70" />
-                <span className="text-xs text-muted-foreground truncate">{locationLabel}</span>
-              </>
-            ) : null}
-          </div>
-
-          {/* Title — 2 lines, fixed height */}
           <h3
-            className="font-bold text-base leading-snug line-clamp-2 h-[2.75rem] mb-2 group-hover:text-primary transition-colors duration-200 overflow-hidden"
+            className="font-bold text-sm sm:text-base leading-snug line-clamp-2 mb-1 sm:mb-1.5 group-hover:text-primary transition-colors duration-200"
             data-testid={`text-tour-title-${tour.id}`}
           >
             {title}
           </h3>
 
-          {/* Description — 2 lines, fixed height */}
-          <p className="text-sm text-muted-foreground line-clamp-2 h-[2.5rem] leading-relaxed overflow-hidden">
+          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 leading-relaxed hidden sm:block">
             {description}
           </p>
 
-          {/* ── Price row — always at same position ── */}
-          <div className="flex items-center justify-between pt-3 mt-3 border-t border-border/50">
+          <div className="flex items-center justify-between pt-2 sm:pt-3 mt-2 sm:mt-3 border-t border-border/50">
             <div className="flex flex-col">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-0.5">
+              <p className="text-[8px] sm:text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-0.5">
                 {t("от", "from")}
               </p>
-              <div className="flex items-baseline gap-1.5">
+              <div className="flex items-baseline gap-1">
                 {tour.discountPercent > 0 && (
-                  <span className="text-sm text-muted-foreground/70 line-through font-medium">
+                  <span className="text-xs text-muted-foreground/70 line-through font-medium">
                     ${price.toFixed(0)}
                   </span>
                 )}
                 <span
-                  className="text-2xl font-extrabold leading-none bg-gradient-to-br from-primary to-cyan-500 bg-clip-text text-transparent"
+                  className="text-lg sm:text-xl font-extrabold leading-none bg-gradient-to-br from-primary to-cyan-500 bg-clip-text text-transparent"
                   data-testid={`text-tour-price-${tour.id}`}
                 >
                   ${discountedPrice.toFixed(0)}
                 </span>
-                <span className="text-xs text-muted-foreground font-medium">
+                <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">
                   / {t("чел.", "p.")}
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-primary/8 text-primary
+            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-primary/8 text-primary
               group-hover:bg-primary group-hover:text-white
               md:opacity-0 md:translate-x-1 md:group-hover:opacity-100 md:group-hover:translate-x-0
               transition-all duration-300">
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </div>
         </div>
