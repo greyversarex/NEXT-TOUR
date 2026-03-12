@@ -57,8 +57,9 @@ mkdir -p uploads
 ok "Директория uploads готова"
 
 step "Перезапуск сервера"
-pm2 restart nexttour || fail "pm2 restart"
-ok "Сервер перезапущен"
+pm2 startOrRestart ecosystem.config.js --env production || fail "pm2 startOrRestart"
+pm2 save
+ok "Сервер перезапущен (PORT=3000)"
 
 echo -e "\n${GREEN}══════════════════════════════════════"
 echo -e "  Деплой завершён успешно"

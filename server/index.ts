@@ -8,6 +8,13 @@ import path from "path";
 const app = express();
 const httpServer = createServer(app);
 
+process.on("unhandledRejection", (reason) => {
+  console.error("[unhandledRejection] Server kept alive:", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("[uncaughtException] Server kept alive:", err);
+});
+
 // Trust reverse proxy (Nginx) — required for correct IP, protocol, and session cookie behaviour
 app.set("trust proxy", 1);
 

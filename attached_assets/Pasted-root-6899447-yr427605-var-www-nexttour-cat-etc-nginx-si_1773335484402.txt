@@ -1,0 +1,58 @@
+root@6899447-yr427605:/var/www/nexttour# cat /etc/nginx/sites-available/nexttour
+server {
+    listen 80;
+    server_name 5.42.111.213;
+    client_max_body_size 200M;
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+    }
+}
+root@6899447-yr427605:/var/www/nexttour# pm2 show nexttour | grep -E "port|PORT|exec path|script"
+│ script path       │ /usr/bin/bash                      │
+│ script args       │ -c npm run start                   │
+│ script id         │ 0                                  │
+root@6899447-yr427605:/var/www/nexttour# curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/tours
+root@6899447-yr427605:/var/www/nexttour# curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/api/toursurs
+root@6899447-yr427605:/var/www/nexttour# pm2 logs nexttour --lines 50 --nostream
+[TAILING] Tailing last 50 lines for [nexttour] process (change the value with --lines option)
+/root/.pm2/logs/nexttour-error.log last 50 lines:
+0|nexttour | Internal Server Error: error: update or delete on table "countries" violates foreign key constraint "cities_country_id_countries_id_fk" on table "cities"
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:74:13330
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|nexttour |     at async By.deleteCountry (/var/www/nexttour/dist/index.cjs:312:2289)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:312:20481 {
+0|nexttour |   length: 333,
+0|nexttour |   severity: 'ERROR',
+0|nexttour |   code: '23503',
+0|nexttour |   detail: 'Key (id)=(7d72c8e9-6115-44db-922f-adf3264f69d7) is still referenced from table "cities".',
+0|nexttour |   hint: undefined,
+0|nexttour |   position: undefined,
+0|nexttour |   internalPosition: undefined,
+0|nexttour |   internalQuery: undefined,
+0|nexttour |   where: undefined,
+0|nexttour |   schema: 'public',
+0|nexttour |   table: 'cities',
+0|nexttour |   column: undefined,
+0|nexttour |   dataType: undefined,
+0|nexttour |   constraint: 'cities_country_id_countries_id_fk',
+0|nexttour |   file: 'ri_triggers.c',
+0|nexttour |   line: '2621',
+0|nexttour |   routine: 'ri_ReportViolation'
+0|nexttour | }
+
+/root/.pm2/logs/nexttour-out.log last 50 lines:
+0|nexttour | �иж-Москва\nПроживание в 4* отеле 6 ночей\nЗавтраки ежедневно\nТрансфер из аэропорта\nВходные билеты в Лувр","includedEn":"Round trip flights\n6 nights in 4* hotel\nDaily breakfasts\nAirport transfers\nLouvre tickets","notIncludedRu":"Виза Шенген\nСтраховка\nОбеды и ужины","notIncludedEn":"Schengen visa\nInsurance\nLunches and dinners","mapUrl":null,"createdAt":"2026-03-06T18:01:35.299Z"},{"id":"0af41af7-b393-40f3-89f8-fda40717aa84","titleRu":"Экзотический Бали","titleEn":"Exotic Bali","descriptionRu":"Бали — остров богов, где уникальная культура встречается с тропической природой. Рисовые террасы, храмы, сёрфинг, спа-процедуры и великолепная кухня ждут вас на этом волшебном острове.","descriptionEn":"Bali — the island of gods, where unique culture meets tropical nature. Rice terraces, temples, surfing, spa treatments and superb cuisine await you on this magical island.","cityId":"2b105fd6-576a-4f64-a5dd-3ac9023b803f","countryId":"65b36981-4d71-41d5-b601-402d67816fa6","categoryId":"4bfc4c72-2f87-4d49-961d-3914101052d7","duration":10,"basePrice":"1490.00","discountPercent":15,"mainImage":"/images/tour-bali.png","images":["/images/tour-bali.png","/images/tour-maldives.png","/images/hero-banner.png"],"isHot":true,"isFeatured":true,"isActive":true,"includedRu":"Авиаперелёт Москва-Денпасар-Москва\nПроживание на вилле 10 ночей\nЗавтраки и ужины\nТрансфер\nЭкскурсия на Убуд","includedEn":"Round trip flights\n10 nights villa stay\nBreakfasts and dinners\nTransfers\nUbud tour","notIncludedRu":"Виза по прилёту ($35)\nСтраховка\nЛичные расходы","notIncludedEn":"Visa on arrival ($35)\nInsurance\nPersonal expenses","mapUrl":"","createdAt":"2026-03-06T18:01:35.299Z"},{"id":"16724083-8f58-45b2-acbf-10d7a48b6b10","titleRu":"Швейцарские Альпы","titleEn":"Swiss Alps","descriptionRu":"Исследуйте величественные Швейцарские Альпы. Горные деревушки, кристальные озёра, Женева и незабываемые виды — это путешествие оставит вас в восхищении от красоты природы.","descriptionEn":"Explore the majestic Swiss Alps. Mountain villages, crystal lakes, Geneva and unforgettable views — this journey will leave you in awe of nature's beauty.","cityId":"a3e0fb0f-ca95-42e6-b745-90c495134b74","countryId":"26591d55-4360-41a0-bfd7-50f291bb6e0f","categoryId":"9674b9b3-66e9-49d9-8134-06458353248e","duration":8,"basePrice":"2190.00","discountPercent":0,"mainImage":"/images/tour-swiss.png","images":["/images/tour-swiss.png","/images/hero-banner.png"],"isHot":false,"isFeatured":true,"isActive":true,"includedRu":"Авиаперелёт Москва-Женева-Москва\nПроживание в 4* отеле 8 ночей\nЗавтраки ежедневно\nЖД-проездной по Швейцарии","includedEn":"Round trip flights\n8 nights in 4* hotel\nDaily breakfasts\nSwiss rail pass","notIncludedRu":"Виза Шенген\nСтраховка\nОбеды и ужины","notIncludedEn":"Schengen visa\nInsurance\nLunches and dinners","mapUrl":"","createdAt":"2026-03-06T18:01:35.299Z"},{"id":"b8b17239-0275-4ca9-b6ca-bc49b106c247","titleRu":"Страна восходящего солнца — Япония","titleEn":"Land of the Rising Sun — Japan","descriptionRu":"Погрузитесь в мир японской культуры: токийские небоскрёбы и традиционные храмы Киото, сакура и суши, гора Фудзи и чайные церемонии. Японий полон контрастов!","descriptionEn":"Immerse yourself in Japanese culture: Tokyo skyscrapers and traditional Kyoto temples, cherry blossoms and sushi, Mount Fuji and tea ceremonies. Japan is full of contrasts!","cityId":"b40fe296-12f3-4a81-9533-9d4881fffa5c","countryId":"2fa4b10f-04b7-4605-bcaa-54c46bfad7b1","categoryId":"cfb172d7-6613-4076-82ea-7e8556f455f3","duration":12,"basePrice":"2890.00","discountPercent":10,"mainImage":"/images/tour-tokyo.png","images":["/images/tour-tokyo.png","/images/hero-banner.png"],"isHot":true,"isFeatured":true,"isActive":true,"includedRu":"Авиаперелёт Москва-Токио-Москва\nПроживание в 4* отелях 12 ночей\nЗавтраки ежедневно\nJR Pass на 7 дней\nЭкскурсии в Токио и Киото","includedEn":"Round trip flights\n12 nights in 4* hotels\nDaily breakfasts\n7-day JR Pass\nTours in Tokyo and Kyoto","notIncludedRu":"Виза (безвизовый въезд для РФ)\nСтраховка\nОбеды и ужины","notIncludedEn":"Visa-free entry\nInsurance\nLunches and dinners","mapUrl":"","createdAt":"2026-03-06T18:01:35.299Z"},{"id":"73537b34-fcc9-4239-9258-52304b1f88a3","titleRu":"Мистическое Перу — Мачу-Пикчу","titleEn":"Mystical Peru — Machu Picchu","descriptionRu":"Следуйте тропой инков к знаменитому Мачу-Пикчу — одному из семи чудес света. Амазонские джунгли, озеро Титикака, Лима с её гастрономией — незабываемое приключение в Южной Америке.","descriptionEn":"Follow the Inca Trail to the famous Machu Picchu — one of the seven wonders of the world. Amazon jungle, Lake Titicaca, Lima gastronomy — an unforgettable South American adventure.","cityId":"f206213c-6797-4aa3-8cb8-f5dc4fcc3737","countryId":"12a16b6b-e8c5-4a1f-b1b3-6e63fd5711d5","categoryId":"98a58cc1-e353-469d-a292-f122a582212f","duration":14,"basePrice":"2590.00","discountPercent":0,"mainImage":"/images/tour-peru.png","images":["/images/tour-peru.png","/images/hero-banner.png"],"isHot":false,"isFeatured":false,"isActive":true,"includedRu":"Авиаперелёт Москва-Лима-Москва\nПроживание в 4* отелях 14 ночей\nЗавтраки\nЭкскурсия в Мачу-Пикчу\nТрансферы","includedEn":"Round trip flights\n14 nights in 4* hotels\nBreakfasts\nMachu Picchu tour\nTransfers","notIncludedRu":"Виза\nСтраховка\nОбеды и ужины","notIncludedEn":"Visa\nInsurance\nLunches and dinners","mapUrl":null,"createdAt":"2026-03-06T18:01:35.299Z"},{"id":"85c4c4e3-e11d-4d1c-afb0-d03f548021cf","titleRu":"Культура Киото","titleEn":"Kyoto Culture","descriptionRu":"Старая столица Японии, Киото, хранит более 1600 буддийских храмов и синтоистских святилищ. Чайные церемонии, гейши в квартале Гион, золотой павильон Кинкакудзи — история на каждом шагу.","descriptionEn":"Japan's ancient capital, Kyoto, houses over 1,600 Buddhist temples and Shinto shrines. Tea ceremonies, geishas in Gion district, the golden Kinkakuji pavilion — history at every step.","cityId":"ead7ec54-b088-467b-9d25-a17ece1224d8","countryId":"2fa4b10f-04b7-4605-bcaa-54c46bfad7b1","categoryId":"cfb172d7-6613-4076-82ea-7e8556f455f3","duration":8,"basePrice":"2490.00","discountPercent":5,"mainImage":"/images/tour-tokyo.png","images":["/images/tour-tokyo.png","/images/tour-swiss.png"],"isHot":false,"isFeatured":false,"isActive":true,"includedRu":"Авиаперелёт Москва-Осака-Москва\nПроживание в рёкане 8 ночей\nЗавтраки ежедневно\nЧайная церемония","includedEn":"Round trip flights\n8 nights in ryokan\nDaily breakfasts\nTea ceremony","notIncludedRu":"Страховка\nОбеды и ужины\nЛичные расходы","notIncludedEn":"Insurance\nLunches and dinners\nPersonal expenses","mapUrl":null,"createdAt":"2026-03-06T18:01:35.299Z"},{"id":"d2f38f0f-7472-4ff5-8734-7ba754bb1ba3","titleRu":"Романтический Санторини ","titleEn":"Romantic Santorini","descriptionRu":"Откройте для себя магию греческого острова Санторини. Белоснежные дома, синие купола церквей, потрясающие закаты над Эгейским морем и незабываемые моменты в одном из красивейших мест на земле.","descriptionEn":"Discover the magic of the Greek island of Santorini. White houses, blue church domes, stunning sunsets over the Aegean Sea and unforgettable moments in one of the most beautiful places on earth.","cityId":"27948356-9ad8-469a-b380-36b567b1690e","countryId":"2a1ef1f5-cbb1-4efe-ae64-3f07d2d0e940","categoryId":"908cd3c8-ac00-4241-a91f-a01ed817953a","duration":7,"basePrice":"1290.00","discountPercent":0,"mainImage":"/images/tour-santorini.png","images":["/images/tour-santorini.png","/images/tour-paris.png","/images/hero-banner.png"],"isHot":false,"isFeatured":true,"isActive":true,"includedRu":"Авиаперелёт Москва-Афины-Москва\nПроживание в 4* отеле 7 ночей\nЗавтраки ежедневно\nТрансфер из аэропорта\nЭкскурсия по острову","includedEn":"Round trip flights Moscow-Athens\n7 nights in 4* hotel\nDaily breakfasts\nAirport transfers\nIsland tour","notIncludedRu":"Виза (не требуется для РФ)\nМедицинская страховка\nЛичные расходы","notIncludedEn":"Visa (not required)\nTravel insurance\nPersonal expenses","mapUrl":"","createdAt":"2026-03-06T18:01:35.299Z"}]
+
+root@6899447-yr427605:/var/www/nexttour# pm2 list
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ nexttour           │ fork     │ 56   │ online    │ 0%       │ 50.1mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+root@6899447-yr427605:/var/www/nexttour# cat /var/www/nexttour/ecosystem.config.js 2>/dev/null || echo "нет файла"
+нет файла
+root@6899447-yr427605:/var/www/nexttour#

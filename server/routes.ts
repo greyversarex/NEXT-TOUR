@@ -35,6 +35,10 @@ function requireAdmin(req: Request, res: Response, next: any) {
   next();
 }
 
+const ah = (fn: (req: Request, res: Response, next: any) => Promise<any>) =>
+  (req: Request, res: Response, next: any) =>
+    Promise.resolve(fn(req, res, next)).catch(next);
+
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
@@ -44,8 +48,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "lax" : false,
+      secure: false,
+      sameSite: "lax" as const,
       maxAge: 30 * 24 * 60 * 60 * 1000,
     },
   }));
@@ -362,20 +366,20 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // Tour Dates
-  app.get("/api/tours/:id/dates", async (req, res) => {
+  app.get("/api/tours/:id/dates", ah(async (req, res) => {
     res.json(await storage.getTourDates(req.params.id));
-  });
-  app.post("/api/tours/:id/dates", requireAdmin, async (req, res) => {
+  }));
+  app.post("/api/tours/:id/dates", requireAdmin, ah(async (req, res) => {
     const data = insertTourDateSchema.parse({ ...req.body, tourId: req.params.id });
     res.json(await storage.createTourDate(data));
-  });
-  app.put("/api/tour-dates/:id", requireAdmin, async (req, res) => {
+  }));
+  app.put("/api/tour-dates/:id", requireAdmin, ah(async (req, res) => {
     res.json(await storage.updateTourDate(req.params.id, req.body));
-  });
-  app.delete("/api/tour-dates/:id", requireAdmin, async (req, res) => {
+  }));
+  app.delete("/api/tour-dates/:id", requireAdmin, ah(async (req, res) => {
     await storage.deleteTourDate(req.params.id);
     res.json({ success: true });
-  });
+  }));
 
   // Price Components
   app.get("/api/price-components", async (req, res) => {
