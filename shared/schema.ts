@@ -80,6 +80,16 @@ export const tours = pgTable("tours", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const tourPriceTiers = pgTable("tour_price_tiers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tourId: varchar("tour_id").notNull().references(() => tours.id, { onDelete: "cascade" }),
+  minPeople: integer("min_people").notNull(),
+  maxPeople: integer("max_people").notNull(),
+  pricePerPerson: decimal("price_per_person", { precision: 10, scale: 2 }).notNull(),
+  labelRu: text("label_ru"),
+  labelEn: text("label_en"),
+});
+
 export const tourDates = pgTable("tour_dates", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   tourId: varchar("tour_id").notNull().references(() => tours.id),
@@ -257,6 +267,7 @@ export const insertCountrySchema = createInsertSchema(countries).omit({ id: true
 export const insertCitySchema = createInsertSchema(cities).omit({ id: true });
 export const insertCategorySchema = createInsertSchema(categories).omit({ id: true });
 export const insertTourSchema = createInsertSchema(tours).omit({ id: true, createdAt: true });
+export const insertTourPriceTierSchema = createInsertSchema(tourPriceTiers).omit({ id: true });
 export const insertTourDateSchema = createInsertSchema(tourDates).omit({ id: true }).extend({
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
@@ -287,6 +298,8 @@ export type Category = typeof categories.$inferSelect;
 export type InsertCategory = z.infer<typeof insertCategorySchema>;
 export type Tour = typeof tours.$inferSelect;
 export type InsertTour = z.infer<typeof insertTourSchema>;
+export type TourPriceTier = typeof tourPriceTiers.$inferSelect;
+export type InsertTourPriceTier = z.infer<typeof insertTourPriceTierSchema>;
 export type TourDate = typeof tourDates.$inferSelect;
 export type InsertTourDate = z.infer<typeof insertTourDateSchema>;
 export type PriceComponent = typeof priceComponents.$inferSelect;

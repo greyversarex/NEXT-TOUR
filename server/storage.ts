@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { eq, and, desc, asc, ilike, or, inArray, sql, ne } from "drizzle-orm";
 import {
-  users, countries, cities, categories, tours, tourDates,
+  users, countries, cities, categories, tours, tourDates, tourPriceTiers,
   priceComponents, tourPriceComponents, tourOptions, tourItinerary, itineraryStops,
   banners, tourFeeds, tourFeedItems, reviews, bookings, news,
   favorites, introScreen, heroSlides, passwordResetTokens, settings,
@@ -9,6 +9,7 @@ import {
   type City, type InsertCity, type Category, type InsertCategory,
   type Tour, type InsertTour, type TourDate, type InsertTourDate,
   type PriceComponent, type InsertPriceComponent, type TourPriceComponent,
+  type TourPriceTier, type InsertTourPriceTier,
   type TourOption, type InsertTourOption, type TourItinerary, type ItineraryStop,
   type Banner, type InsertBanner, type TourFeed, type TourFeedItem,
   type Review, type InsertReview, type Booking, type InsertBooking,
@@ -56,6 +57,12 @@ export interface IStorage {
   createTour(data: InsertTour): Promise<Tour>;
   updateTour(id: string, data: Partial<Tour>): Promise<Tour | undefined>;
   deleteTour(id: string): Promise<void>;
+
+  // Tour Price Tiers
+  getTourPriceTiers(tourId: string): Promise<TourPriceTier[]>;
+  createTourPriceTier(data: any): Promise<TourPriceTier>;
+  updateTourPriceTier(id: string, data: Partial<TourPriceTier>): Promise<TourPriceTier | undefined>;
+  deleteTourPriceTier(id: string): Promise<void>;
 
   // Tour Dates
   getTourDates(tourId: string): Promise<TourDate[]>;
@@ -350,6 +357,24 @@ export class DatabaseStorage implements IStorage {
 
   async deleteTour(id: string) {
     await db.update(tours).set({ isActive: false }).where(eq(tours.id, id));
+  }
+
+  async getTourPriceTiers(tourId: string) {
+    return db.select().from(tourPriceTiers).where(eq(tourPriceTiers.tourId, tourId)).orderBy(asc(tourPriceTiers.minPeople));
+  }
+
+  async createTourPriceTier(data: any) {
+    const [t] = await db.insert(tourPriceTiers).values(data).returning();
+    return t;
+  }
+
+  async updateTourPriceTier(id: string, data: Partial<TourPriceTier>) {
+    const [t] = await db.update(tourPriceTiers).set(data as any).where(eq(tourPriceTiers.id, id)).returning();
+    return t;
+  }
+
+  async deleteTourPriceTier(id: string) {
+    await db.delete(tourPriceTiers).where(eq(tourPriceTiers.id, id));
   }
 
   async getTourDates(tourId: string) {

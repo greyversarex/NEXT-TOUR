@@ -15,7 +15,7 @@ import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route, ChevronDown, ChevronRight, MapPin, Clock } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route, ChevronDown, ChevronRight, MapPin, Clock, DollarSign } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Tour, Country, Category } from "@shared/schema";
@@ -194,6 +194,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
             <TabsTrigger value="dates" className="flex-1 gap-1"><CalendarDays className="h-3.5 w-3.5" />{t("Даты", "Dates")}</TabsTrigger>
             <TabsTrigger value="options" className="flex-1 gap-1"><ListChecks className="h-3.5 w-3.5" />{t("Опции", "Options")}</TabsTrigger>
             <TabsTrigger value="itinerary" className="flex-1 gap-1"><Route className="h-3.5 w-3.5" />{t("Программа", "Itinerary")}</TabsTrigger>
+            <TabsTrigger value="pricing" className="flex-1 gap-1"><DollarSign className="h-3.5 w-3.5" />{t("Цены", "Pricing")}</TabsTrigger>
           </TabsList>
 
           <form id="tour-form" onSubmit={handleSubmit}>
@@ -280,6 +281,13 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
               {isEdit
                 ? <ItineraryManager tourId={tour.id} />
                 : <LocalItineraryManager items={localItinerary} setItems={setLocalItinerary} />}
+              {saveBtn}
+            </TabsContent>
+
+            <TabsContent value="pricing" className="pt-2">
+              {isEdit
+                ? <PriceTiersManager tourId={tour.id} />
+                : <p className="text-sm text-muted-foreground py-4">{t("Сохраните тур, чтобы настроить ценовые уровни", "Save the tour first to configure price tiers")}</p>}
               {saveBtn}
             </TabsContent>
           </form>
@@ -746,6 +754,72 @@ function ItineraryManager({ tourId }: { tourId: string }) {
                   </div>
                 </div>
               )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PriceTiersManager({ tourId }: { tourId: string }) {
+  const { t } = useI18n();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [form, setForm] = useState({ minPeople: "", maxPeople: "", pricePerPerson: "", labelRu: "", labelEn: "" });
+
+  const { data: tiers = [] } = useQuery<any[]>({ queryKey: ["/api/tours", tourId, "price-tiers"], queryFn: () => fetch(`/api/tours/${tourId}/price-tiers`).then(r => r.json()) });
+
+  const addMutation = useMutation({
+    mutationFn: (data: any) => apiRequest("POST", `/api/tours/${tourId}/price-tiers`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tours", tourId, "price-tiers"] });
+      setForm({ minPeople: "", maxPeople: "", pricePerPerson: "", labelRu: "", labelEn: "" });
+      toast({ title: t("Уровень цены добавлен", "Price tier added") });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/tour-price-tiers/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tours", tourId, "price-tiers"] });
+      toast({ title: t("Удалено", "Deleted") });
+    },
+  });
+
+  return (
+    <div className="space-y-4">
+      <div className="border rounded-xl p-4 bg-muted/30 space-y-3">
+        <p className="text-sm font-semibold">{t("Ценообразование по количеству людей", "Group size pricing")}</p>
+        <p className="text-xs text-muted-foreground">{t("Задайте цену за человека для разного количества участников. Если уровни заданы, они заменят базовую цену.", "Set per-person price for different group sizes. If tiers are set, they replace the base price.")}</p>
+        <div className="grid grid-cols-5 gap-2">
+          <div><Label className="text-xs">{t("Мин. чел.", "Min ppl")}</Label><Input type="number" min={1} value={form.minPeople} onChange={e => setForm(p => ({ ...p, minPeople: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Макс. чел.", "Max ppl")}</Label><Input type="number" min={1} value={form.maxPeople} onChange={e => setForm(p => ({ ...p, maxPeople: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Цена ($)", "Price ($)")}</Label><Input type="number" min={0} step="0.01" value={form.pricePerPerson} onChange={e => setForm(p => ({ ...p, pricePerPerson: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Метка (RU)", "Label (RU)")}</Label><Input value={form.labelRu} onChange={e => setForm(p => ({ ...p, labelRu: e.target.value }))} className="mt-1 h-9 text-sm" placeholder={t("Малая группа", "Small group")} /></div>
+          <div><Label className="text-xs">{t("Метка (EN)", "Label (EN)")}</Label><Input value={form.labelEn} onChange={e => setForm(p => ({ ...p, labelEn: e.target.value }))} className="mt-1 h-9 text-sm" placeholder="Small group" /></div>
+        </div>
+        <Button type="button" size="sm" disabled={!form.minPeople || !form.maxPeople || !form.pricePerPerson || addMutation.isPending} onClick={() => addMutation.mutate({ minPeople: Number(form.minPeople), maxPeople: Number(form.maxPeople), pricePerPerson: form.pricePerPerson, labelRu: form.labelRu || null, labelEn: form.labelEn || null })}>
+          <Plus className="h-3.5 w-3.5 mr-1" />{t("Добавить уровень", "Add Tier")}
+        </Button>
+      </div>
+
+      {tiers.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold">{t("Ценовые уровни", "Price Tiers")}</p>
+          {tiers.map((tier: any) => (
+            <div key={tier.id} className="flex items-center justify-between border rounded-lg px-4 py-3 bg-card">
+              <div className="flex items-center gap-4">
+                <Badge variant="secondary" className="text-xs">{tier.minPeople}–{tier.maxPeople} {t("чел.", "ppl")}</Badge>
+                <span className="text-sm font-bold text-primary">${Number(tier.pricePerPerson).toFixed(0)}</span>
+                <span className="text-xs text-muted-foreground">{t("за человека", "per person")}</span>
+                {(tier.labelRu || tier.labelEn) && (
+                  <span className="text-xs text-muted-foreground italic">({tier.labelRu || tier.labelEn})</span>
+                )}
+              </div>
+              <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteMutation.mutate(tier.id)}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           ))}
         </div>

@@ -348,13 +348,14 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   app.get("/api/tours/:id/full", async (req, res) => {
     const tour = await storage.getTour(req.params.id);
     if (!tour) return res.status(404).json({ message: "Tour not found" });
-    const [dates, priceComponents, options, days, allStops, reviews, country, city, category] = await Promise.all([
+    const [dates, priceComponents, options, days, allStops, reviews, priceTiers, country, city, category] = await Promise.all([
       storage.getTourDates(req.params.id),
       storage.getTourPriceComponents(req.params.id),
       storage.getTourOptions(req.params.id),
       storage.getTourItinerary(req.params.id),
       storage.getAllStopsForTour(req.params.id),
       storage.getReviews(req.params.id, "approved"),
+      storage.getTourPriceTiers(req.params.id),
       tour.countryId ? storage.getCountry(tour.countryId) : Promise.resolve(undefined),
       tour.cityId ? storage.getCity(tour.cityId) : Promise.resolve(undefined),
       tour.categoryId ? storage.getCategory(tour.categoryId) : Promise.resolve(undefined),
@@ -367,10 +368,28 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     if (req.user) {
       isFavorite = await storage.isFavorite((req.user as any).id, req.params.id);
     }
-    res.json({ tour, dates, priceComponents, options, itinerary, reviews, isFavorite, country, city, category });
+    res.json({ tour, dates, priceComponents, options, itinerary, reviews, priceTiers, isFavorite, country, city, category });
   });
 
   // Tour Dates
+  app.get("/api/tours/:id/price-tiers", ah(async (req, res) => {
+    res.json(await storage.getTourPriceTiers(req.params.id));
+  }));
+  app.post("/api/tours/:id/price-tiers", requireAdmin, ah(async (req, res) => {
+    const { minPeople, maxPeople, pricePerPerson, labelRu, labelEn } = req.body;
+    if (!minPeople || !maxPeople || !pricePerPerson || minPeople < 1 || maxPeople < minPeople || Number(pricePerPerson) <= 0) {
+      return res.status(400).json({ message: "Invalid tier data: minPeople must be >= 1, maxPeople >= minPeople, price > 0" });
+    }
+    res.json(await storage.createTourPriceTier({ minPeople: Number(minPeople), maxPeople: Number(maxPeople), pricePerPerson: String(pricePerPerson), labelRu: labelRu || null, labelEn: labelEn || null, tourId: req.params.id }));
+  }));
+  app.put("/api/tour-price-tiers/:id", requireAdmin, ah(async (req, res) => {
+    res.json(await storage.updateTourPriceTier(req.params.id, req.body));
+  }));
+  app.delete("/api/tour-price-tiers/:id", requireAdmin, ah(async (req, res) => {
+    await storage.deleteTourPriceTier(req.params.id);
+    res.json({ success: true });
+  }));
+
   app.get("/api/tours/:id/dates", ah(async (req, res) => {
     res.json(await storage.getTourDates(req.params.id));
   }));

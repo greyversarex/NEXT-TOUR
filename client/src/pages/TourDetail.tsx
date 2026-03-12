@@ -68,7 +68,7 @@ export default function TourDetail() {
     );
   }
 
-  const { tour, dates, options, itinerary, reviews, isFavorite, country, city, category } = data;
+  const { tour, dates, options, itinerary, reviews, priceTiers = [], isFavorite, country, city, category } = data;
   const title = lang === "ru" ? tour.titleRu : tour.titleEn;
   const description = lang === "ru" ? tour.descriptionRu : tour.descriptionEn;
   const included = lang === "ru" ? tour.includedRu : tour.includedEn;
@@ -377,17 +377,39 @@ export default function TourDetail() {
               {/* Sidebar header gradient */}
               <div className="bg-gradient-to-br from-primary to-cyan-500 px-6 py-5">
                 <p className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-1">{t("Стоимость", "Price")}</p>
-                <div className="flex items-baseline gap-2">
-                  {tour.discountPercent > 0 && (
-                    <span className="text-white/50 line-through text-base">${price.toFixed(0)}</span>
-                  )}
-                  <span className="text-3xl font-extrabold text-white">${discountedPrice.toFixed(0)}</span>
-                  <span className="text-white/70 text-sm">/ {t("чел.", "person")}</span>
-                </div>
-                {tour.discountPercent > 0 && (
-                  <div className="mt-2 inline-flex items-center bg-white/20 rounded-full px-3 py-1 text-white text-xs font-bold">
-                    -{tour.discountPercent}% {t("скидка", "discount")}
-                  </div>
+                {priceTiers.length > 0 ? (
+                  <>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-extrabold text-white">
+                        {t("от", "from")} ${Number(Math.min(...priceTiers.map((t: any) => Number(t.pricePerPerson)))).toFixed(0)}
+                      </span>
+                      <span className="text-white/70 text-sm">/ {t("чел.", "person")}</span>
+                    </div>
+                    <div className="mt-3 space-y-1.5">
+                      {priceTiers.map((tier: any) => (
+                        <div key={tier.id} className="flex items-center justify-between bg-white/15 rounded-xl px-3 py-1.5">
+                          <span className="text-white/90 text-xs">{tier.minPeople}–{tier.maxPeople} {t("чел.", "ppl")}{(tier.labelRu || tier.labelEn) ? ` · ${lang === "ru" ? (tier.labelRu || tier.labelEn) : (tier.labelEn || tier.labelRu)}` : ""}</span>
+                          <span className="text-white font-bold text-sm">${Number(tier.pricePerPerson).toFixed(0)}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-white/60 text-xs mt-2">{t("Цена зависит от размера группы", "Price depends on group size")}</p>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-baseline gap-2">
+                      {tour.discountPercent > 0 && (
+                        <span className="text-white/50 line-through text-base">${price.toFixed(0)}</span>
+                      )}
+                      <span className="text-3xl font-extrabold text-white">${discountedPrice.toFixed(0)}</span>
+                      <span className="text-white/70 text-sm">/ {t("чел.", "person")}</span>
+                    </div>
+                    {tour.discountPercent > 0 && (
+                      <div className="mt-2 inline-flex items-center bg-white/20 rounded-full px-3 py-1 text-white text-xs font-bold">
+                        -{tour.discountPercent}% {t("скидка", "discount")}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -536,6 +558,7 @@ export default function TourDetail() {
           tour={tour}
           dates={dates}
           options={options}
+          priceTiers={priceTiers}
           preselectedOptions={sidebarOptions}
           onClose={() => setBookingOpen(false)}
         />
@@ -627,7 +650,7 @@ function CounterField({ label, subLabel, value, min, max, onChange }: { label: s
   );
 }
 
-function BookingModal({ tour, dates, options, preselectedOptions = [], onClose }: any) {
+function BookingModal({ tour, dates, options, priceTiers = [], preselectedOptions = [], onClose }: any) {
   const { t, lang } = useI18n();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -639,12 +662,29 @@ function BookingModal({ tour, dates, options, preselectedOptions = [], onClose }
   const [selectedOptions, setSelectedOptions] = useState<string[]>(preselectedOptions);
   const [paymentType, setPaymentType] = useState<"prepay" | "full">("full");
 
-  const basePrice = Number(tour.basePrice) * (1 - tour.discountPercent / 100);
+  const totalPeople = adults + children;
+
+  const getTierPrice = () => {
+    if (priceTiers.length === 0) return null;
+    const sorted = [...priceTiers].sort((a: any, b: any) => a.minPeople - b.minPeople);
+    const tier = sorted.find((t: any) => totalPeople >= t.minPeople && totalPeople <= t.maxPeople);
+    if (tier) return Number(tier.pricePerPerson);
+    if (totalPeople > sorted[sorted.length - 1].maxPeople) return Number(sorted[sorted.length - 1].pricePerPerson);
+    const nextTier = sorted.find((t: any) => totalPeople < t.minPeople);
+    if (nextTier) return Number(nextTier.pricePerPerson);
+    return Number(sorted[0].pricePerPerson);
+  };
+
+  const tierPrice = getTierPrice();
+  const activeTier = priceTiers.length > 0 ? priceTiers.find((t: any) => totalPeople >= t.minPeople && totalPeople <= t.maxPeople) : null;
+  const basePrice = tierPrice !== null ? tierPrice : Number(tour.basePrice) * (1 - tour.discountPercent / 100);
   const optionsTotal = options
     .filter((o: any) => selectedOptions.includes(o.id))
     .reduce((sum: number, o: any) => sum + Number(o.price), 0);
   const travelers = adults + children * 0.5;
-  const totalPrice = (basePrice + optionsTotal) * travelers;
+  const totalPrice = tierPrice !== null
+    ? (tierPrice + optionsTotal) * totalPeople
+    : (basePrice + optionsTotal) * travelers;
   const toPay = paymentType === "prepay" ? totalPrice * 0.3 : totalPrice;
 
   const mutation = useMutation({
@@ -727,13 +767,24 @@ function BookingModal({ tour, dates, options, preselectedOptions = [], onClose }
               <div className="px-4 pb-2">
                 <CounterField
                   label={t("Дети", "Children")}
-                  subLabel={t("до 12 лет — 50% цены", "under 12 — 50% price")}
+                  subLabel={priceTiers.length > 0 ? t("учитываются в кол-ве участников", "counted in group size") : t("до 12 лет — 50% цены", "under 12 — 50% price")}
                   value={children}
                   min={0}
                   max={6}
                   onChange={setChildren}
                 />
               </div>
+              {priceTiers.length > 0 && activeTier && (
+                <div className="px-4 py-2 bg-primary/5 border-t border-border">
+                  <p className="text-xs text-primary font-semibold flex items-center gap-1.5">
+                    <Users className="h-3.5 w-3.5" />
+                    {totalPeople} {t("чел.", "ppl")} — ${Number(activeTier.pricePerPerson).toFixed(0)}/{t("чел.", "person")}
+                    {(activeTier.labelRu || activeTier.labelEn) && (
+                      <span className="text-muted-foreground font-normal">({lang === "ru" ? (activeTier.labelRu || activeTier.labelEn) : (activeTier.labelEn || activeTier.labelRu)})</span>
+                    )}
+                  </p>
+                </div>
+              )}
             </div>
 
             {options.length > 0 && (
@@ -798,13 +849,13 @@ function BookingModal({ tour, dates, options, preselectedOptions = [], onClose }
           <div className="px-6 pb-6">
             <div className="rounded-xl bg-muted/50 border border-border p-4 mb-4 space-y-1.5">
               <div className="flex justify-between text-sm text-muted-foreground">
-                <span>{t("Базовая цена", "Base price")} × {travelers}</span>
-                <span>${(basePrice * travelers).toFixed(0)}</span>
+                <span>{tierPrice !== null ? `$${tierPrice.toFixed(0)} × ${totalPeople} ${t("чел.", "ppl")}` : `${t("Базовая цена", "Base price")} × ${travelers}`}</span>
+                <span>${tierPrice !== null ? (tierPrice * totalPeople).toFixed(0) : (basePrice * travelers).toFixed(0)}</span>
               </div>
               {optionsTotal > 0 && (
                 <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>{t("Дополнительные опции", "Add-ons")} × {travelers}</span>
-                  <span>+${(optionsTotal * travelers).toFixed(0)}</span>
+                  <span>{t("Дополнительные опции", "Add-ons")} × {tierPrice !== null ? totalPeople : travelers}</span>
+                  <span>+${(optionsTotal * (tierPrice !== null ? totalPeople : travelers)).toFixed(0)}</span>
                 </div>
               )}
               {paymentType === "prepay" && (
