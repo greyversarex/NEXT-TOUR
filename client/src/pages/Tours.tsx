@@ -344,7 +344,7 @@ export default function Tours() {
                 {isLoading ? (
                   <Skeleton className="h-5 w-36" />
                 ) : (
-                  <p className="font-semibold text-foreground">
+                  <p className="font-semibold text-white">
                     {lang === "ru"
                       ? `Найдено туров: ${filtered.length}`
                       : `${filtered.length} tour${filtered.length !== 1 ? "s" : ""} found`}
