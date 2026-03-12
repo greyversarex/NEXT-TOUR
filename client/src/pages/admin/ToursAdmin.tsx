@@ -394,14 +394,17 @@ function DatesManager({ tourId }: { tourId: string }) {
   const addMutation = useMutation({
     mutationFn: (d: any) => apiRequest("POST", `/api/tours/${tourId}/dates`, d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/dates`] }); setForm({ startDate: "", endDate: "", maxPeople: 20 }); toast({ title: t("Дата добавлена", "Date added") }); },
+    onError: (err: any) => toast({ title: t("Ошибка", "Error"), description: err.message || t("Не удалось добавить дату", "Failed to add date"), variant: "destructive" }),
   });
   const editMutation = useMutation({
     mutationFn: (d: any) => apiRequest("PUT", `/api/tour-dates/${d.id}`, d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/dates`] }); setEditing(null); toast({ title: t("Сохранено", "Saved") }); },
+    onError: (err: any) => toast({ title: t("Ошибка", "Error"), description: err.message || t("Не удалось сохранить дату", "Failed to save date"), variant: "destructive" }),
   });
   const delMutation = useMutation({
     mutationFn: (id: string) => apiRequest("DELETE", `/api/tour-dates/${id}`, {}),
     onSuccess: () => qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/dates`] }),
+    onError: (err: any) => toast({ title: t("Ошибка", "Error"), description: err.message, variant: "destructive" }),
   });
 
   const activeForm = editing || form;
@@ -426,8 +429,26 @@ function DatesManager({ tourId }: { tourId: string }) {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button size="sm" onClick={() => editing ? editMutation.mutate(editing) : addMutation.mutate({ ...form, startDate: new Date(form.startDate), endDate: new Date(form.endDate), tourId })}>
-            {editing ? t("Сохранить", "Save") : t("Добавить", "Add")}
+          <Button
+            size="sm"
+            disabled={addMutation.isPending || editMutation.isPending}
+            onClick={() => {
+              if (editing) {
+                if (!editing.startDate || !editing.endDate) {
+                  toast({ title: t("Ошибка", "Error"), description: t("Заполните даты начала и конца", "Please fill in start and end dates"), variant: "destructive" });
+                  return;
+                }
+                editMutation.mutate(editing);
+              } else {
+                if (!form.startDate || !form.endDate) {
+                  toast({ title: t("Ошибка", "Error"), description: t("Заполните даты начала и конца", "Please fill in start and end dates"), variant: "destructive" });
+                  return;
+                }
+                addMutation.mutate({ startDate: form.startDate, endDate: form.endDate, maxPeople: form.maxPeople, tourId });
+              }
+            }}
+          >
+            {(addMutation.isPending || editMutation.isPending) ? t("Сохранение...", "Saving...") : editing ? t("Сохранить", "Save") : t("Добавить", "Add")}
           </Button>
           {editing && <Button size="sm" variant="outline" onClick={() => setEditing(null)}>{t("Отмена", "Cancel")}</Button>}
         </div>
