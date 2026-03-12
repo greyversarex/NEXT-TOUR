@@ -977,6 +977,7 @@ export default function Home() {
           <PopularToursSection tours={popularTours} cardWidth={popularCardWidth} />
           <div className="py-2 sm:py-6 md:py-8" />
           <DestinationsSection />
+          <div className="py-2 sm:py-6 md:py-8" />
           <PromoBanner banners={banners} />
           <div className="py-2 sm:py-4 md:py-6" />
           <HotToursSection tours={hotTours} cardWidth={hotCardWidth} />
