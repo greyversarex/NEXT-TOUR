@@ -1,0 +1,127 @@
+root@6899447-yr427605:/var/www/nexttour# root@6899447-yr427605:/var/www/nexttour# cd /var/www/nexttour && git pull origin main && npm run build && pm2 restart nexttour
+remote: Enumerating objects: 80, done.
+remote: Counting objects: 100% (80/80), done.
+remote: Compressing objects: 100% (29/29), done.
+remote: Total 61 (delta 32), reused 61 (delta 32), pack-reused 0 (from 0)
+Unpacking objects: 100% (61/61), 369.68 KiB | 1.44 MiB/s, done.
+From https://github.com/greyversarex/NEXT-TOUR
+ * branch            main       -> FETCH_HEAD
+   0fbc0be..8e7d6a2  main       -> origin/main
+Updating 0fbc0be..8e7d6a2
+Fast-forward
+ ...www-nexttour-cd-var-www-nextt_1773339959567.txt |  58 +++++++++++++++++++++
+ ...www-nexttour-pm2-logs-TAILING_1773339313994.txt |  44 ++++++++++++++++
+ ...www-nexttour-pm2-logs-TAILING_1773339466185.txt |  52 ++++++++++++++++++
+ ...www-nexttour-pm2-logs-TAILING_1773340271195.txt |  39 ++++++++++++++
+ attached_assets/image_1773339330604.png            | Bin 0 -> 37006 bytes
+ client/public/sw.js                                |   2 +-
+ client/src/pages/admin/ToursAdmin.tsx              |  23 ++++----
+ deploy.sh                                          |   3 +-
+ dist/index.cjs                                     |   2 +-
+ ...nLayout-DAHoQyya.js => AdminLayout-Di9tST-p.js} |   2 +-
+ ...sAdmin-583VjzDu.js => BannersAdmin-Bn5O7jJX.js} |   2 +-
+^Cot@6899447-yr427605:/var/www/nexttour#────┴───────────┴──────────┴──────────┘9
+root@6899447-yr427605:/var/www/nexttour# cd /var/www/nexttour && git pull origin main && npm run build && pm2 restart nexttour
+From https://github.com/greyversarex/NEXT-TOUR
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+
+> rest-express@1.0.0 build
+> tsx script/build.ts
+
+building client...
+vite v7.3.1 building client environment for production...
+transforming (5) ../vite/preload-helper.js
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3215 modules transformed.
+../dist/public/index.html                                 3.99 kB │ gzip:   1.50 kB
+../dist/public/assets/index-BcT2w_Mm.css                120.87 kB │ gzip:  18.83 kB
+../dist/public/assets/save-DgNvQYjK.js                    0.32 kB │ gzip:   0.22 kB
+../dist/public/assets/textarea-Ck9vy4dB.js                0.50 kB │ gzip:   0.33 kB
+../dist/public/assets/trash-2-Cg0PXJCT.js                 0.72 kB │ gzip:   0.40 kB
+../dist/public/assets/image-upload-C1TwE28X.js            1.99 kB │ gzip:   1.08 kB
+../dist/public/assets/switch-BHzQdl2b.js                  2.34 kB │ gzip:   1.19 kB
+../dist/public/assets/UsersAdmin-D3l1nTn9.js              2.45 kB │ gzip:   1.13 kB
+../dist/public/assets/CategoriesAdmin-CHxpXpPP.js         2.49 kB │ gzip:   1.11 kB
+../dist/public/assets/PriceComponentsAdmin-Bg73xMHs.js    2.59 kB │ gzip:   1.13 kB
+../dist/public/assets/Dashboard-CTy1f9UF.js               2.60 kB │ gzip:   1.16 kB
+../dist/public/assets/ReviewsAdmin-CV_J-9nH.js            3.68 kB │ gzip:   1.58 kB
+../dist/public/assets/BannersAdmin-Bn5O7jJX.js            3.86 kB │ gzip:   1.55 kB
+../dist/public/assets/NewsAdmin-Cqt4YBvh.js               4.00 kB │ gzip:   1.58 kB
+../dist/public/assets/CitiesAdmin-DCNq5EXF.js             4.06 kB │ gzip:   1.65 kB
+../dist/public/assets/IntroScreenAdmin-CQkdFByY.js        4.19 kB │ gzip:   1.72 kB
+../dist/public/assets/HeroSlidesAdmin-d5RJV5Jo.js         5.37 kB │ gzip:   1.82 kB
+../dist/public/assets/AdminLayout-Di9tST-p.js             5.80 kB │ gzip:   2.28 kB
+../dist/public/assets/FeedsAdmin-DcVjmaEF.js              6.35 kB │ gzip:   2.32 kB
+../dist/public/assets/CountriesAdmin-BBHpg5b0.js          9.68 kB │ gzip:   2.91 kB
+../dist/public/assets/BookingsAdmin-T22sfxFs.js          20.06 kB │ gzip:   5.94 kB
+../dist/public/assets/ToursAdmin-DBjB5vu-.js             29.63 kB │ gzip:   5.91 kB
+../dist/public/assets/LoyaltyAdmin-BfqH7bAH.js           33.78 kB │ gzip:  11.99 kB
+../dist/public/assets/StatisticsAdmin-wE2wNefD.js       399.49 kB │ gzip: 110.06 kB
+../dist/public/assets/index-DQ2dyztP.js                 564.97 kB │ gzip: 173.59 kB
+✓ built in 27.21s
+building server...
+
+  dist/index.cjs  1.6mb ⚠️
+
+⚡ Done in 1614ms
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [nexttour](ids: [ 0 ])
+[PM2] [nexttour](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ nexttour           │ fork     │ 17   │ online    │ 0%       │ 38.1mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+root@6899447-yr427605:/var/www/nexttour# pm2 logs
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-03-12T18:53:53: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-12T18:53:54: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-12T18:53:54: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-12T18:53:54: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-12T18:53:54: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-12T18:53:54: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-12T18:53:54: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-12T18:53:54: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-12T18:53:54: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-12T18:53:54: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-12T18:53:55: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-12T18:53:55: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-12T18:53:55: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-12T18:53:55: PM2 log: App [nexttour:0] exited with code [1] via signal [SIGINT]
+PM2        | 2026-03-12T18:53:55: PM2 log: Script /usr/bin/npm had too many unstable restarts (16). Stopped. "errored"
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+0|nexttour |
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+0|nexttour |
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+0|nexttour |
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour |     at Module._resolveFilename (node:internal/modules/cjs/loader:1207:15)
+0|nexttour |     at Module._load (node:internal/modules/cjs/loader:1038:27)
+0|nexttour |     at Module.require (node:internal/modules/cjs/loader:1289:19)
+0|nexttour |     at require (node:internal/modules/helpers:182:18)
+0|nexttour |     at Object.<anonymous> (/var/www/nexttour/dist/index.cjs:269:5085)
+0|nexttour |     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+0|nexttour |     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+0|nexttour |     at Module.load (node:internal/modules/cjs/loader:1266:32)
+0|nexttour |     at Module._load (node:internal/modules/cjs/loader:1091:12)
+0|nexttour |     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12) {
+0|nexttour |   code: 'MODULE_NOT_FOUND',
+0|nexttour |   requireStack: [ '/var/www/nexttour/dist/index.cjs' ]
+0|nexttour | }
+0|nexttour |
+0|nexttour | Node.js v20.20.1
