@@ -62,6 +62,7 @@ export default function About() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+       <div className="bg-white/90 dark:bg-card/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-xl border border-white/30">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
           {stats.map(({ icon: Icon, value, label }) => (
             <div key={label} className="bg-card border border-card-border rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center hover-elevate transition-all duration-300 hover:-translate-y-1">
@@ -175,6 +176,8 @@ export default function About() {
               />
             </div>
           </div>
+        </div>
+
         </div>
       </div>
     </div>
