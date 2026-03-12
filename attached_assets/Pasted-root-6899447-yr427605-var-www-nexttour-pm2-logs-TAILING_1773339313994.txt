@@ -1,0 +1,44 @@
+root@6899447-yr427605:/var/www/nexttour# pm2 logs
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] exited with code [127] via signal [SIGINT]
+PM2        | 2026-03-12T18:14:16: PM2 error: Error caught while calling pidusage
+PM2        | 2026-03-12T18:14:16: PM2 error: Error: No matching pid found
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-12T18:14:16: PM2 error: Error [ERR_STREAM_DESTROYED]: Cannot call write after a stream was destroyed
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] exited with code [127] via signal [SIGINT]
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-03-12T18:14:16: PM2 error: Error [ERR_STREAM_DESTROYED]: Cannot call write after a stream was destroyed
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] online
+PM2        | 2026-03-12T18:14:16: PM2 log: App [nexttour:0] exited with code [127] via signal [SIGINT]
+PM2        | 2026-03-12T18:14:16: PM2 log: Script /usr/bin/bash had too many unstable restarts (16). Stopped. "errored"
+PM2        | 2026-03-12T18:14:16: PM2 error: Error [ERR_STREAM_DESTROYED]: Cannot call write after a stream was destroyed
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | �зи — история на каждом шагу.","descriptionEn":"Japan's ancient capital, Kyoto, houses over 1,600 Buddhist temples and Shinto shrines. Tea ceremonies, geishas in Gion district, the golden Kinkakuji pavilion — history at every step.","cityId":"ead7ec54-b088-467b-9d25-a17ece1224d8","countryId":"2fa4b10f-04b7-4605-bcaa-54c46bfad7b1","categoryId":"cfb172d7-6613-4076-82ea-7e8556f455f3","duration":8,"basePrice":"2490.00","discountPercent":5,"mainImage":"/images/tour-tokyo.png","images":["/images/tour-tokyo.png","/images/tour-swiss.png"],"isHot":false,"isFeatured":false,"isActive":true,"includedRu":"Авиаперелёт Москва-Осака-Москва\nПроживание в рёкане 8 ночей\nЗавтраки ежедневно\nЧайная церемония","includedEn":"Round trip flights\n8 nights in ryokan\nDaily breakfasts\nTea ceremony","notIncludedRu":"Страховка\nОбеды и ужины\nЛичные расходы","notIncludedEn":"Insurance\nLunches and dinners\nPersonal expenses","mapUrl":null,"createdAt":"2026-03-06T18:01:35.299Z"},{"id":"d2f38f0f-7472-4ff5-8734-7ba754bb1ba3","titleRu":"Романтический Санторини ","titleEn":"Romantic Santorini","descriptionRu":"Откройте для себя магию греческого острова Санторини. Белоснежные дома, синие купола церквей, потрясающие закаты над Эгейским морем и незабываемые моменты в одном из красивейших мест на земле.","descriptionEn":"Discover the magic of the Greek island of Santorini. White houses, blue church domes, stunning sunsets over the Aegean Sea and unforgettable moments in one of the most beautiful places on earth.","cityId":"27948356-9ad8-469a-b380-36b567b1690e","countryId":"2a1ef1f5-cbb1-4efe-ae64-3f07d2d0e940","categoryId":"908cd3c8-ac00-4241-a91f-a01ed817953a","duration":7,"basePrice":"1290.00","discountPercent":0,"mainImage":"/images/tour-santorini.png","images":["/images/tour-santorini.png","/images/tour-paris.png","/images/hero-banner.png"],"isHot":false,"isFeatured":true,"isActive":true,"includedRu":"Авиаперелёт Москва-Афины-Москва\nПроживание в 4* отеле 7 ночей\nЗавтраки ежедневно\nТрансфер из аэропорта\nЭкскурсия по острову","includedEn":"Round trip flights Moscow-Athens\n7 nights in 4* hotel\nDaily breakfasts\nAirport transfers\nIsland tour","notIncludedRu":"Виза (не требуется для РФ)\nМедицинская страховка\nЛичные расходы","notIncludedEn":"Visa (not required)\nTravel insurance\nPersonal expenses","mapUrl":"","createdAt":"2026-03-06T18:01:35.299Z"}]
+0|nexttour |
+0|nexttour | > rest-express@1.0.0 start
+0|nexttour | > NODE_ENV=production node dist/index.cjs
+0|nexttour |
+0|nexttour | [seed] Database already seeded, skipping.
+0|nexttour | 6:09:03 PM [express] serving on port 3000
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour | /usr/bin/bash: run: No such file or directory
+0|nexttour | /usr/bin/bash: run: No such file or directory
+0|nexttour | /usr/bin/bash: run: No such file or directory
+0|nexttour | /usr/bin/bash: run: No such file or directory
+0|nexttour | /usr/bin/bash: run: No such file or directory
+0|nexttour | /usr/bin/bash: run: No such file or directory
+0|nexttour | /usr/bin/bash: run: No such file or directory
+0|nexttour | /usr/bin/bash: run: No such file or directory
+0|nexttour | /usr/bin/bash: run: No such file or directory
+0|nexttour | /usr/bin/bash: run: No such file or directory
+0|nexttour | /usr/bin/bash: run: No such file or directory
+0|nexttour | /usr/bin/bash: run: No such file or directory
+0|nexttour | /usr/bin/bash: run: No such file or directory
+0|nexttour | /usr/bin/bash: run: No such file or directory
+0|nexttour | /usr/bin/bash: run: No such file or directory
