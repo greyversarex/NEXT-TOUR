@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Clock, MapPin, Star, Heart, Users, CheckCircle,
-  XCircle, ChevronLeft, ChevronRight, Calendar, Tag, Loader2, ChevronDown
+  XCircle, ChevronLeft, ChevronRight, Calendar, Tag, Loader2, ChevronDown, Send
 } from "lucide-react";
 import AuthModal from "@/components/AuthModal";
 import TourCard from "@/components/TourCard";
@@ -392,7 +392,17 @@ export default function TourDetail() {
               </div>
 
               <div className="bg-card p-4 md:p-5">
-                {dates.length > 0 ? (
+                {(tour.customDatesTextRu || tour.customDatesTextEn) ? (
+                  <div className="mb-3 md:mb-5">
+                    <p className="text-sm font-semibold flex items-center gap-1.5 mb-2">
+                      <Calendar className="h-4 w-4 text-primary" />
+                      {t("Доступные даты:", "Available dates:")}
+                    </p>
+                    <p className="text-sm text-foreground/80 p-3 bg-muted/40 rounded-xl whitespace-pre-line">
+                      {lang === "ru" ? (tour.customDatesTextRu || tour.customDatesTextEn) : (tour.customDatesTextEn || tour.customDatesTextRu)}
+                    </p>
+                  </div>
+                ) : dates.length > 0 ? (
                   <div className="mb-3 md:mb-5">
                     <button
                       type="button"
@@ -483,6 +493,22 @@ export default function TourDetail() {
                   data-testid="button-book-now"
                 >
                   {t("Забронировать", "Book Now")}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full h-10 rounded-2xl text-sm font-medium mt-2.5"
+                  onClick={() => {
+                    const tourTitle = lang === "ru" ? tour.titleRu : tour.titleEn;
+                    const msg = encodeURIComponent(t(
+                      `Здравствуйте! Хочу узнать подробнее о туре "${tourTitle}".`,
+                      `Hello! I'd like to learn more about the tour "${tourTitle}".`
+                    ));
+                    window.open(`https://wa.me/992988988087?text=${msg}`, "_blank");
+                  }}
+                  data-testid="button-send-request"
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  {t("Отправить заявку", "Send Request")}
                 </Button>
                 {!user && (
                   <p className="text-xs text-muted-foreground text-center mt-2.5">

@@ -128,6 +128,8 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
     includedEn: tour.includedEn || "",
     notIncludedRu: tour.notIncludedRu || "",
     notIncludedEn: tour.notIncludedEn || "",
+    customDatesTextRu: tour.customDatesTextRu || "",
+    customDatesTextEn: tour.customDatesTextEn || "",
   });
 
   const [localDates, setLocalDates] = useState<any[]>([]);
@@ -253,6 +255,14 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
             </TabsContent>
 
             <TabsContent value="dates" className="pt-2">
+              <div className="border rounded-xl p-4 space-y-3 bg-muted/30 mb-4">
+                <p className="text-sm font-semibold">{t("Текст вместо дат (необязательно)", "Text instead of dates (optional)")}</p>
+                <p className="text-xs text-muted-foreground">{t("Если заполнено, отображается вместо списка дат", "If filled, shows instead of the dates list")}</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label className="text-xs">{t("Текст (RU)", "Text (RU)")}</Label><Input value={form.customDatesTextRu} onChange={e => set("customDatesTextRu", e.target.value)} className="mt-1 h-9 text-sm" placeholder={t("Например: Даты уточняйте", "E.g.: Dates upon request")} /></div>
+                  <div><Label className="text-xs">{t("Текст (EN)", "Text (EN)")}</Label><Input value={form.customDatesTextEn} onChange={e => set("customDatesTextEn", e.target.value)} className="mt-1 h-9 text-sm" placeholder="E.g.: Dates upon request" /></div>
+                </div>
+              </div>
               {isEdit
                 ? <DatesManager tourId={tour.id} />
                 : <LocalDatesManager dates={localDates} setDates={setLocalDates} />}

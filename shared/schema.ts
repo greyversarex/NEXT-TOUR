@@ -75,6 +75,8 @@ export const tours = pgTable("tours", {
   notIncludedRu: text("not_included_ru"),
   notIncludedEn: text("not_included_en"),
   mapUrl: text("map_url"),
+  customDatesTextRu: text("custom_dates_text_ru"),
+  customDatesTextEn: text("custom_dates_text_en"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
