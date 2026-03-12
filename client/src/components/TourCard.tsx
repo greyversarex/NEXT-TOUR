@@ -126,7 +126,9 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
             {description}
           </p>
 
-          <div className="flex items-center justify-between pt-2 sm:pt-3 mt-auto border-t border-border/50">
+          <div className="flex-1 min-h-2 sm:min-h-3" />
+
+          <div className="flex items-center justify-between pt-2 sm:pt-3 border-t border-border/50">
             <div className="flex flex-col">
               <p className="text-[8px] sm:text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-0.5">
                 {t("от", "from")}
