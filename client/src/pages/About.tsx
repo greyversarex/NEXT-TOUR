@@ -59,16 +59,21 @@ export default function About() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
        <div className="bg-white/90 dark:bg-card/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-xl border border-white/30">
 
-        <div className="grid md:grid-cols-2 gap-8 sm:gap-10 mb-12 sm:mb-16">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold mb-4">{t("О нас", "About Us")}</h2>
-            <p className="text-muted-foreground leading-relaxed mb-4 text-sm sm:text-base">
+        <div className="mb-12 sm:mb-16">
+          <h2 className="text-xl sm:text-2xl font-bold mb-5">{t("О нас", "About Us")}</h2>
+          <img
+            src={officePhoto}
+            alt={t("О компании NEXT TOUR", "About NEXT TOUR")}
+            className="w-full rounded-2xl object-cover h-56 sm:h-72 md:h-80 shadow-lg mb-6"
+          />
+          <div className="space-y-4">
+            <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
               {t(
                 "NEXT TOUR — туристическая компания из Душанбе, основанная в 2017 году. Мы специализируемся на организации групповых и индивидуальных туров по самым популярным направлениям мира: от пляжного отдыха в Юго-Восточной Азии до экскурсионных программ по Европе и Ближнему Востоку.",
                 "NEXT TOUR is a travel company from Dushanbe, founded in 2017. We specialize in organizing group and individual tours to the world's most popular destinations: from beach holidays in Southeast Asia to sightseeing programs across Europe and the Middle East."
               )}
             </p>
-            <p className="text-muted-foreground leading-relaxed mb-4 text-sm sm:text-base">
+            <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
               {t(
                 "За годы работы мы помогли тысячам клиентов организовать идеальный отдых. Наша команда опытных менеджеров лично знает каждое направление и подберёт тур, который подойдёт именно вам — будь то романтическое путешествие, семейный отдых или приключение с друзьями.",
                 "Over the years, we have helped thousands of clients organize the perfect vacation. Our team of experienced managers personally knows every destination and will find a tour that suits you — whether it's a romantic trip, a family holiday, or an adventure with friends."
@@ -80,13 +85,6 @@ export default function About() {
                 "We work directly with airlines, hotels, and local partners, which allows us to guarantee the best prices and service quality at every stage of your journey."
               )}
             </p>
-          </div>
-          <div>
-            <img
-              src={officePhoto}
-              alt={t("О компании NEXT TOUR", "About NEXT TOUR")}
-              className="w-full rounded-2xl object-cover h-64 sm:h-72 shadow-lg"
-            />
           </div>
         </div>
 
