@@ -747,5 +747,50 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
   });
 
+  // Currencies (public)
+  app.get("/api/currencies", ah(async (req, res) => {
+    res.json(await storage.getCurrencies(true));
+  }));
+
+  // Currencies (admin)
+  app.get("/api/admin/currencies", requireAdmin, ah(async (req, res) => {
+    res.json(await storage.getCurrencies(false));
+  }));
+  app.post("/api/admin/currencies", requireAdmin, ah(async (req, res) => {
+    const { code, symbol, nameRu, nameEn, rateToBase, isBase, isActive, sortOrder } = req.body;
+    if (!code || !symbol || !nameRu || !nameEn || rateToBase === undefined) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+    if (isBase) {
+      const existing = await storage.getCurrencies(false);
+      for (const c of existing) {
+        if (c.isBase) await storage.updateCurrency(c.id, { isBase: false });
+      }
+    }
+    res.json(await storage.createCurrency({ code, symbol, nameRu, nameEn, rateToBase: String(rateToBase), isBase: isBase || false, isActive: isActive !== false, sortOrder: sortOrder || 0 }));
+  }));
+  app.put("/api/admin/currencies/:id", requireAdmin, ah(async (req, res) => {
+    if (req.body.isBase) {
+      const existing = await storage.getCurrencies(false);
+      for (const c of existing) {
+        if (c.isBase && c.id !== req.params.id) await storage.updateCurrency(c.id, { isBase: false });
+      }
+    }
+    res.json(await storage.updateCurrency(req.params.id, req.body));
+  }));
+  app.delete("/api/admin/currencies/:id", requireAdmin, ah(async (req, res) => {
+    await storage.deleteCurrency(req.params.id);
+    res.json({ success: true });
+  }));
+
+  const existing = await storage.getCurrencies(false);
+  if (existing.length === 0) {
+    await storage.createCurrency({ code: "TJS", symbol: "TJS", nameRu: "Сомони", nameEn: "Somoni", rateToBase: "1", isBase: true, isActive: true, sortOrder: 0 });
+    await storage.createCurrency({ code: "USD", symbol: "$", nameRu: "Доллар США", nameEn: "US Dollar", rateToBase: "10.89", isBase: false, isActive: true, sortOrder: 1 });
+    await storage.createCurrency({ code: "EUR", symbol: "€", nameRu: "Евро", nameEn: "Euro", rateToBase: "11.85", isBase: false, isActive: true, sortOrder: 2 });
+    await storage.createCurrency({ code: "RUB", symbol: "₽", nameRu: "Рубль", nameEn: "Ruble", rateToBase: "0.13", isBase: false, isActive: true, sortOrder: 3 });
+    console.log("[currencies] Seeded default currencies (TJS, USD, EUR, RUB)");
+  }
+
   return httpServer;
 }

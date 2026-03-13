@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useI18n } from "@/lib/i18n";
+import { useCurrency } from "@/lib/currency";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -77,6 +78,7 @@ export default function TourDetail() {
   const cityName = city ? (lang === "ru" ? city.nameRu : city.nameEn) : null;
   const categoryName = category ? (lang === "ru" ? category.nameRu : category.nameEn) : null;
 
+  const { formatPrice, convertPrice, currentSymbol } = useCurrency();
   const price = Number(tour.basePrice);
   const discountedPrice = tour.discountPercent > 0 ? price * (1 - tour.discountPercent / 100) : price;
 
@@ -381,7 +383,7 @@ export default function TourDetail() {
                   <>
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-extrabold text-white">
-                        {t("от", "from")} ${Number(Math.min(...priceTiers.map((t: any) => Number(t.pricePerPerson)))).toFixed(0)}
+                        {t("от", "from")} {formatPrice(Math.min(...priceTiers.map((t: any) => Number(t.pricePerPerson))))}
                       </span>
                       <span className="text-white/70 text-sm">/ {t("чел.", "person")}</span>
                     </div>
@@ -389,7 +391,7 @@ export default function TourDetail() {
                       {priceTiers.map((tier: any) => (
                         <div key={tier.id} className="flex items-center justify-between bg-white/15 rounded-xl px-3 py-1.5">
                           <span className="text-white/90 text-xs">{tier.minPeople}–{tier.maxPeople} {t("чел.", "ppl")}{(tier.labelRu || tier.labelEn) ? ` · ${lang === "ru" ? (tier.labelRu || tier.labelEn) : (tier.labelEn || tier.labelRu)}` : ""}</span>
-                          <span className="text-white font-bold text-sm">${Number(tier.pricePerPerson).toFixed(0)}</span>
+                          <span className="text-white font-bold text-sm">{formatPrice(tier.pricePerPerson)}</span>
                         </div>
                       ))}
                     </div>
@@ -399,9 +401,9 @@ export default function TourDetail() {
                   <>
                     <div className="flex items-baseline gap-2">
                       {tour.discountPercent > 0 && (
-                        <span className="text-white/50 line-through text-base">${price.toFixed(0)}</span>
+                        <span className="text-white/50 line-through text-base">{formatPrice(price)}</span>
                       )}
-                      <span className="text-3xl font-extrabold text-white">${discountedPrice.toFixed(0)}</span>
+                      <span className="text-3xl font-extrabold text-white">{formatPrice(discountedPrice)}</span>
                       <span className="text-white/70 text-sm">/ {t("чел.", "person")}</span>
                     </div>
                     {tour.discountPercent > 0 && (
@@ -467,7 +469,7 @@ export default function TourDetail() {
                       {t("Дополнительно:", "Add-ons:")}
                       {sidebarOptions.length > 0 && !addonsOpen && (
                         <span className="text-xs text-primary font-bold md:hidden">
-                          +${options.filter((o: any) => sidebarOptions.includes(o.id)).reduce((s: number, o: any) => s + Number(o.price), 0).toFixed(0)}
+                          +{formatPrice(options.filter((o: any) => sidebarOptions.includes(o.id)).reduce((s: number, o: any) => s + Number(o.price), 0))}
                         </span>
                       )}
                       <ChevronDown className={`h-4 w-4 ml-auto md:hidden transition-transform ${addonsOpen ? "rotate-180" : ""}`} />
@@ -494,7 +496,7 @@ export default function TourDetail() {
                                 {lang === "ru" ? opt.nameRu : opt.nameEn}
                               </span>
                               <span className={`text-xs font-bold shrink-0 ${checked ? "text-primary" : "text-muted-foreground"}`}>
-                                +${Number(opt.price).toFixed(0)}
+                                +{formatPrice(opt.price)}
                               </span>
                             </label>
                           );
@@ -502,7 +504,7 @@ export default function TourDetail() {
                       </div>
                       {sidebarOptions.length > 0 && (
                         <p className="text-xs text-primary font-semibold mt-2.5 text-right">
-                          +${options.filter((o: any) => sidebarOptions.includes(o.id)).reduce((s: number, o: any) => s + Number(o.price), 0).toFixed(0)} {t("доп. опции", "add-ons")}
+                          +{formatPrice(options.filter((o: any) => sidebarOptions.includes(o.id)).reduce((s: number, o: any) => s + Number(o.price), 0))} {t("доп. опции", "add-ons")}
                         </p>
                       )}
                     </div>
@@ -652,6 +654,7 @@ function CounterField({ label, subLabel, value, min, max, onChange }: { label: s
 
 function BookingModal({ tour, dates, options, priceTiers = [], preselectedOptions = [], onClose }: any) {
   const { t, lang } = useI18n();
+  const { formatPrice, convertPrice, currentSymbol } = useCurrency();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -691,7 +694,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
     mutationFn: (data: any) => apiRequest("POST", "/api/bookings", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
-      toast({ title: t("Бронирование создано!", "Booking created!"), description: t(`К оплате: $${toPay.toFixed(0)}`, `To pay: $${toPay.toFixed(0)}`) });
+      toast({ title: t("Бронирование создано!", "Booking created!"), description: t(`К оплате: ${formatPrice(toPay)}`, `To pay: ${formatPrice(toPay)}`) });
       onClose();
     },
   });
@@ -778,7 +781,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
                 <div className="px-4 py-2 bg-primary/5 border-t border-border">
                   <p className="text-xs text-primary font-semibold flex items-center gap-1.5">
                     <Users className="h-3.5 w-3.5" />
-                    {totalPeople} {t("чел.", "ppl")} — ${Number(activeTier.pricePerPerson).toFixed(0)}/{t("чел.", "person")}
+                    {totalPeople} {t("чел.", "ppl")} — {formatPrice(activeTier.pricePerPerson)}/{t("чел.", "person")}
                     {(activeTier.labelRu || activeTier.labelEn) && (
                       <span className="text-muted-foreground font-normal">({lang === "ru" ? (activeTier.labelRu || activeTier.labelEn) : (activeTier.labelEn || activeTier.labelRu)})</span>
                     )}
@@ -810,7 +813,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
                         />
                         <span className="flex-1 text-sm">{lang === "ru" ? opt.nameRu : opt.nameEn}</span>
                         <span className={`text-sm font-semibold ${checked ? "text-primary" : "text-muted-foreground"}`}>
-                          +${Number(opt.price).toFixed(0)}
+                          +{formatPrice(opt.price)}
                         </span>
                       </label>
                     );
@@ -837,7 +840,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
                   >
                     <div className="text-xs text-muted-foreground mb-0.5">{opt.label}</div>
                     <div className={`text-lg font-bold ${paymentType === opt.value ? "text-primary" : ""}`}>
-                      ${opt.amount.toFixed(0)}
+                      {formatPrice(opt.amount)}
                     </div>
                     <div className="text-xs text-muted-foreground">{opt.sub} {t("от суммы", "of total")}</div>
                   </button>
@@ -849,24 +852,24 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
           <div className="px-6 pb-6">
             <div className="rounded-xl bg-muted/50 border border-border p-4 mb-4 space-y-1.5">
               <div className="flex justify-between text-sm text-muted-foreground">
-                <span>{tierPrice !== null ? `$${tierPrice.toFixed(0)} × ${totalPeople} ${t("чел.", "ppl")}` : `${t("Базовая цена", "Base price")} × ${travelers}`}</span>
-                <span>${tierPrice !== null ? (tierPrice * totalPeople).toFixed(0) : (basePrice * travelers).toFixed(0)}</span>
+                <span>{tierPrice !== null ? `${formatPrice(tierPrice)} × ${totalPeople} ${t("чел.", "ppl")}` : `${t("Базовая цена", "Base price")} × ${travelers}`}</span>
+                <span>{formatPrice(tierPrice !== null ? tierPrice * totalPeople : basePrice * travelers)}</span>
               </div>
               {optionsTotal > 0 && (
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>{t("Дополнительные опции", "Add-ons")} × {tierPrice !== null ? totalPeople : travelers}</span>
-                  <span>+${(optionsTotal * (tierPrice !== null ? totalPeople : travelers)).toFixed(0)}</span>
+                  <span>+{formatPrice(optionsTotal * (tierPrice !== null ? totalPeople : travelers))}</span>
                 </div>
               )}
               {paymentType === "prepay" && (
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>{t("Полная стоимость", "Full amount")}</span>
-                  <span>${totalPrice.toFixed(0)}</span>
+                  <span>{formatPrice(totalPrice)}</span>
                 </div>
               )}
               <div className="flex justify-between items-center pt-2 border-t border-border">
                 <span className="font-semibold">{t("К оплате сейчас", "To pay now")}</span>
-                <span className="text-xl font-bold text-primary">${toPay.toFixed(0)}</span>
+                <span className="text-xl font-bold text-primary">{formatPrice(toPay)}</span>
               </div>
             </div>
 

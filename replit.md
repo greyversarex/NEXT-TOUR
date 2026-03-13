@@ -19,7 +19,7 @@ TravelPro is a bilingual (Russian/English) travel booking platform. It lets user
 Key pages:
 - **Public**: Home (hero slider, featured tours), Tours (search/filter), Tour Detail, Promotions, News, About
 - **User**: Profile (bookings, favorites, loyalty level)
-- **Admin**: Dashboard, Tours (with Dates/Options/Itinerary/Pricing sub-tabs), Bookings, Reviews, Users, Countries, Categories, Feeds, News, Banners, Hero Slides, Intro Screen
+- **Admin**: Dashboard, Tours (with Dates/Options/Itinerary/Pricing sub-tabs), Bookings, Reviews, Users, Countries, Categories, Feeds, News, Banners, Hero Slides, Intro Screen, Currencies
 
 The app is a monorepo with a React frontend, an Express backend, and a shared schema. Everything runs in a single Node.js process in development.
 
@@ -63,6 +63,7 @@ Preferred communication style: Simple, everyday language.
   - `tours` — bilingual titles/descriptions, price, discount percent, hot flag, images (JSON array), country/city/category FK
   - `tourDates`, `priceComponents`, `tourPriceComponents`, `tourOptions`, `tourItinerary` — detailed tour data
   - `banners`, `heroSlides`, `introScreen` — CMS-style content
+  - `currencies` — multi-currency support (code, symbol, rateToBase, isBase flag). Base currency is TJS (Somoni). Prices stored in TJS, converted client-side via `CurrencyProvider` + `useCurrency()` hook in `client/src/lib/currency.tsx`
   - `tourFeeds`, `tourFeedItems` — curated collections of tours
   - `reviews` — with approval status (`pending`/`approved`/`rejected`)
   - `bookings` — status flow (`new`→`prepaid`→`paid`/`cancelled`), payment type

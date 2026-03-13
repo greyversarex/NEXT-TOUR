@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
+import { useCurrency } from "@/lib/currency";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { User, Heart, BookOpen, Trophy, Star, Calendar, DollarSign, Upload, Loader2 } from "lucide-react";
@@ -198,6 +199,7 @@ function EditProfileForm() {
 
 function BookingsTab() {
   const { t, lang } = useI18n();
+  const { formatPrice } = useCurrency();
   const { data: bookings = [], isLoading } = useQuery<any[]>({ queryKey: ["/api/bookings"] });
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -251,7 +253,7 @@ function BookingsTab() {
                       </span>
                       <span className="flex items-center gap-1">
                         <DollarSign className="h-3.5 w-3.5" />
-                        ${Number(booking.totalPrice).toFixed(0)}
+                        {formatPrice(booking.totalPrice)}
                       </span>
                     </div>
                   </div>

@@ -251,6 +251,18 @@ export const passwordResetTokens = pgTable("password_reset_tokens", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const currencies = pgTable("currencies", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  code: text("code").notNull().unique(),
+  symbol: text("symbol").notNull(),
+  nameRu: text("name_ru").notNull(),
+  nameEn: text("name_en").notNull(),
+  rateToBase: decimal("rate_to_base", { precision: 12, scale: 4 }).notNull(),
+  isBase: boolean("is_base").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+});
+
 export const settings = pgTable("settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   key: text("key").notNull().unique(),
@@ -277,6 +289,7 @@ export const insertTourPriceComponentSchema = createInsertSchema(tourPriceCompon
 export const insertTourOptionSchema = createInsertSchema(tourOptions).omit({ id: true });
 export const insertTourItinerarySchema = createInsertSchema(tourItinerary).omit({ id: true });
 export const insertItineraryStopSchema = createInsertSchema(itineraryStops).omit({ id: true });
+export const insertCurrencySchema = createInsertSchema(currencies).omit({ id: true });
 export const insertBannerSchema = createInsertSchema(banners).omit({ id: true });
 export const insertTourFeedSchema = createInsertSchema(tourFeeds).omit({ id: true });
 export const insertTourFeedItemSchema = createInsertSchema(tourFeedItems).omit({ id: true });
@@ -323,6 +336,8 @@ export type Favorite = typeof favorites.$inferSelect;
 export type IntroScreen = typeof introScreen.$inferSelect;
 export type HeroSlide = typeof heroSlides.$inferSelect;
 export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type Currency = typeof currencies.$inferSelect;
+export type InsertCurrency = z.infer<typeof insertCurrencySchema>;
 export type Settings = typeof settings.$inferSelect;
 
 export interface AnalyticsData {

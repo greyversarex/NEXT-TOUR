@@ -10,6 +10,7 @@ import { Menu, X, Globe, User, LogOut, Settings, Heart, BookOpen, ShieldCheck } 
 import AuthModal from "./AuthModal";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
+import { useCurrency } from "@/lib/currency";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -17,6 +18,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const { user, logout } = useAuth();
   const { lang, setLang, t } = useI18n();
+  const { currencies, currentCode, setCurrentCode, currentSymbol } = useCurrency();
   const [location] = useLocation();
 
   useEffect(() => {
@@ -117,6 +119,33 @@ export default function Header() {
                 <Globe className="h-4 w-4" />
                 <span className="text-xs font-bold">{lang.toUpperCase()}</span>
               </Button>
+
+              {currencies.length > 1 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1 h-9 px-2.5 rounded-lg transition-all duration-200 text-white/90 hover:text-white hover:bg-white/15"
+                      data-testid="button-currency-toggle"
+                    >
+                      <span className="text-xs font-bold">{currentSymbol}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="min-w-[140px] rounded-xl shadow-xl border-border/60 p-1">
+                    {currencies.map(c => (
+                      <DropdownMenuItem
+                        key={c.id}
+                        onClick={() => setCurrentCode(c.code)}
+                        className={`rounded-lg text-sm cursor-pointer ${currentCode === c.code ? "bg-primary/10 font-bold" : ""}`}
+                      >
+                        <span className="font-semibold mr-2">{c.symbol}</span>
+                        {lang === "ru" ? c.nameRu : c.nameEn}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
 
               {user ? (
                 <DropdownMenu>

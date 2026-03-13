@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/lib/i18n";
+import { CurrencyProvider } from "@/lib/currency";
 import { AuthProvider } from "@/lib/auth";
 import NotFound from "@/pages/not-found";
 import Header from "@/components/Header";
@@ -37,6 +38,7 @@ const HeroSlidesAdmin    = lazy(() => import("@/pages/admin/HeroSlidesAdmin"));
 const StatisticsAdmin    = lazy(() => import("@/pages/admin/StatisticsAdmin"));
 const LoyaltyAdmin       = lazy(() => import("@/pages/admin/LoyaltyAdmin"));
 const IntroScreenAdmin   = lazy(() => import("@/pages/admin/IntroScreenAdmin"));
+const CurrenciesAdmin    = lazy(() => import("@/pages/admin/CurrenciesAdmin"));
 
 function AdminFallback() {
   return (
@@ -104,6 +106,9 @@ function Router() {
       <Route path="/admin/intro-screen">
         {() => <Suspense fallback={<AdminFallback />}><IntroScreenAdmin /></Suspense>}
       </Route>
+      <Route path="/admin/currencies">
+        {() => <Suspense fallback={<AdminFallback />}><CurrenciesAdmin /></Suspense>}
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
@@ -137,12 +142,14 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <AppShell />
-          </TooltipProvider>
-        </AuthProvider>
+        <CurrencyProvider>
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <AppShell />
+            </TooltipProvider>
+          </AuthProvider>
+        </CurrencyProvider>
       </I18nProvider>
     </QueryClientProvider>
   );

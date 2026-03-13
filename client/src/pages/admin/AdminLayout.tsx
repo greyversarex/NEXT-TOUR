@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Map, Building2, Tag, Image, Layers,
   Users, BookOpen, MessageSquare, Newspaper,
   PlusCircle, ChevronRight, Settings, Globe, BarChart3,
-  Award, Monitor
+  Award, Monitor, Coins
 } from "lucide-react";
 
 const navItems = [
@@ -25,6 +25,7 @@ const navItems = [
   { href: "/admin/reviews", label: "Reviews", labelRu: "Отзывы", icon: MessageSquare },
   { href: "/admin/bookings", label: "Bookings", labelRu: "Бронирования", icon: BookOpen },
   { href: "/admin/users", label: "Users", labelRu: "Пользователи", icon: Users },
+  { href: "/admin/currencies", label: "Currencies", labelRu: "Валюты", icon: Coins },
 ];
 
 interface AdminLayoutProps {

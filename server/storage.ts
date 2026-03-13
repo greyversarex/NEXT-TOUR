@@ -4,7 +4,7 @@ import {
   users, countries, cities, categories, tours, tourDates, tourPriceTiers,
   priceComponents, tourPriceComponents, tourOptions, tourItinerary, itineraryStops,
   banners, tourFeeds, tourFeedItems, reviews, bookings, news,
-  favorites, introScreen, heroSlides, passwordResetTokens, settings,
+  favorites, introScreen, heroSlides, passwordResetTokens, currencies, settings,
   type User, type InsertUser, type Country, type InsertCountry,
   type City, type InsertCity, type Category, type InsertCategory,
   type Tour, type InsertTour, type TourDate, type InsertTourDate,
@@ -14,7 +14,7 @@ import {
   type Banner, type InsertBanner, type TourFeed, type TourFeedItem,
   type Review, type InsertReview, type Booking, type InsertBooking,
   type News, type InsertNews, type Favorite, type IntroScreen, type HeroSlide,
-  type PasswordResetToken,
+  type PasswordResetToken, type Currency, type InsertCurrency,
   type AnalyticsData, type LoyaltySettings,
 } from "@shared/schema";
 import bcrypt from "bcryptjs";
@@ -164,6 +164,12 @@ export interface IStorage {
   // Loyalty Settings
   getLoyaltySettings(): Promise<LoyaltySettings>;
   updateLoyaltySettings(data: LoyaltySettings): Promise<LoyaltySettings>;
+
+  // Currencies
+  getCurrencies(activeOnly?: boolean): Promise<Currency[]>;
+  createCurrency(data: any): Promise<Currency>;
+  updateCurrency(id: string, data: Partial<Currency>): Promise<Currency | undefined>;
+  deleteCurrency(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -886,6 +892,27 @@ export class DatabaseStorage implements IStorage {
       await db.insert(settings).values({ key: "loyalty", value: data as any });
     }
     return data;
+  }
+
+  async getCurrencies(activeOnly = false) {
+    if (activeOnly) {
+      return db.select().from(currencies).where(eq(currencies.isActive, true)).orderBy(asc(currencies.sortOrder));
+    }
+    return db.select().from(currencies).orderBy(asc(currencies.sortOrder));
+  }
+
+  async createCurrency(data: any) {
+    const [c] = await db.insert(currencies).values(data).returning();
+    return c;
+  }
+
+  async updateCurrency(id: string, data: Partial<Currency>) {
+    const [c] = await db.update(currencies).set(data as any).where(eq(currencies.id, id)).returning();
+    return c;
+  }
+
+  async deleteCurrency(id: string) {
+    await db.delete(currencies).where(eq(currencies.id, id));
   }
 }
 

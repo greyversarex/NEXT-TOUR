@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Clock, Heart, ArrowRight, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { useCurrency } from "@/lib/currency";
 import { useAuth } from "@/lib/auth";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -19,6 +20,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
   const queryClient = useQueryClient();
   const [favState, setFavState] = useState(isFavorite);
 
+  const { formatPrice } = useCurrency();
   const title = lang === "ru" ? tour.titleRu : tour.titleEn;
   const description = lang === "ru" ? tour.descriptionRu : tour.descriptionEn;
   const price = Number(tour.basePrice);
@@ -133,14 +135,14 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
               </span>
               {tour.discountPercent > 0 && (
                 <span className="text-xs text-muted-foreground/70 line-through font-medium">
-                  ${price.toFixed(0)}
+                  {formatPrice(price)}
                 </span>
               )}
               <span
                 className="text-lg sm:text-xl font-extrabold leading-none bg-gradient-to-br from-primary to-cyan-500 bg-clip-text text-transparent"
                 data-testid={`text-tour-price-${tour.id}`}
               >
-                ${discountedPrice.toFixed(0)}
+                {formatPrice(discountedPrice)}
               </span>
               <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">
                 / {t("чел.", "p.")}
