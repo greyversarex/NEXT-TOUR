@@ -135,6 +135,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
   const [localDates, setLocalDates] = useState<any[]>([]);
   const [localOptions, setLocalOptions] = useState<any[]>([]);
   const [localItinerary, setLocalItinerary] = useState<any[]>([]);
+  const [localPriceTiers, setLocalPriceTiers] = useState<any[]>([]);
 
   const set = (key: string, val: any) => setForm(p => ({ ...p, [key]: val }));
 
@@ -149,10 +150,11 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
       );
       const saved = await res.json();
       const tourId = saved.id;
-      if (!isEdit && (localDates.length || localOptions.length || localItinerary.length)) {
+      if (!isEdit && (localDates.length || localOptions.length || localItinerary.length || localPriceTiers.length)) {
         await Promise.all([
           ...localDates.map(d => apiRequest("POST", `/api/tours/${tourId}/dates`, { ...d, tourId })),
           ...localOptions.map(o => apiRequest("POST", `/api/tours/${tourId}/options`, { ...o, tourId })),
+          ...localPriceTiers.map(pt => apiRequest("POST", `/api/tours/${tourId}/price-tiers`, { ...pt, tourId })),
         ]);
         for (const day of localItinerary) {
           const dayRes = await apiRequest("POST", `/api/tours/${tourId}/itinerary`, { ...day, tourId });
@@ -287,7 +289,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
             <TabsContent value="pricing" className="pt-2">
               {isEdit
                 ? <PriceTiersManager tourId={tour.id} />
-                : <p className="text-sm text-muted-foreground py-4">{t("Сохраните тур, чтобы настроить ценовые уровни", "Save the tour first to configure price tiers")}</p>}
+                : <LocalPriceTiersManager tiers={localPriceTiers} setTiers={setLocalPriceTiers} />}
               {saveBtn}
             </TabsContent>
           </form>
@@ -754,6 +756,54 @@ function ItineraryManager({ tourId }: { tourId: string }) {
                   </div>
                 </div>
               )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LocalPriceTiersManager({ tiers, setTiers }: { tiers: any[]; setTiers: (t: any[]) => void }) {
+  const { t } = useI18n();
+  const [form, setForm] = useState({ minPeople: "", maxPeople: "", pricePerPerson: "", labelRu: "", labelEn: "" });
+  const add = () => {
+    if (!form.minPeople || !form.maxPeople || !form.pricePerPerson) return;
+    setTiers([...tiers, { ...form, minPeople: Number(form.minPeople), maxPeople: Number(form.maxPeople), id: "local-" + Date.now() + "-" + Math.random().toString(36).slice(2) }]);
+    setForm({ minPeople: "", maxPeople: "", pricePerPerson: "", labelRu: "", labelEn: "" });
+  };
+  return (
+    <div className="space-y-4">
+      <div className="border rounded-xl p-4 bg-muted/30 space-y-3">
+        <p className="text-sm font-semibold">{t("Ценообразование по количеству людей", "Group size pricing")}</p>
+        <p className="text-xs text-muted-foreground">{t("Задайте цену за человека для разного количества участников. Если уровни заданы, они заменят базовую цену.", "Set per-person price for different group sizes. If tiers are set, they replace the base price.")}</p>
+        <div className="grid grid-cols-5 gap-2">
+          <div><Label className="text-xs">{t("Мин. чел.", "Min ppl")}</Label><Input type="number" min={1} value={form.minPeople} onChange={e => setForm(p => ({ ...p, minPeople: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Макс. чел.", "Max ppl")}</Label><Input type="number" min={1} value={form.maxPeople} onChange={e => setForm(p => ({ ...p, maxPeople: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Цена ($)", "Price ($)")}</Label><Input type="number" min={0} step="0.01" value={form.pricePerPerson} onChange={e => setForm(p => ({ ...p, pricePerPerson: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Метка (RU)", "Label (RU)")}</Label><Input value={form.labelRu} onChange={e => setForm(p => ({ ...p, labelRu: e.target.value }))} className="mt-1 h-9 text-sm" placeholder={t("Малая группа", "Small group")} /></div>
+          <div><Label className="text-xs">{t("Метка (EN)", "Label (EN)")}</Label><Input value={form.labelEn} onChange={e => setForm(p => ({ ...p, labelEn: e.target.value }))} className="mt-1 h-9 text-sm" placeholder="Small group" /></div>
+        </div>
+        <Button type="button" size="sm" disabled={!form.minPeople || !form.maxPeople || !form.pricePerPerson} onClick={add}>
+          <Plus className="h-3.5 w-3.5 mr-1" />{t("Добавить уровень", "Add Tier")}
+        </Button>
+      </div>
+      {tiers.length === 0 ? <p className="text-sm text-muted-foreground text-center py-4">{t("Нет ценовых уровней", "No price tiers yet")}</p> : (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold">{t("Ценовые уровни", "Price Tiers")}</p>
+          {tiers.map((tier: any) => (
+            <div key={tier.id} className="flex items-center justify-between border rounded-lg px-4 py-3 bg-card">
+              <div className="flex items-center gap-4">
+                <Badge variant="secondary" className="text-xs">{tier.minPeople}–{tier.maxPeople} {t("чел.", "ppl")}</Badge>
+                <span className="text-sm font-bold text-primary">${Number(tier.pricePerPerson).toFixed(0)}</span>
+                <span className="text-xs text-muted-foreground">{t("за человека", "per person")}</span>
+                {(tier.labelRu || tier.labelEn) && (
+                  <span className="text-xs text-muted-foreground italic">({tier.labelRu || tier.labelEn})</span>
+                )}
+              </div>
+              <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setTiers(tiers.filter((x: any) => x.id !== tier.id))}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           ))}
         </div>
