@@ -40,8 +40,8 @@ export default function Promotions() {
                 <Flame className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold leading-tight">{t("Горящие туры", "Hot Deals")}</h2>
-                <p className="text-sm text-muted-foreground mt-0.5">{t("Ограниченные предложения — бронируйте скорее!", "Limited time offers — book fast!")}</p>
+                <h2 className="text-2xl md:text-3xl font-bold leading-tight text-white drop-shadow">{t("Горящие туры", "Hot Deals")}</h2>
+                <p className="text-sm text-white/70 mt-0.5">{t("Ограниченные предложения — бронируйте скорее!", "Limited time offers — book fast!")}</p>
               </div>
               <Badge className="ml-auto bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400 border-0 rounded-full text-sm px-3 py-1 font-bold">
                 {hotTours.length}
@@ -66,8 +66,8 @@ export default function Promotions() {
                 <Tag className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold leading-tight">{t("Туры со скидкой", "Discounted Tours")}</h2>
-                <p className="text-sm text-muted-foreground mt-0.5">{t("Специальные цены для вас", "Special prices just for you")}</p>
+                <h2 className="text-2xl md:text-3xl font-bold leading-tight text-white drop-shadow">{t("Туры со скидкой", "Discounted Tours")}</h2>
+                <p className="text-sm text-white/70 mt-0.5">{t("Специальные цены для вас", "Special prices just for you")}</p>
               </div>
             </div>
             {discLoading ? (
