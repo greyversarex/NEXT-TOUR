@@ -33,12 +33,8 @@ export default function TourDetail() {
   const [currentImg, setCurrentImg] = useState(0);
   const [authOpen, setAuthOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
-  const [sidebarOptions, setSidebarOptions] = useState<string[]>([]);
-  const [sidebarAdults, setSidebarAdults] = useState(1);
-  const [sidebarChildren, setSidebarChildren] = useState(0);
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const [datesOpen, setDatesOpen] = useState(!isMobile);
-  const [addonsOpen, setAddonsOpen] = useState(!isMobile);
 
   const { data, isLoading } = useQuery<any>({
     queryKey: [`/api/tours/${id}/full`],
@@ -459,118 +455,6 @@ export default function TourDetail() {
                   </p>
                 )}
 
-                {options.length > 0 && (
-                  <div className="mb-3 md:mb-5">
-                    <button
-                      type="button"
-                      className="text-sm font-semibold flex items-center gap-1.5 mb-3 w-full md:cursor-default"
-                      onClick={() => setAddonsOpen(p => !p)}
-                      data-testid="toggle-addons"
-                    >
-                      <Tag className="h-4 w-4 text-primary" />
-                      {t("Дополнительно:", "Add-ons:")}
-                      {sidebarOptions.length > 0 && !addonsOpen && (
-                        <span className="text-xs text-primary font-bold md:hidden">
-                          +{formatPrice(options.filter((o: any) => sidebarOptions.includes(o.id)).reduce((s: number, o: any) => s + Number(o.price), 0))}
-                        </span>
-                      )}
-                      <ChevronDown className={`h-4 w-4 ml-auto md:hidden transition-transform ${addonsOpen ? "rotate-180" : ""}`} />
-                    </button>
-                    <div className={`${addonsOpen ? "" : "hidden md:block"}`}>
-                      <div className="space-y-1.5 rounded-2xl border border-border/50 p-2 md:p-3 bg-muted/30">
-                        {options.map((opt: any) => {
-                          const checked = sidebarOptions.includes(opt.id);
-                          return (
-                            <label
-                              key={opt.id}
-                              className={`flex items-center justify-between gap-2 cursor-pointer rounded-xl px-3 py-1.5 md:py-2 transition-all duration-200 ${checked ? "bg-primary/10 border border-primary/20" : "hover:bg-muted border border-transparent"}`}
-                              data-testid={`checkbox-addon-${opt.id}`}
-                            >
-                              <span className="flex items-center gap-2.5 text-sm">
-                                <Checkbox
-                                  checked={checked}
-                                  onCheckedChange={v =>
-                                    setSidebarOptions(prev =>
-                                      v ? [...prev, opt.id] : prev.filter(x => x !== opt.id)
-                                    )
-                                  }
-                                />
-                                {lang === "ru" ? opt.nameRu : opt.nameEn}
-                              </span>
-                              <span className={`text-xs font-bold shrink-0 ${checked ? "text-primary" : "text-muted-foreground"}`}>
-                                +{formatPrice(opt.price)}
-                              </span>
-                            </label>
-                          );
-                        })}
-                      </div>
-                      {sidebarOptions.length > 0 && (
-                        <p className="text-xs text-primary font-semibold mt-2.5 text-right">
-                          +{formatPrice(options.filter((o: any) => sidebarOptions.includes(o.id)).reduce((s: number, o: any) => s + Number(o.price), 0))} {t("доп. опции", "add-ons")}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Tourist counter */}
-                <div className="rounded-2xl border border-border/60 bg-muted/30 px-4 py-3 mb-3 md:mb-4 space-y-2">
-                  <p className="text-sm font-semibold flex items-center gap-1.5 mb-1">
-                    <Users className="h-4 w-4 text-primary" />
-                    {t("Туристы", "Travelers")}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">{t("Взрослые", "Adults")}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button type="button" onClick={() => setSidebarAdults(a => Math.max(1, a - 1))} disabled={sidebarAdults <= 1}
-                        className="w-7 h-7 rounded-full border-2 border-border flex items-center justify-center text-base font-bold transition-colors hover:border-primary hover:text-primary disabled:opacity-30">−</button>
-                      <span className="w-5 text-center font-semibold text-sm">{sidebarAdults}</span>
-                      <button type="button" onClick={() => setSidebarAdults(a => Math.min(10, a + 1))} disabled={sidebarAdults >= 10}
-                        className="w-7 h-7 rounded-full border-2 border-border flex items-center justify-center text-base font-bold transition-colors hover:border-primary hover:text-primary disabled:opacity-30">+</button>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">{t("Дети", "Children")}</p>
-                      <p className="text-xs text-muted-foreground">{priceTiers.length > 0 ? t("учитываются в кол-ве", "counted in group") : t("до 12 лет — 50%", "under 12 — 50%")}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button type="button" onClick={() => setSidebarChildren(c => Math.max(0, c - 1))} disabled={sidebarChildren <= 0}
-                        className="w-7 h-7 rounded-full border-2 border-border flex items-center justify-center text-base font-bold transition-colors hover:border-primary hover:text-primary disabled:opacity-30">−</button>
-                      <span className="w-5 text-center font-semibold text-sm">{sidebarChildren}</span>
-                      <button type="button" onClick={() => setSidebarChildren(c => Math.min(6, c + 1))} disabled={sidebarChildren >= 6}
-                        className="w-7 h-7 rounded-full border-2 border-border flex items-center justify-center text-base font-bold transition-colors hover:border-primary hover:text-primary disabled:opacity-30">+</button>
-                    </div>
-                  </div>
-                  {(() => {
-                    const total = sidebarAdults + sidebarChildren;
-                    const optExtra = sidebarOptions.length > 0 ? options.filter((o: any) => sidebarOptions.includes(o.id)).reduce((s: number, o: any) => s + Number(o.price), 0) : 0;
-                    if (priceTiers.length > 0) {
-                      const sorted = [...priceTiers].sort((a: any, b: any) => a.minPeople - b.minPeople);
-                      const tier = sorted.find((t: any) => total >= t.minPeople && total <= t.maxPeople)
-                        || (total > sorted[sorted.length - 1].maxPeople ? sorted[sorted.length - 1] : sorted[0]);
-                      const perPerson = Number(tier.pricePerPerson);
-                      const totalCost = (perPerson + optExtra) * total;
-                      return (
-                        <div className="pt-2 border-t border-border/50 flex items-center justify-between">
-                          <span className="text-xs text-muted-foreground">{total} {t("чел.", "ppl")} × {formatPrice(perPerson)}</span>
-                          <span className="text-sm font-bold text-primary">{formatPrice(totalCost)}</span>
-                        </div>
-                      );
-                    }
-                    const travelers = sidebarAdults + sidebarChildren * 0.5;
-                    const totalCost = (discountedPrice + optExtra) * travelers;
-                    return (
-                      <div className="pt-2 border-t border-border/50 flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">{sidebarAdults} {t("взр.", "adult")}{sidebarChildren > 0 ? ` + ${sidebarChildren} ${t("дет.", "child")}` : ""}</span>
-                        <span className="text-sm font-bold text-primary">{formatPrice(totalCost)}</span>
-                      </div>
-                    );
-                  })()}
-                </div>
-
                 <Button
                   className="w-full h-12 rounded-2xl font-bold text-base shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
                   onClick={() => user ? setBookingOpen(true) : setAuthOpen(true)}
@@ -621,9 +505,6 @@ export default function TourDetail() {
           dates={dates}
           options={options}
           priceTiers={priceTiers}
-          preselectedOptions={sidebarOptions}
-          initialAdults={sidebarAdults}
-          initialChildren={sidebarChildren}
           onClose={() => setBookingOpen(false)}
         />
       )}
