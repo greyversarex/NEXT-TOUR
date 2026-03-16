@@ -39,6 +39,7 @@ const StatisticsAdmin    = lazy(() => import("@/pages/admin/StatisticsAdmin"));
 const LoyaltyAdmin       = lazy(() => import("@/pages/admin/LoyaltyAdmin"));
 const IntroScreenAdmin   = lazy(() => import("@/pages/admin/IntroScreenAdmin"));
 const CurrenciesAdmin    = lazy(() => import("@/pages/admin/CurrenciesAdmin"));
+const EmailAdmin         = lazy(() => import("@/pages/admin/EmailAdmin"));
 
 function AdminFallback() {
   return (
@@ -108,6 +109,9 @@ function Router() {
       </Route>
       <Route path="/admin/currencies">
         {() => <Suspense fallback={<AdminFallback />}><CurrenciesAdmin /></Suspense>}
+      </Route>
+      <Route path="/admin/email">
+        {() => <Suspense fallback={<AdminFallback />}><EmailAdmin /></Suspense>}
       </Route>
       <Route component={NotFound} />
     </Switch>

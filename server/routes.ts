@@ -10,7 +10,7 @@ import { Pool } from "pg";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import path from "path";
-import { sendPasswordResetEmail, sendWelcomeEmail } from "./email";
+import { sendPasswordResetEmail, sendWelcomeEmail, sendBookingConfirmationEmail, sendBulkEmail } from "./email";
 import multer from "multer";
 import { storage } from "./storage";
 import {
@@ -575,6 +575,33 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     try {
       const user = req.user as any;
       const booking = await storage.createBooking({ ...req.body, userId: user.id });
+
+      // Send confirmation email asynchronously (don't block response)
+      if (user.email) {
+        const tour = await storage.getTour(booking.tourId);
+        let startDate: string | undefined;
+        let endDate: string | undefined;
+        if (booking.tourDateId) {
+          const dates = await storage.getTourDates(booking.tourId);
+          const d = dates.find((x: any) => x.id === booking.tourDateId);
+          if (d) {
+            startDate = new Date(d.startDate).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" });
+            endDate = new Date(d.endDate).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" });
+          }
+        }
+        sendBookingConfirmationEmail({
+          toEmail: user.email,
+          name: user.name,
+          tourTitle: tour?.titleRu || "Тур",
+          bookingId: booking.id,
+          adults: booking.adults,
+          children: booking.children,
+          totalPrice: booking.totalPrice,
+          startDate,
+          endDate,
+        }).catch(err => console.error("[email] booking confirmation error:", err));
+      }
+
       res.json(booking);
     } catch (e: any) {
       res.status(400).json({ message: e.message });
@@ -791,6 +818,64 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     await storage.createCurrency({ code: "RUB", symbol: "₽", nameRu: "Рубль", nameEn: "Ruble", rateToBase: "0.13", isBase: false, isActive: true, sortOrder: 3 });
     console.log("[currencies] Seeded default currencies (TJS, USD, EUR, RUB)");
   }
+
+  // Email broadcast (admin only)
+  app.post("/api/admin/email/broadcast", requireAdmin, ah(async (req, res) => {
+    const { subject, html, audience } = req.body;
+    if (!subject || !html) return res.status(400).json({ message: "subject and html are required" });
+
+    const allUsers = await storage.getAllUsers();
+
+    let recipients: Array<{ email: string; name: string }>;
+    if (audience === "all") {
+      recipients = allUsers.map(u => ({ email: u.email, name: u.name }));
+    } else if (audience === "booked") {
+      const allBookings = await storage.getBookings();
+      const bookedUserIds = new Set(allBookings.map((b: any) => b.userId));
+      recipients = allUsers.filter(u => bookedUserIds.has(u.id)).map(u => ({ email: u.email, name: u.name }));
+    } else {
+      recipients = allUsers.filter(u => u.role === "user").map(u => ({ email: u.email, name: u.name }));
+    }
+
+    if (recipients.length === 0) return res.json({ sent: 0, failed: 0, total: 0 });
+
+    const result = await sendBulkEmail({ recipients, subject, html });
+    res.json({ ...result, total: recipients.length });
+  }));
+
+  // Send booking confirmation manually (admin)
+  app.post("/api/admin/email/booking/:id", requireAdmin, ah(async (req, res) => {
+    const booking = await storage.getBooking(req.params.id) as any;
+    if (!booking) return res.status(404).json({ message: "Booking not found" });
+
+    const user = await storage.getUser(booking.userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    let startDate: string | undefined;
+    let endDate: string | undefined;
+    if (booking.tourDateId) {
+      const dates = await storage.getTourDates(booking.tourId);
+      const d = dates.find((x: any) => x.id === booking.tourDateId);
+      if (d) {
+        startDate = new Date(d.startDate).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" });
+        endDate = new Date(d.endDate).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" });
+      }
+    }
+
+    const ok = await sendBookingConfirmationEmail({
+      toEmail: user.email,
+      name: user.name,
+      tourTitle: booking.tour?.titleRu || "Тур",
+      bookingId: booking.id,
+      adults: booking.adults,
+      children: booking.children,
+      totalPrice: booking.totalPrice,
+      startDate,
+      endDate,
+    });
+
+    res.json({ success: ok });
+  }));
 
   return httpServer;
 }
