@@ -15,7 +15,7 @@ import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route, ChevronDown, ChevronRight, MapPin, Clock, DollarSign } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route, ChevronDown, ChevronRight, MapPin, Clock, DollarSign, X } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Tour, Country, Category } from "@shared/schema";
@@ -120,6 +120,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
     basePrice: tour.basePrice || 500,
     discountPercent: tour.discountPercent || 0,
     mainImage: tour.mainImage || "",
+    images: (tour.images || []) as string[],
     mapUrl: tour.mapUrl || "",
     isHot: tour.isHot || false,
     isFeatured: tour.isFeatured || false,
@@ -239,6 +240,51 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
                   <div><Label>{t("Скидка (%)", "Discount (%)")}</Label><Input type="number" value={form.discountPercent} onChange={e => set("discountPercent", Number(e.target.value))} className="mt-1" min={0} max={100} /></div>
                 </div>
                 <div><Label>{t("Главное фото", "Main Image")}</Label><div className="mt-1"><ImageUpload value={form.mainImage} onChange={v => set("mainImage", v)} /></div></div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label>{t("Галерея фото", "Photo Gallery")}</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 gap-1 text-xs"
+                      onClick={() => set("images", [...form.images, ""])}
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      {t("Добавить фото", "Add Photo")}
+                    </Button>
+                  </div>
+                  {form.images.length === 0 && (
+                    <p className="text-xs text-muted-foreground py-2">{t("Нет дополнительных фото", "No additional photos")}</p>
+                  )}
+                  <div className="space-y-2">
+                    {form.images.map((img: string, idx: number) => (
+                      <div key={idx} className="flex gap-2 items-center">
+                        <div className="flex-1">
+                          <ImageUpload
+                            value={img}
+                            onChange={v => {
+                              const updated = [...form.images];
+                              updated[idx] = v;
+                              set("images", updated);
+                            }}
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
+                          onClick={() => set("images", form.images.filter((_: string, i: number) => i !== idx))}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <div><Label>{t("Ссылка на карту (iframe URL)", "Map URL (iframe)")}</Label><Input value={form.mapUrl} onChange={e => set("mapUrl", e.target.value)} className="mt-1" placeholder="https://www.google.com/maps/embed?..." /></div>
                 <div className="grid grid-cols-2 gap-4">
                   <div><Label>{t("Включено (RU)", "Included (RU)")}</Label><Textarea value={form.includedRu} onChange={e => set("includedRu", e.target.value)} className="mt-1" placeholder={t("Каждый пункт на новой строке", "One item per line")} /></div>
