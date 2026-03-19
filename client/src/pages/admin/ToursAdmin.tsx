@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "./AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route, ChevronDown, ChevronRight, MapPin, Clock, DollarSign, X } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route, ChevronDown, ChevronRight, MapPin, Clock, DollarSign, X, Upload, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Tour, Country, Category } from "@shared/schema";
@@ -108,6 +108,8 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
   const isEdit = !!tour.id;
 
   const [saving, setSaving] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     titleRu: tour.titleRu || "",
     titleEn: tour.titleEn || "",
@@ -139,6 +141,29 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
   const [localPriceTiers, setLocalPriceTiers] = useState<any[]>([]);
 
   const set = (key: string, val: any) => setForm(p => ({ ...p, [key]: val }));
+
+  const handleGalleryFiles = async (files: FileList) => {
+    setUploadingGallery(true);
+    try {
+      const uploaded: string[] = [];
+      for (const file of Array.from(files)) {
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await fetch("/api/upload", { method: "POST", body: fd, credentials: "include" });
+        if (res.ok) {
+          const { url } = await res.json();
+          uploaded.push(url);
+        }
+      }
+      if (uploaded.length) {
+        setForm(p => ({ ...p, images: [...p.images, ...uploaded] }));
+      }
+    } catch {
+      toast({ title: "Ошибка загрузки", variant: "destructive" });
+    } finally {
+      setUploadingGallery(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -242,46 +267,44 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
                 <div><Label>{t("Главное фото", "Main Image")}</Label><div className="mt-1"><ImageUpload value={form.mainImage} onChange={v => set("mainImage", v)} /></div></div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <Label>{t("Галерея фото", "Photo Gallery")}</Label>
+                  <Label>{t("Галерея фото", "Photo Gallery")}</Label>
+                  <div className="flex flex-wrap gap-2 mt-1 items-center">
+                    {form.images.map((img: string, idx: number) => (
+                      <div key={idx} className="relative group">
+                        <img
+                          src={img}
+                          alt=""
+                          className="h-10 w-14 object-cover rounded border border-border"
+                          onError={e => (e.currentTarget.style.display = "none")}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => set("images", form.images.filter((_: string, i: number) => i !== idx))}
+                          className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-2.5 w-2.5" />
+                        </button>
+                      </div>
+                    ))}
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="h-7 gap-1 text-xs"
-                      onClick={() => set("images", [...form.images, ""])}
+                      className="h-10 gap-1.5 shrink-0"
+                      disabled={uploadingGallery}
+                      onClick={() => galleryInputRef.current?.click()}
                     >
-                      <Plus className="h-3.5 w-3.5" />
-                      {t("Добавить фото", "Add Photo")}
+                      {uploadingGallery ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                      {uploadingGallery ? "..." : t("Загрузить", "Upload")}
                     </Button>
-                  </div>
-                  {form.images.length === 0 && (
-                    <p className="text-xs text-muted-foreground py-2">{t("Нет дополнительных фото", "No additional photos")}</p>
-                  )}
-                  <div className="space-y-2">
-                    {form.images.map((img: string, idx: number) => (
-                      <div key={idx} className="flex gap-2 items-center">
-                        <div className="flex-1">
-                          <ImageUpload
-                            value={img}
-                            onChange={v => {
-                              const updated = [...form.images];
-                              updated[idx] = v;
-                              set("images", updated);
-                            }}
-                          />
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
-                          onClick={() => set("images", form.images.filter((_: string, i: number) => i !== idx))}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
+                    <input
+                      ref={galleryInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={e => e.target.files?.length && handleGalleryFiles(e.target.files)}
+                    />
                   </div>
                 </div>
 
