@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "./AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -98,6 +98,85 @@ export default function ToursAdmin() {
         />
       )}
     </AdminLayout>
+  );
+}
+
+function ImagePositionPicker({ src, value, onChange, label, hint, height = 200 }: {
+  src: string; value: string; onChange: (v: string) => void;
+  label: string; hint: string; height?: number;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+  const startMouse = useRef({ x: 0, y: 0 });
+  const startPct = useRef({ x: 50, y: 50 });
+
+  const parsePos = (v: string) => {
+    const parts = v.split(" ");
+    return { x: parseFloat(parts[0]) || 50, y: parseFloat(parts[1]) || 50 };
+  };
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    dragging.current = true;
+    startMouse.current = { x: e.clientX, y: e.clientY };
+    startPct.current = parsePos(value);
+    e.preventDefault();
+  };
+
+  const onMouseMove = useCallback((e: MouseEvent) => {
+    if (!dragging.current || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const dx = e.clientX - startMouse.current.x;
+    const dy = e.clientY - startMouse.current.y;
+    const newX = Math.max(0, Math.min(100, startPct.current.x - (dx / rect.width) * 100));
+    const newY = Math.max(0, Math.min(100, startPct.current.y - (dy / rect.height) * 100));
+    onChange(`${Math.round(newX)}% ${Math.round(newY)}%`);
+  }, [onChange]);
+
+  const onMouseUp = useCallback(() => { dragging.current = false; }, []);
+
+  useEffect(() => {
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+  }, [onMouseMove, onMouseUp]);
+
+  const { x, y } = parsePos(value);
+
+  return (
+    <div>
+      <Label>{label}</Label>
+      <p className="text-xs text-muted-foreground mt-0.5 mb-2">{hint}</p>
+      <div
+        ref={containerRef}
+        className="relative w-full rounded-lg overflow-hidden border-2 border-primary/40 select-none cursor-grab active:cursor-grabbing"
+        style={{
+          height,
+          backgroundImage: `url(${src})`,
+          backgroundSize: "cover",
+          backgroundPosition: value,
+          backgroundRepeat: "no-repeat",
+        }}
+        onMouseDown={onMouseDown}
+      >
+        {/* Center crosshair */}
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+          <div className="w-8 h-8 relative">
+            <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-white/80 -translate-x-1/2 shadow-[0_0_3px_rgba(0,0,0,0.8)]" />
+            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-white/80 -translate-y-1/2 shadow-[0_0_3px_rgba(0,0,0,0.8)]" />
+            <div className="absolute inset-1 rounded-full border-2 border-white/80 shadow-[0_0_3px_rgba(0,0,0,0.8)]" />
+          </div>
+        </div>
+        <div className="absolute top-2 left-2 bg-black/50 text-white text-[11px] px-2 py-1 rounded backdrop-blur-sm pointer-events-none">
+          ← → ↑ ↓ {hint.split("(")[0].trim()}
+        </div>
+        <div className="absolute bottom-2 right-2 font-mono text-[10px] text-white/80 bg-black/40 px-1.5 py-0.5 rounded pointer-events-none">
+          {Math.round(x)}% {Math.round(y)}%
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -268,46 +347,14 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
                 <div><Label>{t("Главное фото", "Main Image")}</Label><div className="mt-1"><ImageUpload value={form.mainImage} onChange={v => set("mainImage", v)} /></div></div>
 
                 {form.mainImage && (
-                  <div>
-                    <Label>{t("Фокус изображения", "Image Focus Point")}</Label>
-                    <p className="text-xs text-muted-foreground mt-0.5 mb-2">{t("Нажмите на фото, чтобы задать точку фокуса (что останется видимым при обрезке)", "Click on the photo to set the focus point (what stays visible when cropped)")}</p>
-                    <div
-                      className="relative w-full rounded-lg overflow-hidden border border-border cursor-crosshair select-none"
-                      style={{ height: "180px" }}
-                      onClick={e => {
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
-                        const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
-                        set("mainImagePosition", `${x}% ${y}%`);
-                      }}
-                    >
-                      <img
-                        src={form.mainImage}
-                        alt=""
-                        className="w-full h-full object-cover pointer-events-none"
-                        style={{ objectPosition: form.mainImagePosition }}
-                      />
-                      {/* Focal point crosshair */}
-                      {(() => {
-                        const [xStr, yStr] = form.mainImagePosition.split(" ");
-                        const x = parseFloat(xStr);
-                        const y = parseFloat(yStr);
-                        return (
-                          <div
-                            className="absolute pointer-events-none"
-                            style={{ left: `${x}%`, top: `${y}%`, transform: "translate(-50%, -50%)" }}
-                          >
-                            <div className="relative w-7 h-7 flex items-center justify-center">
-                              <div className="absolute inset-0 rounded-full border-2 border-white shadow-[0_0_0_1.5px_rgba(0,0,0,0.6)]" />
-                              <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white shadow-[0_0_0_0.5px_rgba(0,0,0,0.5)]" style={{ transform: "translateX(-50%)" }} />
-                              <div className="absolute top-1/2 left-0 right-0 h-px bg-white shadow-[0_0_0_0.5px_rgba(0,0,0,0.5)]" style={{ transform: "translateY(-50%)" }} />
-                            </div>
-                          </div>
-                        );
-                      })()}
-                      <div className="absolute bottom-1.5 right-2 text-[10px] text-white/80 bg-black/40 px-1.5 py-0.5 rounded font-mono">{form.mainImagePosition}</div>
-                    </div>
-                  </div>
+                  <ImagePositionPicker
+                    src={form.mainImage}
+                    value={form.mainImagePosition}
+                    onChange={v => set("mainImagePosition", v)}
+                    label={t("Позиция фото (потяните для настройки)", "Photo Position (drag to adjust)")}
+                    hint={t("Тяните фото чтобы выбрать видимую область в рамке", "Drag the photo to choose the visible area within the frame")}
+                    height={210}
+                  />
                 )}
 
                 <div>
