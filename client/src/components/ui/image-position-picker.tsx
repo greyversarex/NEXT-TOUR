@@ -1,16 +1,29 @@
 import { useRef, useCallback, useEffect } from "react";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { ZoomIn } from "lucide-react";
 
 interface ImagePositionPickerProps {
   src: string;
   value: string;
   onChange: (v: string) => void;
+  scale?: number;
+  onScaleChange?: (s: number) => void;
   label?: string;
   hint?: string;
   height?: number;
 }
 
-export function ImagePositionPicker({ src, value, onChange, label, hint, height = 200 }: ImagePositionPickerProps) {
+export function ImagePositionPicker({
+  src,
+  value,
+  onChange,
+  scale = 1,
+  onScaleChange,
+  label,
+  hint,
+  height = 200,
+}: ImagePositionPickerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
   const startMouse = useRef({ x: 0, y: 0 });
@@ -52,21 +65,27 @@ export function ImagePositionPicker({ src, value, onChange, label, hint, height 
   const { x, y } = parsePos(value);
 
   return (
-    <div>
+    <div className="space-y-3">
       {label && <Label>{label}</Label>}
-      {hint && <p className="text-xs text-muted-foreground mt-0.5 mb-2">{hint}</p>}
+      {hint && <p className="text-xs text-muted-foreground mt-0.5">{hint}</p>}
+
       <div
         ref={containerRef}
         className="relative w-full rounded-lg overflow-hidden border-2 border-primary/40 select-none cursor-grab active:cursor-grabbing"
-        style={{
-          height,
-          backgroundImage: `url(${src})`,
-          backgroundSize: "cover",
-          backgroundPosition: value,
-          backgroundRepeat: "no-repeat",
-        }}
+        style={{ height }}
         onMouseDown={onMouseDown}
       >
+        <img
+          src={src}
+          alt=""
+          draggable={false}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          style={{
+            objectPosition: value,
+            transform: `scale(${scale})`,
+            transformOrigin: value,
+          }}
+        />
         <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
           <div className="w-8 h-8 relative">
             <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-white/80 -translate-x-1/2 shadow-[0_0_3px_rgba(0,0,0,0.8)]" />
@@ -81,6 +100,30 @@ export function ImagePositionPicker({ src, value, onChange, label, hint, height 
           {Math.round(x)}% {Math.round(y)}%
         </div>
       </div>
+
+      {onScaleChange && (
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <ZoomIn className="h-3.5 w-3.5" />
+              <span>Масштаб</span>
+            </div>
+            <span className="text-xs font-mono text-muted-foreground">{Math.round(scale * 100)}%</span>
+          </div>
+          <Slider
+            min={100}
+            max={300}
+            step={5}
+            value={[Math.round(scale * 100)]}
+            onValueChange={([v]) => onScaleChange(v / 100)}
+            className="w-full"
+          />
+          <div className="flex justify-between text-[10px] text-muted-foreground">
+            <span>100%</span>
+            <span>300%</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

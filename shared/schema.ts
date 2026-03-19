@@ -69,6 +69,7 @@ export const tours = pgTable("tours", {
   mainImage: text("main_image"),
   mainImagePosition: text("main_image_position").notNull().default("50% 50%"),
   images: text("images").array().notNull().default(sql`'{}'`),
+  imagesMeta: jsonb("images_meta").$type<{ position: string; scale: number }[]>(),
   isHot: boolean("is_hot").notNull().default(false),
   isFeatured: boolean("is_featured").notNull().default(false),
   isActive: boolean("is_active").notNull().default(true),

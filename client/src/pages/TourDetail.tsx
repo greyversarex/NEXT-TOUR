@@ -93,7 +93,21 @@ export default function TourDetail() {
               src={images[currentImg]}
               alt={title}
               className="w-full h-full object-cover transition-all duration-700"
-              style={{ objectPosition: currentImg === 0 ? (tour.mainImagePosition || "50% 50%") : "50% 50%" }}
+              style={(() => {
+                if (currentImg === 0) {
+                  return {
+                    objectPosition: tour.mainImagePosition || "50% 50%",
+                  };
+                }
+                const meta = (tour as any).imagesMeta?.[currentImg - 1];
+                const pos = meta?.position || "50% 50%";
+                const sc = meta?.scale || 1;
+                return {
+                  objectPosition: pos,
+                  transform: sc !== 1 ? `scale(${sc})` : undefined,
+                  transformOrigin: pos,
+                };
+              })()}
             />
             {/* Bottom gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
@@ -125,15 +139,29 @@ export default function TourDetail() {
             )}
             {images.length > 1 && (
               <div className="absolute bottom-5 right-5 flex gap-2">
-                {images.slice(0, 4).map((img: string, i: number) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentImg(i)}
-                    className={`w-16 h-11 rounded-xl border-2 overflow-hidden transition-all duration-200 hover:scale-105 ${i === currentImg ? "border-white shadow-lg" : "border-white/40 opacity-70 hover:opacity-100"}`}
-                  >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
+                {images.slice(0, 4).map((img: string, i: number) => {
+                  const thumbMeta = i === 0
+                    ? { position: tour.mainImagePosition || "50% 50%", scale: 1 }
+                    : { position: (tour as any).imagesMeta?.[i - 1]?.position || "50% 50%", scale: (tour as any).imagesMeta?.[i - 1]?.scale || 1 };
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentImg(i)}
+                      className={`w-16 h-11 rounded-xl border-2 overflow-hidden transition-all duration-200 hover:scale-105 ${i === currentImg ? "border-white shadow-lg" : "border-white/40 opacity-70 hover:opacity-100"}`}
+                    >
+                      <img
+                        src={img}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        style={{
+                          objectPosition: thumbMeta.position,
+                          transform: thumbMeta.scale !== 1 ? `scale(${thumbMeta.scale})` : undefined,
+                          transformOrigin: thumbMeta.position,
+                        }}
+                      />
+                    </button>
+                  );
+                })}
               </div>
             )}
           </>

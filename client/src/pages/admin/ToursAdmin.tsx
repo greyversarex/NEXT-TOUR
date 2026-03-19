@@ -120,6 +120,8 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
   const [saving, setSaving] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const [editingGalleryIdx, setEditingGalleryIdx] = useState<number | null>(null);
+  const [pendingGalleryPosition, setPendingGalleryPosition] = useState("50% 50%");
+  const [pendingGalleryScale, setPendingGalleryScale] = useState(1);
   const [replacingGallery, setReplacingGallery] = useState(false);
   const [showPositionPicker, setShowPositionPicker] = useState(false);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -138,6 +140,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
     mainImage: tour.mainImage || "",
     mainImagePosition: tour.mainImagePosition || "50% 50%",
     images: (tour.images || []) as string[],
+    imagesMeta: ((tour as any).imagesMeta || []) as { position: string; scale: number }[],
     mapUrl: tour.mapUrl || "",
     isHot: tour.isHot || false,
     isFeatured: tour.isFeatured || false,
@@ -320,19 +323,35 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
                   <Label>{t("Галерея фото", "Photo Gallery")}</Label>
                   <div className="flex flex-wrap gap-2 mt-1 items-center">
                     {form.images.map((img: string, idx: number) => (
-                      <div key={idx} className="relative group cursor-pointer" onClick={() => setEditingGalleryIdx(idx)}>
-                        <img
-                          src={img}
-                          alt=""
-                          className="h-10 w-14 object-cover rounded border border-border"
-                          onError={e => (e.currentTarget.style.display = "none")}
-                        />
+                      <div key={idx} className="relative group cursor-pointer" onClick={() => {
+                        const meta = form.imagesMeta?.[idx];
+                        setPendingGalleryPosition(meta?.position || "50% 50%");
+                        setPendingGalleryScale(meta?.scale || 1);
+                        setEditingGalleryIdx(idx);
+                      }}>
+                        <div className="h-10 w-14 overflow-hidden rounded border border-border">
+                          <img
+                            src={img}
+                            alt=""
+                            className="w-full h-full object-cover"
+                            style={{
+                              objectPosition: form.imagesMeta?.[idx]?.position || "50% 50%",
+                              transform: `scale(${form.imagesMeta?.[idx]?.scale || 1})`,
+                              transformOrigin: form.imagesMeta?.[idx]?.position || "50% 50%",
+                            }}
+                            onError={e => (e.currentTarget.style.display = "none")}
+                          />
+                        </div>
                         <div className="absolute inset-0 rounded bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
                           <Edit className="h-3.5 w-3.5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                         <button
                           type="button"
-                          onClick={e => { e.stopPropagation(); set("images", form.images.filter((_: string, i: number) => i !== idx)); }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            set("images", form.images.filter((_: string, i: number) => i !== idx));
+                            set("imagesMeta", (form.imagesMeta || []).filter((_: any, i: number) => i !== idx));
+                          }}
                           className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="h-2.5 w-2.5" />
@@ -425,34 +444,51 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
           <DialogHeader>
             <DialogTitle>{t("Редактировать фото галереи", "Edit Gallery Photo")} #{(editingGalleryIdx + 1)}</DialogTitle>
           </DialogHeader>
-          <div className="rounded-lg overflow-hidden border border-border">
-            <img
-              src={form.images[editingGalleryIdx]}
-              alt=""
-              className="w-full max-h-64 object-contain bg-black/5"
-            />
-          </div>
-          <div className="flex gap-2 mt-1">
+
+          <ImagePositionPicker
+            src={form.images[editingGalleryIdx]}
+            value={pendingGalleryPosition}
+            onChange={setPendingGalleryPosition}
+            scale={pendingGalleryScale}
+            onScaleChange={setPendingGalleryScale}
+            height={240}
+          />
+
+          <div className="flex gap-2 pt-1">
             <Button
               type="button"
               className="flex-1 gap-1.5"
+              onClick={() => {
+                const newMeta = [...(form.imagesMeta || [])];
+                while (newMeta.length <= editingGalleryIdx) newMeta.push({ position: "50% 50%", scale: 1 });
+                newMeta[editingGalleryIdx] = { position: pendingGalleryPosition, scale: pendingGalleryScale };
+                set("imagesMeta", newMeta);
+                setEditingGalleryIdx(null);
+              }}
+            >
+              ✓ {t("Применить", "Apply")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-1.5"
               onClick={() => replaceGalleryRef.current?.click()}
               disabled={replacingGallery}
             >
               {replacingGallery ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-              {replacingGallery ? t("Загружается…", "Uploading…") : t("Заменить фото", "Replace Photo")}
+              {replacingGallery ? t("Загружается…", "Uploading…") : t("Заменить", "Replace")}
             </Button>
             <Button
               type="button"
               variant="destructive"
-              className="gap-1.5"
+              size="icon"
               onClick={() => {
                 set("images", form.images.filter((_: string, i: number) => i !== editingGalleryIdx));
+                set("imagesMeta", (form.imagesMeta || []).filter((_: any, i: number) => i !== editingGalleryIdx));
                 setEditingGalleryIdx(null);
               }}
             >
               <X className="h-4 w-4" />
-              {t("Удалить", "Delete")}
             </Button>
           </div>
           <input
