@@ -196,6 +196,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
   const [saving, setSaving] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+  const [showPositionPicker, setShowPositionPicker] = useState(false);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     titleRu: tour.titleRu || "",
@@ -353,18 +354,19 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
                   <div><Label>{t("Цена ($)", "Price ($)")}</Label><Input type="number" value={form.basePrice} onChange={e => set("basePrice", e.target.value)} className="mt-1" min={0} /></div>
                   <div><Label>{t("Скидка (%)", "Discount (%)")}</Label><Input type="number" value={form.discountPercent} onChange={e => set("discountPercent", Number(e.target.value))} className="mt-1" min={0} max={100} /></div>
                 </div>
-                <div><Label>{t("Главное фото", "Main Image")}</Label><div className="mt-1"><ImageUpload value={form.mainImage} onChange={v => set("mainImage", v)} /></div></div>
-
-                {form.mainImage && (
-                  <ImagePositionPicker
-                    src={form.mainImage}
-                    value={form.mainImagePosition}
-                    onChange={v => set("mainImagePosition", v)}
-                    label={t("Позиция фото (потяните для настройки)", "Photo Position (drag to adjust)")}
-                    hint={t("Тяните фото чтобы выбрать видимую область в рамке", "Drag the photo to choose the visible area within the frame")}
-                    height={210}
-                  />
-                )}
+                <div>
+                  <Label>{t("Главное фото", "Main Image")}</Label>
+                  <div className="mt-1">
+                    <ImageUpload
+                      value={form.mainImage}
+                      onChange={v => set("mainImage", v)}
+                      onImageClick={form.mainImage ? () => setShowPositionPicker(true) : undefined}
+                    />
+                  </div>
+                  {form.mainImage && (
+                    <p className="text-xs text-muted-foreground mt-1">{t("Нажмите на превью фото для настройки позиции", "Click the photo preview to adjust position")}</p>
+                  )}
+                </div>
 
                 <div>
                   <Label>{t("Галерея фото", "Photo Gallery")}</Label>
@@ -471,6 +473,35 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
       <Dialog open onOpenChange={() => setLightboxImg(null)}>
         <DialogContent className="max-w-3xl p-2 bg-black border-0">
           <img src={lightboxImg} alt="" className="w-full max-h-[80vh] object-contain rounded" />
+        </DialogContent>
+      </Dialog>
+    )}
+
+    {showPositionPicker && form.mainImage && (
+      <Dialog open onOpenChange={() => setShowPositionPicker(false)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{t("Настройка позиции фото", "Adjust Photo Position")}</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground -mt-2">
+            {t("Тяните фото чтобы выбрать видимую область. Крестик показывает центр кадра.", "Drag the photo to choose the visible area. The crosshair shows the center of the frame.")}
+          </p>
+          <ImagePositionPicker
+            src={form.mainImage}
+            value={form.mainImagePosition}
+            onChange={v => set("mainImagePosition", v)}
+            label=""
+            hint=""
+            height={320}
+          />
+          <div className="flex justify-end gap-2 pt-1">
+            <Button type="button" variant="outline" onClick={() => set("mainImagePosition", "50% 50%")}>
+              {t("По центру", "Center")}
+            </Button>
+            <Button type="button" onClick={() => setShowPositionPicker(false)}>
+              {t("Готово", "Done")}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     )}
