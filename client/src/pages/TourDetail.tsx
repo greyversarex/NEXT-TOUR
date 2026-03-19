@@ -93,6 +93,7 @@ export default function TourDetail() {
               src={images[currentImg]}
               alt={title}
               className="w-full h-full object-cover transition-all duration-700"
+              style={{ objectPosition: currentImg === 0 ? (tour.mainImagePosition || "50% 50%") : "50% 50%" }}
             />
             {/* Bottom gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />

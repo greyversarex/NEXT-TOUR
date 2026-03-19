@@ -122,6 +122,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
     basePrice: tour.basePrice || 500,
     discountPercent: tour.discountPercent || 0,
     mainImage: tour.mainImage || "",
+    mainImagePosition: tour.mainImagePosition || "50% 50%",
     images: (tour.images || []) as string[],
     mapUrl: tour.mapUrl || "",
     isHot: tour.isHot || false,
@@ -265,6 +266,49 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
                   <div><Label>{t("Скидка (%)", "Discount (%)")}</Label><Input type="number" value={form.discountPercent} onChange={e => set("discountPercent", Number(e.target.value))} className="mt-1" min={0} max={100} /></div>
                 </div>
                 <div><Label>{t("Главное фото", "Main Image")}</Label><div className="mt-1"><ImageUpload value={form.mainImage} onChange={v => set("mainImage", v)} /></div></div>
+
+                {form.mainImage && (
+                  <div>
+                    <Label>{t("Фокус изображения", "Image Focus Point")}</Label>
+                    <p className="text-xs text-muted-foreground mt-0.5 mb-2">{t("Нажмите на фото, чтобы задать точку фокуса (что останется видимым при обрезке)", "Click on the photo to set the focus point (what stays visible when cropped)")}</p>
+                    <div
+                      className="relative w-full rounded-lg overflow-hidden border border-border cursor-crosshair select-none"
+                      style={{ height: "180px" }}
+                      onClick={e => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+                        const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+                        set("mainImagePosition", `${x}% ${y}%`);
+                      }}
+                    >
+                      <img
+                        src={form.mainImage}
+                        alt=""
+                        className="w-full h-full object-cover pointer-events-none"
+                        style={{ objectPosition: form.mainImagePosition }}
+                      />
+                      {/* Focal point crosshair */}
+                      {(() => {
+                        const [xStr, yStr] = form.mainImagePosition.split(" ");
+                        const x = parseFloat(xStr);
+                        const y = parseFloat(yStr);
+                        return (
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{ left: `${x}%`, top: `${y}%`, transform: "translate(-50%, -50%)" }}
+                          >
+                            <div className="relative w-7 h-7 flex items-center justify-center">
+                              <div className="absolute inset-0 rounded-full border-2 border-white shadow-[0_0_0_1.5px_rgba(0,0,0,0.6)]" />
+                              <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white shadow-[0_0_0_0.5px_rgba(0,0,0,0.5)]" style={{ transform: "translateX(-50%)" }} />
+                              <div className="absolute top-1/2 left-0 right-0 h-px bg-white shadow-[0_0_0_0.5px_rgba(0,0,0,0.5)]" style={{ transform: "translateY(-50%)" }} />
+                            </div>
+                          </div>
+                        );
+                      })()}
+                      <div className="absolute bottom-1.5 right-2 text-[10px] text-white/80 bg-black/40 px-1.5 py-0.5 rounded font-mono">{form.mainImagePosition}</div>
+                    </div>
+                  </div>
+                )}
 
                 <div>
                   <Label>{t("Галерея фото", "Photo Gallery")}</Label>

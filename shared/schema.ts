@@ -67,6 +67,7 @@ export const tours = pgTable("tours", {
   basePrice: decimal("base_price", { precision: 10, scale: 2 }).notNull(),
   discountPercent: integer("discount_percent").notNull().default(0),
   mainImage: text("main_image"),
+  mainImagePosition: text("main_image_position").notNull().default("50% 50%"),
   images: text("images").array().notNull().default(sql`'{}'`),
   isHot: boolean("is_hot").notNull().default(false),
   isFeatured: boolean("is_featured").notNull().default(false),
