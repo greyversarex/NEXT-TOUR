@@ -298,6 +298,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
   );
 
   return (
+    <>
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -473,6 +474,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
         </DialogContent>
       </Dialog>
     )}
+    </>
   );
 }
 
