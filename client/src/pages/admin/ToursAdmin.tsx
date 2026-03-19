@@ -195,6 +195,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
 
   const [saving, setSaving] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [lightboxImg, setLightboxImg] = useState<string | null>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     titleRu: tour.titleRu || "",
@@ -368,16 +369,17 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
                   <Label>{t("Галерея фото", "Photo Gallery")}</Label>
                   <div className="flex flex-wrap gap-2 mt-1 items-center">
                     {form.images.map((img: string, idx: number) => (
-                      <div key={idx} className="relative group">
+                      <div key={idx} className="relative group cursor-pointer" onClick={() => setLightboxImg(img)}>
                         <img
                           src={img}
                           alt=""
                           className="h-10 w-14 object-cover rounded border border-border"
                           onError={e => (e.currentTarget.style.display = "none")}
                         />
+                        <div className="absolute inset-0 rounded bg-black/0 group-hover:bg-black/25 transition-colors" />
                         <button
                           type="button"
-                          onClick={() => set("images", form.images.filter((_: string, i: number) => i !== idx))}
+                          onClick={e => { e.stopPropagation(); set("images", form.images.filter((_: string, i: number) => i !== idx)); }}
                           className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="h-2.5 w-2.5" />
@@ -463,6 +465,14 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
         </Tabs>
       </DialogContent>
     </Dialog>
+
+    {lightboxImg && (
+      <Dialog open onOpenChange={() => setLightboxImg(null)}>
+        <DialogContent className="max-w-3xl p-2 bg-black border-0">
+          <img src={lightboxImg} alt="" className="w-full max-h-[80vh] object-contain rounded" />
+        </DialogContent>
+      </Dialog>
+    )}
   );
 }
 
