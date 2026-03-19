@@ -10,6 +10,7 @@ export const loyaltyLevelEnum = pgEnum("loyalty_level", ["beginner", "traveler",
 export const reviewStatusEnum = pgEnum("review_status", ["pending", "approved", "rejected"]);
 export const bookingStatusEnum = pgEnum("booking_status", ["new", "prepaid", "paid", "cancelled"]);
 export const paymentTypeEnum = pgEnum("payment_type", ["prepay", "full"]);
+export const alifPaymentStatusEnum = pgEnum("alif_payment_status", ["pending", "ok", "failed", "canceled"]);
 
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -199,6 +200,19 @@ export const bookings = pgTable("bookings", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const alifPayments = pgTable("alif_payments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  bookingId: varchar("booking_id").notNull().references(() => bookings.id),
+  orderId: text("order_id").notNull().unique(),
+  transactionId: text("transaction_id"),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  status: alifPaymentStatusEnum("status").notNull().default("pending"),
+  gate: text("gate").notNull().default("korti_milli"),
+  alifResponse: jsonb("alif_response"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const news = pgTable("news", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   titleRu: text("title_ru").notNull(),
@@ -296,6 +310,7 @@ export const insertTourFeedItemSchema = createInsertSchema(tourFeedItems).omit({
 export const insertReviewSchema = createInsertSchema(reviews).omit({ id: true, createdAt: true, status: true, inFeaturedFeed: true });
 export const insertBookingSchema = createInsertSchema(bookings).omit({ id: true, createdAt: true, bookingStatus: true, paidAmount: true });
 export const insertNewsSchema = createInsertSchema(news).omit({ id: true });
+export const insertAlifPaymentSchema = createInsertSchema(alifPayments).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertFavoriteSchema = createInsertSchema(favorites).omit({ id: true, createdAt: true });
 export const insertIntroScreenSchema = createInsertSchema(introScreen).omit({ id: true });
 export const insertHeroSlideSchema = createInsertSchema(heroSlides).omit({ id: true });
@@ -330,6 +345,8 @@ export type Review = typeof reviews.$inferSelect;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Booking = typeof bookings.$inferSelect;
 export type InsertBooking = z.infer<typeof insertBookingSchema>;
+export type AlifPayment = typeof alifPayments.$inferSelect;
+export type InsertAlifPayment = z.infer<typeof insertAlifPaymentSchema>;
 export type News = typeof news.$inferSelect;
 export type InsertNews = z.infer<typeof insertNewsSchema>;
 export type Favorite = typeof favorites.$inferSelect;

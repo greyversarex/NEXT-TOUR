@@ -5,6 +5,7 @@ import {
   priceComponents, tourPriceComponents, tourOptions, tourItinerary, itineraryStops,
   banners, tourFeeds, tourFeedItems, reviews, bookings, news,
   favorites, introScreen, heroSlides, passwordResetTokens, currencies, settings,
+  alifPayments,
   type User, type InsertUser, type Country, type InsertCountry,
   type City, type InsertCity, type Category, type InsertCategory,
   type Tour, type InsertTour, type TourDate, type InsertTourDate,
@@ -13,6 +14,7 @@ import {
   type TourOption, type InsertTourOption, type TourItinerary, type ItineraryStop,
   type Banner, type InsertBanner, type TourFeed, type TourFeedItem,
   type Review, type InsertReview, type Booking, type InsertBooking,
+  type AlifPayment,
   type News, type InsertNews, type Favorite, type IntroScreen, type HeroSlide,
   type PasswordResetToken, type Currency, type InsertCurrency,
   type AnalyticsData, type LoyaltySettings,
@@ -164,6 +166,12 @@ export interface IStorage {
   // Loyalty Settings
   getLoyaltySettings(): Promise<LoyaltySettings>;
   updateLoyaltySettings(data: LoyaltySettings): Promise<LoyaltySettings>;
+
+  // Alif Payments
+  createAlifPayment(data: { bookingId: string; orderId: string; amount: string; gate: string }): Promise<AlifPayment>;
+  getAlifPaymentByOrderId(orderId: string): Promise<AlifPayment | undefined>;
+  getAlifPaymentByBookingId(bookingId: string): Promise<AlifPayment | undefined>;
+  updateAlifPayment(id: string, data: Partial<AlifPayment>): Promise<AlifPayment | undefined>;
 
   // Currencies
   getCurrencies(activeOnly?: boolean): Promise<Currency[]>;
@@ -892,6 +900,26 @@ export class DatabaseStorage implements IStorage {
       await db.insert(settings).values({ key: "loyalty", value: data as any });
     }
     return data;
+  }
+
+  async createAlifPayment(data: { bookingId: string; orderId: string; amount: string; gate: string }) {
+    const [p] = await db.insert(alifPayments).values({ ...data, status: "pending" }).returning();
+    return p;
+  }
+
+  async getAlifPaymentByOrderId(orderId: string) {
+    const [p] = await db.select().from(alifPayments).where(eq(alifPayments.orderId, orderId));
+    return p;
+  }
+
+  async getAlifPaymentByBookingId(bookingId: string) {
+    const [p] = await db.select().from(alifPayments).where(eq(alifPayments.bookingId, bookingId)).orderBy(desc(alifPayments.createdAt));
+    return p;
+  }
+
+  async updateAlifPayment(id: string, data: Partial<AlifPayment>) {
+    const [p] = await db.update(alifPayments).set({ ...data, updatedAt: new Date() } as any).where(eq(alifPayments.id, id)).returning();
+    return p;
   }
 
   async getCurrencies(activeOnly = false) {

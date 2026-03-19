@@ -21,6 +21,7 @@ import NewsPage, { NewsDetail } from "@/pages/NewsPage";
 import Promotions from "@/pages/Promotions";
 import About from "@/pages/About";
 import ResetPassword from "@/pages/ResetPassword";
+import PaymentResult from "@/pages/PaymentResult";
 
 // Admin pages — lazy (грузятся только при открытии /admin/*)
 const Dashboard          = lazy(() => import("@/pages/admin/Dashboard"));
@@ -62,6 +63,7 @@ function Router() {
       <Route path="/promotions" component={Promotions} />
       <Route path="/about" component={About} />
       <Route path="/reset-password" component={ResetPassword} />
+      <Route path="/payment/result" component={PaymentResult} />
       <Route path="/admin">
         {() => <Suspense fallback={<AdminFallback />}><Dashboard /></Suspense>}
       </Route>

@@ -11,6 +11,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import path from "path";
 import { sendPasswordResetEmail, sendWelcomeEmail, sendBookingConfirmationEmail, sendBulkEmail } from "./email";
+import { initiateAlifPayment, checkAlifTransaction } from "./payment";
 import multer from "multer";
 import { storage } from "./storage";
 import {
@@ -875,6 +876,149 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     });
 
     res.json({ success: ok });
+  }));
+
+  // ── Alif Acquiring Payments ──────────────────────────────────────────────
+  const getAppBaseUrl = (req: Request) => {
+    const proto = req.headers["x-forwarded-proto"] || req.protocol;
+    const host = req.headers["x-forwarded-host"] || req.headers.host;
+    return `${proto}://${host}`;
+  };
+
+  // Initiate payment for a booking
+  app.post("/api/payments/initiate", requireAuth, ah(async (req, res) => {
+    const user = req.user as any;
+    const { bookingId, gate = "korti_milli" } = req.body;
+    if (!bookingId) return res.status(400).json({ message: "bookingId required" });
+
+    const booking = await storage.getBooking(bookingId);
+    if (!booking) return res.status(404).json({ message: "Booking not found" });
+    if (user.role !== "admin" && booking.userId !== user.id) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const existing = await storage.getAlifPaymentByBookingId(bookingId);
+    if (existing && existing.status === "ok") {
+      return res.status(400).json({ message: "Booking already paid" });
+    }
+
+    const paymentType = booking.paymentType;
+    const totalPrice = Number(booking.totalPrice);
+    const amount = paymentType === "prepay" ? totalPrice * 0.3 : totalPrice;
+
+    const baseUrl = getAppBaseUrl(req);
+    const orderId = `TOUR-${bookingId.slice(0, 8)}-${Date.now()}`;
+    const callbackUrl = `${baseUrl}/api/payments/callback`;
+    const returnUrl = `${baseUrl}/payment/result?orderId=${orderId}`;
+
+    let alifResult;
+    try {
+      alifResult = await initiateAlifPayment({
+        orderId,
+        amount,
+        gate,
+        callbackUrl,
+        returnUrl,
+        info: `Тур: ${(booking as any).tour?.titleRu || ""}`,
+        email: user.email,
+      });
+    } catch (err: any) {
+      console.error("[alif] initiateAlifPayment error:", err.message);
+      return res.status(500).json({ message: err.message || "Payment service error" });
+    }
+
+    if (alifResult.code === 200 && alifResult.url) {
+      await storage.createAlifPayment({
+        bookingId,
+        orderId,
+        amount: amount.toFixed(2),
+        gate,
+      });
+      return res.json({ url: alifResult.url, orderId });
+    }
+
+    return res.status(400).json({ message: alifResult.message || "Failed to initiate payment" });
+  }));
+
+  // Callback from Alif (no auth — public endpoint)
+  app.post("/api/payments/callback", async (req, res) => {
+    try {
+      const { orderId, transactionId, status, amount } = req.body;
+      console.log(`[alif] Callback received: orderId=${orderId} status=${status} txn=${transactionId}`);
+
+      if (!orderId) return res.status(400).send("Missing orderId");
+
+      const payment = await storage.getAlifPaymentByOrderId(orderId);
+      if (!payment) {
+        console.warn(`[alif] Payment not found for orderId=${orderId}`);
+        return res.status(200).send("OK");
+      }
+
+      const normalized = status === "ok" ? "ok" : status === "canceled" ? "canceled" : status === "failed" ? "failed" : "pending";
+
+      await storage.updateAlifPayment(payment.id, {
+        status: normalized as any,
+        transactionId: transactionId?.toString(),
+        alifResponse: req.body,
+      });
+
+      if (normalized === "ok") {
+        const booking = await storage.getBooking(payment.bookingId);
+        if (booking) {
+          const newBookingStatus = booking.paymentType === "prepay" ? "prepaid" : "paid";
+          await storage.updateBooking(payment.bookingId, {
+            bookingStatus: newBookingStatus as any,
+            paidAmount: amount?.toString() || payment.amount,
+          });
+        }
+      }
+
+      res.status(200).send("OK");
+    } catch (err) {
+      console.error("[alif] callback error:", err);
+      res.status(200).send("OK");
+    }
+  });
+
+  // Get payment status for a booking
+  app.get("/api/payments/booking/:bookingId", requireAuth, ah(async (req, res) => {
+    const user = req.user as any;
+    const booking = await storage.getBooking(req.params.bookingId);
+    if (!booking) return res.status(404).json({ message: "Booking not found" });
+    if (user.role !== "admin" && booking.userId !== user.id) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    const payment = await storage.getAlifPaymentByBookingId(req.params.bookingId);
+    res.json(payment || null);
+  }));
+
+  // Get payment status by orderId (for result page)
+  app.get("/api/payments/order/:orderId", requireAuth, ah(async (req, res) => {
+    const user = req.user as any;
+    const payment = await storage.getAlifPaymentByOrderId(req.params.orderId);
+    if (!payment) return res.status(404).json({ message: "Payment not found" });
+    const booking = await storage.getBooking(payment.bookingId);
+    if (!booking) return res.status(404).json({ message: "Booking not found" });
+    if (user.role !== "admin" && booking.userId !== user.id) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    res.json({ payment, booking });
+  }));
+
+  // Check txn status from Alif directly
+  app.post("/api/payments/check/:orderId", requireAuth, ah(async (req, res) => {
+    const user = req.user as any;
+    const payment = await storage.getAlifPaymentByOrderId(req.params.orderId);
+    if (!payment) return res.status(404).json({ message: "Not found" });
+    const booking = await storage.getBooking(payment.bookingId);
+    if (!booking) return res.status(404).json({ message: "Not found" });
+    if (user.role !== "admin" && booking.userId !== user.id) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    const baseUrl = getAppBaseUrl(req);
+    const callbackUrl = `${baseUrl}/api/payments/callback`;
+    const result = await checkAlifTransaction({ orderId: payment.orderId, amount: Number(payment.amount), callbackUrl });
+    res.json(result);
   }));
 
   return httpServer;

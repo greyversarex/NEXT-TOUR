@@ -607,6 +607,8 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
   const [children, setChildren] = useState(initialChildren);
   const [selectedOptions, setSelectedOptions] = useState<string[]>(preselectedOptions);
   const [paymentType, setPaymentType] = useState<"prepay" | "full">("full");
+  const [createdBookingId, setCreatedBookingId] = useState<string | null>(null);
+  const [payGate, setPayGate] = useState("korti_milli");
 
   const totalPeople = adults + children;
 
@@ -635,10 +637,22 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
 
   const mutation = useMutation({
     mutationFn: (data: any) => apiRequest("POST", "/api/bookings", data),
-    onSuccess: () => {
+    onSuccess: (booking: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
-      toast({ title: t("Бронирование создано!", "Booking created!"), description: t(`К оплате: ${formatPrice(toPay)}`, `To pay: ${formatPrice(toPay)}`) });
-      onClose();
+      setCreatedBookingId(booking.id);
+    },
+  });
+
+  const payMutation = useMutation({
+    mutationFn: ({ bookingId, gate }: { bookingId: string; gate: string }) =>
+      apiRequest("POST", "/api/payments/initiate", { bookingId, gate }),
+    onSuccess: (data: any) => {
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    },
+    onError: (err: any) => {
+      toast({ title: t("Ошибка оплаты", "Payment error"), description: err.message, variant: "destructive" });
     },
   });
 
@@ -661,9 +675,77 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="sm:max-w-xl p-0 overflow-hidden max-h-[90vh] flex flex-col">
         <div className="bg-gradient-to-r from-primary to-primary/80 px-6 py-5 text-primary-foreground shrink-0">
-          <DialogTitle className="text-lg font-bold text-white">{t("Бронирование тура", "Book Tour")}</DialogTitle>
+          <DialogTitle className="text-lg font-bold text-white">
+            {createdBookingId ? t("Бронирование создано!", "Booking Created!") : t("Бронирование тура", "Book Tour")}
+          </DialogTitle>
           <p className="text-sm text-white/80 mt-0.5 truncate">{lang === "ru" ? tour.titleRu : tour.titleEn}</p>
         </div>
+
+        {createdBookingId ? (
+          <div className="px-6 py-8 space-y-6 text-center">
+            <div className="space-y-2">
+              <CheckCircle className="h-14 w-14 text-green-500 mx-auto" />
+              <h3 className="text-lg font-semibold">{t("Заявка принята!", "Request Accepted!")}</h3>
+              <p className="text-sm text-muted-foreground">
+                {t("Оплатите тур онлайн прямо сейчас через Alif Bank или наш менеджер свяжется с вами.", "Pay for your tour online now via Alif Bank, or our manager will contact you.")}
+              </p>
+            </div>
+
+            <div className="bg-muted/40 rounded-xl px-5 py-4 text-left space-y-2 text-sm border border-border">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{t("К оплате", "Amount due")}</span>
+                <span className="font-bold text-primary text-base">{formatPrice(toPay)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{t("Тип оплаты", "Payment type")}</span>
+                <span className="font-medium">{paymentType === "prepay" ? t("Предоплата 30%", "Deposit 30%") : t("Полная оплата", "Full payment")}</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground text-left font-medium mb-1">{t("Способ оплаты:", "Payment method:")}</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { value: "korti_milli", label: "Корти Милли" },
+                  { value: "wallet", label: "Alif Mobi" },
+                  { value: "salom", label: "Рассрочка Salom" },
+                  { value: "invoice", label: t("Наличными", "Cash Invoice") },
+                ].map((g) => (
+                  <button
+                    key={g.value}
+                    type="button"
+                    onClick={() => setPayGate(g.value)}
+                    className={`rounded-lg border-2 px-3 py-2.5 text-sm font-medium transition-all text-left ${payGate === g.value ? "border-primary bg-primary/5 text-primary" : "border-border hover:border-primary/50"}`}
+                  >
+                    {g.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={onClose}
+                data-testid="button-pay-later"
+              >
+                {t("Позже", "Later")}
+              </Button>
+              <Button
+                type="button"
+                className="flex-1 font-semibold"
+                disabled={payMutation.isPending}
+                onClick={() => payMutation.mutate({ bookingId: createdBookingId!, gate: payGate })}
+                data-testid="button-pay-online"
+              >
+                {payMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+                {t("Оплатить онлайн", "Pay Online")}
+              </Button>
+            </div>
+          </div>
+        ) : (
 
         <form onSubmit={handleSubmit} className="overflow-y-auto flex-1">
           <div className="px-6 py-4 space-y-5">
@@ -825,6 +907,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
             </Button>
           </div>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );

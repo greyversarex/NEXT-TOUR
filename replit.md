@@ -18,8 +18,8 @@ TravelPro is a bilingual (Russian/English) travel booking platform. It lets user
 
 Key pages:
 - **Public**: Home (hero slider, featured tours), Tours (search/filter), Tour Detail, Promotions, News, About
-- **User**: Profile (bookings, favorites, loyalty level)
-- **Admin**: Dashboard, Tours (with Dates/Options/Itinerary/Pricing sub-tabs), Bookings, Reviews, Users, Countries, Categories, Feeds, News, Banners, Hero Slides, Intro Screen, Currencies
+- **User**: Profile (bookings, favorites, loyalty level), Payment Result (`/payment/result?orderId=...`)
+- **Admin**: Dashboard, Tours (with Dates/Options/Itinerary/Pricing sub-tabs), Bookings, Reviews, Users, Countries, Categories, Feeds, News, Banners, Hero Slides, Intro Screen, Currencies, Email Broadcasts
 
 The app is a monorepo with a React frontend, an Express backend, and a shared schema. Everything runs in a single Node.js process in development.
 
@@ -112,3 +112,19 @@ Preferred communication style: Simple, everyday language.
 |---|---|
 | `DATABASE_URL` | PostgreSQL connection string |
 | `SESSION_SECRET` | Secret for signing session cookies (falls back to a hardcoded default) |
+| `SENDGRID_API_KEY` | SendGrid API key for sending emails |
+| `SENDGRID_FROM_EMAIL` | Verified sender email address in SendGrid |
+| `ALIF_TERMINAL_ID` | Alif Bank acquiring terminal ID (key) |
+| `ALIF_TERMINAL_PASSWORD` | Alif Bank acquiring terminal password |
+| `ALIF_TEST_MODE` | Set to `"false"` for production, omit or `"true"` for test env |
+
+### Alif Acquiring Payment Flow
+
+- `server/payment.ts` — HMAC SHA256 token generation + Alif API calls
+- `POST /api/payments/initiate` — Creates Alif payment session, returns redirect URL
+- `POST /api/payments/callback` — Public endpoint, receives Alif status callbacks, updates booking status
+- `GET /api/payments/booking/:bookingId` — Get payment record for a booking
+- `GET /api/payments/order/:orderId` — Get payment status by orderId (used by result page)
+- DB table: `alif_payments` (tracks all payment attempts)
+- After booking creation in `BookingModal`, user is shown a payment choice screen with 4 payment methods (Korti Milli, Alif Mobi, Salom installment, Cash invoice)
+- After payment, Alif redirects to `/payment/result?orderId=...`
