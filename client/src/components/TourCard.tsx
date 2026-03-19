@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Clock, Heart, ArrowRight, MapPin } from "lucide-react";
+import { Clock, Heart, ArrowRight, MapPin, Settings2, Check } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
 import { useAuth } from "@/lib/auth";
@@ -7,6 +7,9 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Tour, Country, City } from "@shared/schema";
 import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { ImagePositionPicker } from "@/components/ui/image-position-picker";
 
 interface TourCardProps {
   tour: Tour;
@@ -19,6 +22,18 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [favState, setFavState] = useState(isFavorite);
+  const [showPositionEditor, setShowPositionEditor] = useState(false);
+  const [pendingPosition, setPendingPosition] = useState((tour as any).mainImagePosition || "50% 50%");
+  const isAdmin = (user as any)?.role === "admin";
+
+  const savePositionMutation = useMutation({
+    mutationFn: (position: string) =>
+      apiRequest("PATCH", `/api/tours/${tour.id}`, { mainImagePosition: position }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tours"] });
+      setShowPositionEditor(false);
+    },
+  });
 
   const { formatPrice } = useCurrency();
   const title = lang === "ru" ? tour.titleRu : tour.titleEn;
@@ -53,6 +68,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
   };
 
   return (
+    <>
     <Link href={`/tours/${tour.id}`} className="block h-full">
       <div
         className="group relative rounded-xl sm:rounded-2xl overflow-hidden bg-white dark:bg-card border border-transparent cursor-pointer
@@ -73,8 +89,24 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
             src={tour.mainImage || "/images/hero-banner.png"}
             alt={title}
             className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
+            style={{ objectPosition: (tour as any).mainImagePosition || "50% 50%" }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+          {isAdmin && tour.mainImage && (
+            <button
+              className="absolute top-2 right-2 z-20 p-1.5 rounded-lg bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-black/70 backdrop-blur-sm"
+              title="Настроить позицию изображения"
+              data-testid={`btn-position-${tour.id}`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setPendingPosition((tour as any).mainImagePosition || "50% 50%");
+                setShowPositionEditor(true);
+              }}
+            >
+              <Settings2 className="w-3.5 h-3.5" />
+            </button>
+          )}
 
           <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-col gap-1 z-10">
             {tour.discountPercent > 0 && (
@@ -159,5 +191,36 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
         </div>
       </div>
     </Link>
+
+    {isAdmin && showPositionEditor && tour.mainImage && (
+      <Dialog open={showPositionEditor} onOpenChange={setShowPositionEditor}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Позиция изображения — {lang === "ru" ? tour.titleRu : tour.titleEn}</DialogTitle>
+          </DialogHeader>
+          <ImagePositionPicker
+            src={tour.mainImage}
+            value={pendingPosition}
+            onChange={setPendingPosition}
+            hint="Тяните изображение чтобы выбрать область кадрирования"
+            height={220}
+          />
+          <div className="flex gap-2 mt-2">
+            <Button
+              className="flex-1"
+              onClick={() => savePositionMutation.mutate(pendingPosition)}
+              disabled={savePositionMutation.isPending}
+            >
+              <Check className="w-4 h-4 mr-1.5" />
+              {savePositionMutation.isPending ? "Сохраняется…" : "Сохранить"}
+            </Button>
+            <Button variant="outline" onClick={() => setShowPositionEditor(false)}>
+              Отмена
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    )}
+    </>
   );
 }
