@@ -119,9 +119,11 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
 
   const [saving, setSaving] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
-  const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+  const [editingGalleryIdx, setEditingGalleryIdx] = useState<number | null>(null);
+  const [replacingGallery, setReplacingGallery] = useState(false);
   const [showPositionPicker, setShowPositionPicker] = useState(false);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const replaceGalleryRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     titleRu: tour.titleRu || "",
     titleEn: tour.titleEn || "",
@@ -175,6 +177,28 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
       toast({ title: "Ошибка загрузки", variant: "destructive" });
     } finally {
       setUploadingGallery(false);
+    }
+  };
+
+  const handleReplaceGalleryFile = async (file: File) => {
+    if (editingGalleryIdx === null) return;
+    setReplacingGallery(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd, credentials: "include" });
+      if (res.ok) {
+        const { url } = await res.json();
+        setForm(p => {
+          const imgs = [...p.images];
+          imgs[editingGalleryIdx] = url;
+          return { ...p, images: imgs };
+        });
+      }
+    } catch {
+      toast({ title: "Ошибка загрузки", variant: "destructive" });
+    } finally {
+      setReplacingGallery(false);
     }
   };
 
@@ -296,14 +320,16 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
                   <Label>{t("Галерея фото", "Photo Gallery")}</Label>
                   <div className="flex flex-wrap gap-2 mt-1 items-center">
                     {form.images.map((img: string, idx: number) => (
-                      <div key={idx} className="relative group cursor-pointer" onClick={() => setLightboxImg(img)}>
+                      <div key={idx} className="relative group cursor-pointer" onClick={() => setEditingGalleryIdx(idx)}>
                         <img
                           src={img}
                           alt=""
                           className="h-10 w-14 object-cover rounded border border-border"
                           onError={e => (e.currentTarget.style.display = "none")}
                         />
-                        <div className="absolute inset-0 rounded bg-black/0 group-hover:bg-black/25 transition-colors" />
+                        <div className="absolute inset-0 rounded bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                          <Edit className="h-3.5 w-3.5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
                         <button
                           type="button"
                           onClick={e => { e.stopPropagation(); set("images", form.images.filter((_: string, i: number) => i !== idx)); }}
@@ -393,10 +419,53 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
       </DialogContent>
     </Dialog>
 
-    {lightboxImg && (
-      <Dialog open onOpenChange={() => setLightboxImg(null)}>
-        <DialogContent className="max-w-3xl p-2 bg-black border-0">
-          <img src={lightboxImg} alt="" className="w-full max-h-[80vh] object-contain rounded" />
+    {editingGalleryIdx !== null && form.images[editingGalleryIdx] && (
+      <Dialog open onOpenChange={() => setEditingGalleryIdx(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t("Редактировать фото галереи", "Edit Gallery Photo")} #{(editingGalleryIdx + 1)}</DialogTitle>
+          </DialogHeader>
+          <div className="rounded-lg overflow-hidden border border-border">
+            <img
+              src={form.images[editingGalleryIdx]}
+              alt=""
+              className="w-full max-h-64 object-contain bg-black/5"
+            />
+          </div>
+          <div className="flex gap-2 mt-1">
+            <Button
+              type="button"
+              className="flex-1 gap-1.5"
+              onClick={() => replaceGalleryRef.current?.click()}
+              disabled={replacingGallery}
+            >
+              {replacingGallery ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+              {replacingGallery ? t("Загружается…", "Uploading…") : t("Заменить фото", "Replace Photo")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              className="gap-1.5"
+              onClick={() => {
+                set("images", form.images.filter((_: string, i: number) => i !== editingGalleryIdx));
+                setEditingGalleryIdx(null);
+              }}
+            >
+              <X className="h-4 w-4" />
+              {t("Удалить", "Delete")}
+            </Button>
+          </div>
+          <input
+            ref={replaceGalleryRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={e => {
+              const file = e.target.files?.[0];
+              if (file) handleReplaceGalleryFile(file);
+              e.target.value = "";
+            }}
+          />
         </DialogContent>
       </Dialog>
     )}
