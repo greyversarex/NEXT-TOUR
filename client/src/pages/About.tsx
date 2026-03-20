@@ -49,8 +49,8 @@ export default function About() {
           <h1 className="text-3xl md:text-4xl font-extrabold mb-4 leading-tight text-white drop-shadow-md">{t("О компании NEXT TOUR", "About NEXT TOUR")}</h1>
           <p className="text-base sm:text-lg md:text-xl text-white/75 max-w-2xl mx-auto leading-relaxed px-2">
             {t(
-              "Ваш надёжный партнёр в мире путешествий. Организуем незабываемые туры по всему миру с 2017 года.",
-              "Your reliable partner in the world of travel. Organizing unforgettable tours worldwide since 2017."
+              "Ваш надёжный партнёр в мире путешествий. Организуем незабываемые туры по всему миру с 2023 года.",
+              "Your reliable partner in the world of travel. Organizing unforgettable tours worldwide since 2023."
             )}
           </p>
         </div>
@@ -69,8 +69,8 @@ export default function About() {
           <div className="space-y-4">
             <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
               {t(
-                "NEXT TOUR — туристическая компания из Душанбе, основанная в 2017 году. Мы специализируемся на организации групповых и индивидуальных туров по самым популярным направлениям мира: от пляжного отдыха в Юго-Восточной Азии до экскурсионных программ по Европе и Ближнему Востоку.",
-                "NEXT TOUR is a travel company from Dushanbe, founded in 2017. We specialize in organizing group and individual tours to the world's most popular destinations: from beach holidays in Southeast Asia to sightseeing programs across Europe and the Middle East."
+                "NEXT TOUR — туристическая компания из Душанбе, основанная в 2023 году. Мы специализируемся на организации групповых и индивидуальных туров по самым популярным направлениям мира: от пляжного отдыха в Юго-Восточной Азии до экскурсионных программ по Европе и Ближнему Востоку.",
+                "NEXT TOUR is a travel company from Dushanbe, founded in 2023. We specialize in organizing group and individual tours to the world's most popular destinations: from beach holidays in Southeast Asia to sightseeing programs across Europe and the Middle East."
               )}
             </p>
             <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
@@ -124,7 +124,7 @@ export default function About() {
                 </div>
                 <div>
                   <p className="font-medium text-sm sm:text-base">{t("Телефон", "Phone")}</p>
-                  <a href="tel:+992988988087" className="text-muted-foreground text-xs sm:text-sm hover:text-primary transition-colors">+992 988 988 087</a>
+                  <a href="tel:+992885260101" className="text-muted-foreground text-xs sm:text-sm hover:text-primary transition-colors">+992 885 260 101</a>
                 </div>
               </div>
               <div className="flex items-start gap-3">

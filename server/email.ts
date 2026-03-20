@@ -143,7 +143,7 @@ export async function sendBookingConfirmationEmail(opts: {
         Если у вас есть вопросы — напишите нам в WhatsApp.
       </p>
 
-      <a href="https://wa.me/992988988087"
+      <a href="https://wa.me/992885260101"
          style="display:inline-block;background:#25D366;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:14px;margin-right:12px;">
         WhatsApp →
       </a>

@@ -500,7 +500,7 @@ export default function TourDetail() {
                       `Здравствуйте! Хочу узнать подробнее о туре "${tourTitle}".`,
                       `Hello! I'd like to learn more about the tour "${tourTitle}".`
                     ));
-                    window.open(`https://wa.me/992988988087?text=${msg}`, "_blank");
+                    window.open(`https://wa.me/992885260101?text=${msg}`, "_blank");
                   }}
                   data-testid="button-send-request"
                 >
