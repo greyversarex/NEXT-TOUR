@@ -497,6 +497,12 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     await storage.deleteBanner(req.params.id);
     res.json({ success: true });
   });
+  app.patch("/api/banners/reorder", requireAdmin, async (req, res) => {
+    const { orderedIds } = req.body as { orderedIds: string[] };
+    if (!Array.isArray(orderedIds)) return res.status(400).json({ error: "orderedIds required" });
+    await Promise.all(orderedIds.map((id, idx) => storage.updateBanner(id, { order: idx })));
+    res.json({ success: true });
+  });
 
   // Tour Feeds
   app.get("/api/tour-feeds", async (req, res) => {

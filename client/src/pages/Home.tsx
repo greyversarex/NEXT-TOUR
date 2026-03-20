@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Link, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -8,11 +8,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import TourCard from "@/components/TourCard";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/lib/auth";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { format } from "date-fns";
 import {
   Search, Star, ChevronLeft, ChevronRight, MapPin, Clock,
   Users, ArrowRight, Quote, Flame, CalendarDays, ChevronDown,
-  Award, Globe, Shield, Gem, ThumbsUp, TrendingUp
+  Award, Globe, Shield, Gem, ThumbsUp, TrendingUp, ChevronUp, Pencil
 } from "lucide-react";
 import type { Tour, Country, City } from "@shared/schema";
 
@@ -701,58 +703,145 @@ function DestinationsSection() {
   );
 }
 
+function BannerCard({ src, titleEl, subtitleEl, linkUrl = "/promotions" }: { src: string; titleEl: React.ReactNode; subtitleEl?: React.ReactNode; linkUrl?: string }) {
+  const { t } = useI18n();
+  return (
+    <div className="group relative rounded-2xl sm:rounded-3xl overflow-hidden h-48 sm:h-72 md:h-96 shadow-2xl hover:shadow-[0_32px_80px_rgba(0,0,0,0.28)] transition-shadow duration-500 cursor-pointer">
+      <MediaDisplay src={src} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-cyan-400 to-primary/0" />
+      <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between px-4 sm:px-6 md:px-16 py-5 sm:py-8 md:py-12 gap-3 sm:gap-5">
+        <div className="text-white text-center md:text-left">
+          <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 mb-2 sm:mb-4 text-[10px] sm:text-xs tracking-widest uppercase px-3 py-1 sm:px-4 sm:py-1.5">
+            🔥 {t("Специальное предложение", "Special Offer")}
+          </Badge>
+          <h3 className="text-lg sm:text-2xl md:text-5xl font-extrabold mb-1 sm:mb-2 leading-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+            {titleEl}
+          </h3>
+          {subtitleEl && (
+            <p className="text-white/75 text-sm md:text-base mt-2 max-w-md leading-relaxed">{subtitleEl}</p>
+          )}
+        </div>
+        <Link href={linkUrl} className="shrink-0">
+          <Button size="lg" className="bg-white text-primary hover:bg-white/95 font-bold px-8 py-5 rounded-2xl shadow-xl text-base hover:scale-105 hover:shadow-2xl transition-all duration-200">
+            {t("Смотреть акции", "View Offers")} <ArrowRight className="h-4 w-4 ml-2" />
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 function PromoBanner({ banners }: { banners: any[] }) {
   const { t, lang } = useI18n();
-  const banner = banners[0];
+  const { user } = useAuth();
+  const isAdmin = (user as any)?.role === "admin";
 
-  const content = (src: string, titleEl: React.ReactNode, subtitleEl?: React.ReactNode, linkUrl = "/promotions") => (
+  const [localBanners, setLocalBanners] = useState<any[]>([]);
+  useEffect(() => { setLocalBanners(banners); }, [banners]);
+
+  const reorderMutation = useMutation({
+    mutationFn: (orderedIds: string[]) => apiRequest("PATCH", "/api/banners/reorder", { orderedIds }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/banners?active=true"] }),
+  });
+
+  const move = (idx: number, dir: -1 | 1) => {
+    const next = [...localBanners];
+    const swapIdx = idx + dir;
+    if (swapIdx < 0 || swapIdx >= next.length) return;
+    [next[idx], next[swapIdx]] = [next[swapIdx], next[idx]];
+    setLocalBanners(next);
+    reorderMutation.mutate(next.map((b: any) => b.id));
+  };
+
+  const fallback = (
     <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-4 sm:py-8 pt-[77px] pb-[77px] mt-[-24px] mb-[-64px]">
       <Reveal y={16}>
-        <div className="group relative rounded-2xl sm:rounded-3xl overflow-hidden h-48 sm:h-72 md:h-96 shadow-2xl hover:shadow-[0_32px_80px_rgba(0,0,0,0.28)] transition-shadow duration-500 cursor-pointer">
-          <MediaDisplay src={src} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-
-          {/* Decorative accent line */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-cyan-400 to-primary/0" />
-
-          <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between px-4 sm:px-6 md:px-16 py-5 sm:py-8 md:py-12 gap-3 sm:gap-5">
-            <div className="text-white text-center md:text-left">
-              <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 mb-2 sm:mb-4 text-[10px] sm:text-xs tracking-widest uppercase px-3 py-1 sm:px-4 sm:py-1.5">
-                🔥 {t("Специальное предложение", "Special Offer")}
-              </Badge>
-              <h3 className="text-lg sm:text-2xl md:text-5xl font-extrabold mb-1 sm:mb-2 leading-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-                {titleEl}
-              </h3>
-              {subtitleEl && (
-                <p className="text-white/75 text-sm md:text-base mt-2 max-w-md leading-relaxed">{subtitleEl}</p>
-              )}
-            </div>
-            <Link href={linkUrl} className="shrink-0">
-              <Button
-                size="lg"
-                className="bg-white text-primary hover:bg-white/95 font-bold px-8 py-5 rounded-2xl shadow-xl text-base hover:scale-105 hover:shadow-2xl transition-all duration-200"
-              >
-                {t("Смотреть акции", "View Offers")} <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </Link>
-          </div>
-        </div>
+        <BannerCard
+          src="/images/tour-maldives.png"
+          titleEl={t("Скидки до 30% на летние туры", "Up to 30% off summer tours")}
+          subtitleEl={t("Успейте забронировать по лучшим ценам сезона", "Book now at the best prices of the season")}
+        />
       </Reveal>
     </section>
   );
 
-  if (!banner) return content(
-    "/images/tour-maldives.png",
-    t("Скидки до 30% на летние туры", "Up to 30% off summer tours"),
-    t("Успейте забронировать по лучшим ценам сезона", "Book now at the best prices of the season")
-  );
+  if (!isAdmin) {
+    const banner = localBanners[0];
+    if (!banner) return fallback;
+    return (
+      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-4 sm:py-8 pt-[77px] pb-[77px] mt-[-24px] mb-[-64px]">
+        <Reveal y={16}>
+          <BannerCard
+            src={banner.imageUrl}
+            titleEl={lang === "ru" ? banner.titleRu : (banner.titleEn || banner.titleRu)}
+            subtitleEl={banner.subtitleRu ? (lang === "ru" ? banner.subtitleRu : (banner.subtitleEn || banner.subtitleRu)) : undefined}
+            linkUrl={banner.linkUrl || "/promotions"}
+          />
+        </Reveal>
+      </section>
+    );
+  }
 
-  return content(
-    banner.imageUrl,
-    lang === "ru" ? banner.titleRu : (banner.titleEn || banner.titleRu),
-    banner.subtitleRu ? (lang === "ru" ? banner.subtitleRu : (banner.subtitleEn || banner.subtitleRu)) : undefined,
-    banner.linkUrl || "/promotions"
+  if (!localBanners.length) return fallback;
+
+  return (
+    <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-4 sm:py-8 pt-[77px] pb-[77px] mt-[-24px] mb-[-64px]">
+      <div className="flex items-center gap-3 mb-4">
+        <Badge variant="outline" className="text-xs font-semibold tracking-wide border-primary/40 text-primary bg-primary/5 px-3 py-1">
+          ⚙️ {t("Режим администратора — управление баннерами", "Admin mode — manage banners")}
+        </Badge>
+        <Link href="/admin/banners">
+          <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-primary gap-1.5">
+            <Pencil className="h-3 w-3" /> {t("Редактировать в панели", "Edit in panel")}
+          </Button>
+        </Link>
+      </div>
+      <div className="flex flex-col gap-4">
+        {localBanners.map((banner: any, idx: number) => (
+          <div key={banner.id} className="relative group/banner">
+            <BannerCard
+              src={banner.imageUrl}
+              titleEl={lang === "ru" ? banner.titleRu : (banner.titleEn || banner.titleRu)}
+              subtitleEl={banner.subtitleRu ? (lang === "ru" ? banner.subtitleRu : (banner.subtitleEn || banner.subtitleRu)) : undefined}
+              linkUrl={banner.linkUrl || "/promotions"}
+            />
+            <div className="absolute top-3 right-3 flex flex-col gap-1 opacity-0 group-hover/banner:opacity-100 transition-opacity duration-200 z-20">
+              <button
+                onClick={() => move(idx, -1)}
+                disabled={idx === 0 || reorderMutation.isPending}
+                className="w-9 h-9 rounded-xl bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 flex items-center justify-center transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed hover:scale-110"
+                title={t("Переместить вверх", "Move up")}
+              >
+                <ChevronUp className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => move(idx, 1)}
+                disabled={idx === localBanners.length - 1 || reorderMutation.isPending}
+                className="w-9 h-9 rounded-xl bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 flex items-center justify-center transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed hover:scale-110"
+                title={t("Переместить вниз", "Move down")}
+              >
+                <ChevronDown className="h-4 w-4" />
+              </button>
+              <Link href="/admin/banners">
+                <button
+                  className="w-9 h-9 rounded-xl bg-primary/80 backdrop-blur-sm text-white hover:bg-primary flex items-center justify-center transition-all duration-150 hover:scale-110"
+                  title={t("Редактировать", "Edit")}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+              </Link>
+            </div>
+            <div className="absolute top-3 left-3 z-20">
+              <Badge className="bg-black/50 backdrop-blur-sm text-white border-white/20 text-xs font-mono">
+                #{idx + 1}
+              </Badge>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
