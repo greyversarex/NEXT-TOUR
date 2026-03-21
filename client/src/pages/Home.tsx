@@ -1108,26 +1108,21 @@ export default function Home() {
         </div>
       ) : (
         <>
-          {isAdmin && (
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-              <Badge variant="outline" className="text-xs font-semibold tracking-wide border-primary/40 text-primary bg-primary/5 px-3 py-1 gap-1.5">
-                ⚙️ {t("Режим администратора — перемещайте блоки стрелками", "Admin mode — reorder sections with arrows")}
-              </Badge>
-            </div>
-          )}
           {orderedSections.map((id, idx) => (
-            <div key={id}>
+            <div key={id} className={isAdmin ? "group/sec relative" : ""}>
               {isAdmin && (
-                <AdminSectionBar
-                  labelRu={SECTIONS[id].labelRu}
-                  labelEn={SECTIONS[id].labelEn}
-                  editHref={SECTIONS[id].editHref}
-                  onMoveUp={() => moveSection(idx, -1)}
-                  onMoveDown={() => moveSection(idx, 1)}
-                  canMoveUp={idx > 0}
-                  canMoveDown={idx < orderedSections.length - 1}
-                  saving={layoutMutation.isPending}
-                />
+                <div className="absolute top-0 left-0 right-0 z-40 opacity-0 group-hover/sec:opacity-100 transition-opacity duration-150 pointer-events-none group-hover/sec:pointer-events-auto">
+                  <AdminSectionBar
+                    labelRu={SECTIONS[id].labelRu}
+                    labelEn={SECTIONS[id].labelEn}
+                    editHref={SECTIONS[id].editHref}
+                    onMoveUp={() => moveSection(idx, -1)}
+                    onMoveDown={() => moveSection(idx, 1)}
+                    canMoveUp={idx > 0}
+                    canMoveDown={idx < orderedSections.length - 1}
+                    saving={layoutMutation.isPending}
+                  />
+                </div>
               )}
               {SECTIONS[id].node}
             </div>
