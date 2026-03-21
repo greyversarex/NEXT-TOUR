@@ -733,111 +733,26 @@ function BannerCard({ src, titleEl, subtitleEl, linkUrl = "/promotions" }: { src
   );
 }
 
-function PromoBanner({ banners }: { banners: any[] }) {
+function SingleBannerSection({ banner, isAdmin }: { banner: any; isAdmin: boolean }) {
   const { t, lang } = useI18n();
-  const { user } = useAuth();
-  const isAdmin = (user as any)?.role === "admin";
-
-  const [localBanners, setLocalBanners] = useState<any[]>([]);
-  useEffect(() => { setLocalBanners(banners); }, [banners]);
-
-  const reorderMutation = useMutation({
-    mutationFn: (orderedIds: string[]) => apiRequest("PATCH", "/api/banners/reorder", { orderedIds }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/banners?active=true"] }),
-  });
-
-  const move = (idx: number, dir: -1 | 1) => {
-    const next = [...localBanners];
-    const swapIdx = idx + dir;
-    if (swapIdx < 0 || swapIdx >= next.length) return;
-    [next[idx], next[swapIdx]] = [next[swapIdx], next[idx]];
-    setLocalBanners(next);
-    reorderMutation.mutate(next.map((b: any) => b.id));
-  };
-
-  const fallback = (
-    <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-4 sm:py-8 pt-[77px] pb-[77px] mt-[-24px] mb-[-64px]">
-      <Reveal y={16}>
-        <BannerCard
-          src="/images/tour-maldives.png"
-          titleEl={t("Скидки до 30% на летние туры", "Up to 30% off summer tours")}
-          subtitleEl={t("Успейте забронировать по лучшим ценам сезона", "Book now at the best prices of the season")}
-        />
-      </Reveal>
-    </section>
-  );
-
-  if (!isAdmin) {
-    const banner = localBanners[0];
-    if (!banner) return fallback;
-    return (
-      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-4 sm:py-8 pt-[77px] pb-[77px] mt-[-24px] mb-[-64px]">
-        <Reveal y={16}>
-          <BannerCard
-            src={banner.imageUrl}
-            titleEl={lang === "ru" ? banner.titleRu : (banner.titleEn || banner.titleRu)}
-            subtitleEl={banner.subtitleRu ? (lang === "ru" ? banner.subtitleRu : (banner.subtitleEn || banner.subtitleRu)) : undefined}
-            linkUrl={banner.linkUrl || "/promotions"}
-          />
-        </Reveal>
-      </section>
-    );
-  }
-
-  if (!localBanners.length) return fallback;
-
+  const title = lang === "ru" ? banner.titleRu : (banner.titleEn || banner.titleRu);
+  const subtitle = banner.subtitleRu ? (lang === "ru" ? banner.subtitleRu : (banner.subtitleEn || banner.subtitleRu)) : undefined;
   return (
     <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-4 sm:py-8 pt-[77px] pb-[77px] mt-[-24px] mb-[-64px]">
-      <div className="flex justify-end mb-2">
-        <Link href="/admin/banners">
-          <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-primary gap-1.5">
-            <Pencil className="h-3 w-3" /> {t("Редактировать баннеры", "Edit banners")}
-          </Button>
-        </Link>
-      </div>
-      <div className="flex flex-col gap-4">
-        {localBanners.map((banner: any, idx: number) => (
-          <div key={banner.id} className="relative group/banner">
-            <BannerCard
-              src={banner.imageUrl}
-              titleEl={lang === "ru" ? banner.titleRu : (banner.titleEn || banner.titleRu)}
-              subtitleEl={banner.subtitleRu ? (lang === "ru" ? banner.subtitleRu : (banner.subtitleEn || banner.subtitleRu)) : undefined}
-              linkUrl={banner.linkUrl || "/promotions"}
-            />
-            <div className="absolute top-3 right-3 flex flex-col gap-1 opacity-0 group-hover/banner:opacity-100 transition-opacity duration-200 z-20">
-              <button
-                onClick={() => move(idx, -1)}
-                disabled={idx === 0 || reorderMutation.isPending}
-                className="w-9 h-9 rounded-xl bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 flex items-center justify-center transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed hover:scale-110"
-                title={t("Переместить вверх", "Move up")}
-              >
-                <ChevronUp className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => move(idx, 1)}
-                disabled={idx === localBanners.length - 1 || reorderMutation.isPending}
-                className="w-9 h-9 rounded-xl bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 flex items-center justify-center transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed hover:scale-110"
-                title={t("Переместить вниз", "Move down")}
-              >
-                <ChevronDown className="h-4 w-4" />
-              </button>
-              <Link href="/admin/banners">
-                <button
-                  className="w-9 h-9 rounded-xl bg-primary/80 backdrop-blur-sm text-white hover:bg-primary flex items-center justify-center transition-all duration-150 hover:scale-110"
-                  title={t("Редактировать", "Edit")}
-                >
+      <Reveal y={16}>
+        <div className="relative group/singleBanner">
+          <BannerCard src={banner.imageUrl} titleEl={title} subtitleEl={subtitle} linkUrl={banner.linkUrl || "/promotions"} />
+          {isAdmin && (
+            <Link href="/admin/banners">
+              <div className="absolute top-3 right-3 z-20 opacity-0 group-hover/singleBanner:opacity-100 transition-opacity duration-200">
+                <button className="w-9 h-9 rounded-xl bg-primary/80 backdrop-blur-sm text-white hover:bg-primary flex items-center justify-center transition-all duration-150 hover:scale-110" title={t("Редактировать баннер", "Edit banner")}>
                   <Pencil className="h-3.5 w-3.5" />
                 </button>
-              </Link>
-            </div>
-            <div className="absolute top-3 left-3 z-20">
-              <Badge className="bg-black/50 backdrop-blur-sm text-white border-white/20 text-xs font-mono">
-                #{idx + 1}
-              </Badge>
-            </div>
-          </div>
-        ))}
-      </div>
+              </div>
+            </Link>
+          )}
+        </div>
+      </Reveal>
     </section>
   );
 }
@@ -1030,15 +945,13 @@ function WhyUsSection() {
   );
 }
 
-const DEFAULT_SECTION_ORDER = ["popular", "destinations", "banners", "hot", "reviews"];
-
 function AdminSectionBar({
-  labelRu, labelEn, onMoveUp, onMoveDown, canMoveUp, canMoveDown, saving,
+  labelRu, labelEn, onMoveUp, onMoveDown, canMoveUp, canMoveDown, saving, editHref,
 }: {
   labelRu: string; labelEn: string;
   onMoveUp: () => void; onMoveDown: () => void;
   canMoveUp: boolean; canMoveDown: boolean;
-  saving: boolean;
+  saving: boolean; editHref?: string;
 }) {
   const { t } = useI18n();
   return (
@@ -1047,6 +960,16 @@ function AdminSectionBar({
       <span className="text-xs font-semibold text-primary/80 tracking-wide">{t(labelRu, labelEn)}</span>
       <div className="ml-auto flex items-center gap-1">
         {saving && <span className="text-[10px] text-muted-foreground mr-1">{t("Сохранение...", "Saving...")}</span>}
+        {editHref && (
+          <Link href={editHref}>
+            <button
+              className="w-7 h-7 rounded-lg border border-primary/30 bg-white dark:bg-background text-primary flex items-center justify-center hover:bg-primary/10 transition-colors"
+              title={t("Редактировать", "Edit")}
+            >
+              <Pencil className="h-3 w-3" />
+            </button>
+          </Link>
+        )}
         <button
           onClick={onMoveUp}
           disabled={!canMoveUp || saving}
@@ -1079,14 +1002,44 @@ export default function Home() {
   const { data: banners = [] } = useQuery<any[]>({ queryKey: ["/api/banners?active=true"] });
   const { data: savedLayout } = useQuery<string[]>({ queryKey: ["/api/settings/home-layout"] });
 
-  const [sectionOrder, setSectionOrder] = useState<string[]>(DEFAULT_SECTION_ORDER);
-  useEffect(() => {
-    if (savedLayout && Array.isArray(savedLayout)) setSectionOrder(savedLayout);
-  }, [savedLayout]);
+  const [sectionOrder, setSectionOrder] = useState<string[]>([]);
 
   const layoutMutation = useMutation({
     mutationFn: (order: string[]) => apiRequest("POST", "/api/settings/home-layout", { order }),
   });
+
+  useEffect(() => {
+    if (!savedLayout) return;
+
+    let layout = [...savedLayout];
+
+    if (banners.length > 0) {
+      // Migrate old "banners" group → individual banner entries
+      if (layout.includes("banners")) {
+        const idx = layout.indexOf("banners");
+        const bannerIds = (banners as any[]).map((b) => `banner:${b.id}`);
+        layout = [...layout.slice(0, idx), ...bannerIds, ...layout.slice(idx + 1)];
+      }
+
+      // Remove stale banner IDs (deleted banners)
+      layout = layout.filter(
+        (id) => !id.startsWith("banner:") || (banners as any[]).some((b) => `banner:${b.id}` === id)
+      );
+
+      // Add new banners not yet in layout (append at end)
+      const inLayout = new Set(layout);
+      (banners as any[]).forEach((b) => {
+        if (!inLayout.has(`banner:${b.id}`)) layout = [...layout, `banner:${b.id}`];
+      });
+
+      // If layout changed from original, save to DB
+      if (JSON.stringify(layout) !== JSON.stringify(savedLayout)) {
+        layoutMutation.mutate(layout);
+      }
+    }
+
+    setSectionOrder(layout);
+  }, [savedLayout, banners]);
 
   const moveSection = (idx: number, dir: -1 | 1) => {
     const next = [...sectionOrder];
@@ -1105,7 +1058,7 @@ export default function Home() {
   const hotCardWidth: string = hotFeed?.cardWidth || "medium";
   const popularCardWidth: string = (featuredFeed || allFeed || feeds[0])?.cardWidth || "medium";
 
-  const SECTIONS: Record<string, { labelRu: string; labelEn: string; node: React.ReactNode }> = {
+  const SECTIONS: Record<string, { labelRu: string; labelEn: string; editHref?: string; node: React.ReactNode }> = {
     popular: {
       labelRu: "Популярные туры",
       labelEn: "Popular Tours",
@@ -1115,11 +1068,6 @@ export default function Home() {
       labelRu: "Направления",
       labelEn: "Destinations",
       node: <><DestinationsSection /><div className="py-2 sm:py-6 md:py-8" /></>,
-    },
-    banners: {
-      labelRu: "Баннеры / Акции",
-      labelEn: "Banners / Promotions",
-      node: <><PromoBanner banners={banners} /><div className="py-2 sm:py-4 md:py-6" /></>,
     },
     hot: {
       labelRu: "Горящие туры",
@@ -1131,9 +1079,20 @@ export default function Home() {
       labelEn: "Reviews",
       node: <ReviewsSection />,
     },
+    ...(Object.fromEntries(
+      (banners as any[]).map((b) => [
+        `banner:${b.id}`,
+        {
+          labelRu: `Баннер: ${b.titleRu}`,
+          labelEn: `Banner: ${b.titleEn || b.titleRu}`,
+          editHref: "/admin/banners",
+          node: <SingleBannerSection banner={b} isAdmin={isAdmin} />,
+        },
+      ])
+    )),
   };
 
-  const orderedSections = sectionOrder.filter(id => SECTIONS[id]);
+  const orderedSections = sectionOrder.filter((id) => SECTIONS[id]);
 
   return (
     <div className="min-h-screen">
@@ -1144,7 +1103,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-32 space-y-10">
           <Skeleton className="h-8 w-56 md:w-72 mb-6" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-7">
-            {[1,2,3,4].map(i => <Skeleton key={i} className="h-60 md:h-80 rounded-2xl" />)}
+            {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-60 md:h-80 rounded-2xl" />)}
           </div>
         </div>
       ) : (
@@ -1152,7 +1111,7 @@ export default function Home() {
           {isAdmin && (
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
               <Badge variant="outline" className="text-xs font-semibold tracking-wide border-primary/40 text-primary bg-primary/5 px-3 py-1 gap-1.5">
-                ⚙️ {t("Режим администратора — перетаскивайте блоки стрелками", "Admin mode — reorder sections with arrows")}
+                ⚙️ {t("Режим администратора — перемещайте блоки стрелками", "Admin mode — reorder sections with arrows")}
               </Badge>
             </div>
           )}
@@ -1162,6 +1121,7 @@ export default function Home() {
                 <AdminSectionBar
                   labelRu={SECTIONS[id].labelRu}
                   labelEn={SECTIONS[id].labelEn}
+                  editHref={SECTIONS[id].editHref}
                   onMoveUp={() => moveSection(idx, -1)}
                   onMoveDown={() => moveSection(idx, 1)}
                   canMoveUp={idx > 0}
