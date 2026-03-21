@@ -788,13 +788,10 @@ function PromoBanner({ banners }: { banners: any[] }) {
 
   return (
     <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-4 sm:py-8 pt-[77px] pb-[77px] mt-[-24px] mb-[-64px]">
-      <div className="flex items-center gap-3 mb-4">
-        <Badge variant="outline" className="text-xs font-semibold tracking-wide border-primary/40 text-primary bg-primary/5 px-3 py-1">
-          ⚙️ {t("Режим администратора — управление баннерами", "Admin mode — manage banners")}
-        </Badge>
+      <div className="flex justify-end mb-2">
         <Link href="/admin/banners">
           <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-primary gap-1.5">
-            <Pencil className="h-3 w-3" /> {t("Редактировать в панели", "Edit in panel")}
+            <Pencil className="h-3 w-3" /> {t("Редактировать баннеры", "Edit banners")}
           </Button>
         </Link>
       </div>
@@ -1033,21 +1030,110 @@ function WhyUsSection() {
   );
 }
 
+const DEFAULT_SECTION_ORDER = ["popular", "destinations", "banners", "hot", "reviews"];
+
+function AdminSectionBar({
+  labelRu, labelEn, onMoveUp, onMoveDown, canMoveUp, canMoveDown, saving,
+}: {
+  labelRu: string; labelEn: string;
+  onMoveUp: () => void; onMoveDown: () => void;
+  canMoveUp: boolean; canMoveDown: boolean;
+  saving: boolean;
+}) {
+  const { t } = useI18n();
+  return (
+    <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/8 border-l-4 border-primary/60 select-none">
+      <span className="text-primary/60 text-sm">⠿</span>
+      <span className="text-xs font-semibold text-primary/80 tracking-wide">{t(labelRu, labelEn)}</span>
+      <div className="ml-auto flex items-center gap-1">
+        {saving && <span className="text-[10px] text-muted-foreground mr-1">{t("Сохранение...", "Saving...")}</span>}
+        <button
+          onClick={onMoveUp}
+          disabled={!canMoveUp || saving}
+          className="w-7 h-7 rounded-lg border border-primary/30 bg-white dark:bg-background text-primary flex items-center justify-center hover:bg-primary/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          title={t("Переместить вверх", "Move up")}
+        >
+          <ChevronUp className="h-3.5 w-3.5" />
+        </button>
+        <button
+          onClick={onMoveDown}
+          disabled={!canMoveDown || saving}
+          className="w-7 h-7 rounded-lg border border-primary/30 bg-white dark:bg-background text-primary flex items-center justify-center hover:bg-primary/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          title={t("Переместить вниз", "Move down")}
+        >
+          <ChevronDown className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const { t } = useI18n();
+  const { user } = useAuth();
+  const isAdmin = (user as any)?.role === "admin";
+
   const { data: feeds = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/tour-feeds?withTours=true&active=true"],
   });
   const { data: banners = [] } = useQuery<any[]>({ queryKey: ["/api/banners?active=true"] });
+  const { data: savedLayout } = useQuery<string[]>({ queryKey: ["/api/settings/home-layout"] });
+
+  const [sectionOrder, setSectionOrder] = useState<string[]>(DEFAULT_SECTION_ORDER);
+  useEffect(() => {
+    if (savedLayout && Array.isArray(savedLayout)) setSectionOrder(savedLayout);
+  }, [savedLayout]);
+
+  const layoutMutation = useMutation({
+    mutationFn: (order: string[]) => apiRequest("POST", "/api/settings/home-layout", { order }),
+  });
+
+  const moveSection = (idx: number, dir: -1 | 1) => {
+    const next = [...sectionOrder];
+    const swapIdx = idx + dir;
+    if (swapIdx < 0 || swapIdx >= next.length) return;
+    [next[idx], next[swapIdx]] = [next[swapIdx], next[idx]];
+    setSectionOrder(next);
+    layoutMutation.mutate(next);
+  };
 
   const hotFeed = feeds.find((f: any) => f.slug === "hot" || f.nameRu?.includes("Горящ"));
   const featuredFeed = feeds.find((f: any) => f.slug === "featured" || f.nameRu?.includes("Рекоменд") || f.nameRu?.includes("Популяр"));
   const allFeed = feeds.find((f: any) => f.slug === "all" || (!hotFeed && !featuredFeed));
-
   const hotTours: Tour[] = hotFeed?.tours || [];
   const popularTours: Tour[] = featuredFeed?.tours || allFeed?.tours || (feeds[0]?.tours ?? []);
   const hotCardWidth: string = hotFeed?.cardWidth || "medium";
   const popularCardWidth: string = (featuredFeed || allFeed || feeds[0])?.cardWidth || "medium";
+
+  const SECTIONS: Record<string, { labelRu: string; labelEn: string; node: React.ReactNode }> = {
+    popular: {
+      labelRu: "Популярные туры",
+      labelEn: "Popular Tours",
+      node: <><PopularToursSection tours={popularTours} cardWidth={popularCardWidth} /><div className="py-2 sm:py-6 md:py-8" /></>,
+    },
+    destinations: {
+      labelRu: "Направления",
+      labelEn: "Destinations",
+      node: <><DestinationsSection /><div className="py-2 sm:py-6 md:py-8" /></>,
+    },
+    banners: {
+      labelRu: "Баннеры / Акции",
+      labelEn: "Banners / Promotions",
+      node: <><PromoBanner banners={banners} /><div className="py-2 sm:py-4 md:py-6" /></>,
+    },
+    hot: {
+      labelRu: "Горящие туры",
+      labelEn: "Hot Tours",
+      node: <HotToursSection tours={hotTours} cardWidth={hotCardWidth} />,
+    },
+    reviews: {
+      labelRu: "Отзывы",
+      labelEn: "Reviews",
+      node: <ReviewsSection />,
+    },
+  };
+
+  const orderedSections = sectionOrder.filter(id => SECTIONS[id]);
 
   return (
     <div className="min-h-screen">
@@ -1063,14 +1149,29 @@ export default function Home() {
         </div>
       ) : (
         <>
-          <PopularToursSection tours={popularTours} cardWidth={popularCardWidth} />
-          <div className="py-2 sm:py-6 md:py-8" />
-          <DestinationsSection />
-          <div className="py-2 sm:py-6 md:py-8" />
-          <PromoBanner banners={banners} />
-          <div className="py-2 sm:py-4 md:py-6" />
-          <HotToursSection tours={hotTours} cardWidth={hotCardWidth} />
-          <ReviewsSection />
+          {isAdmin && (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+              <Badge variant="outline" className="text-xs font-semibold tracking-wide border-primary/40 text-primary bg-primary/5 px-3 py-1 gap-1.5">
+                ⚙️ {t("Режим администратора — перетаскивайте блоки стрелками", "Admin mode — reorder sections with arrows")}
+              </Badge>
+            </div>
+          )}
+          {orderedSections.map((id, idx) => (
+            <div key={id}>
+              {isAdmin && (
+                <AdminSectionBar
+                  labelRu={SECTIONS[id].labelRu}
+                  labelEn={SECTIONS[id].labelEn}
+                  onMoveUp={() => moveSection(idx, -1)}
+                  onMoveDown={() => moveSection(idx, 1)}
+                  canMoveUp={idx > 0}
+                  canMoveDown={idx < orderedSections.length - 1}
+                  saving={layoutMutation.isPending}
+                />
+              )}
+              {SECTIONS[id].node}
+            </div>
+          ))}
         </>
       )}
     </div>

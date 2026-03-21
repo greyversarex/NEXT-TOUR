@@ -166,6 +166,8 @@ export interface IStorage {
   // Loyalty Settings
   getLoyaltySettings(): Promise<LoyaltySettings>;
   updateLoyaltySettings(data: LoyaltySettings): Promise<LoyaltySettings>;
+  getHomeLayout(): Promise<string[]>;
+  setHomeLayout(order: string[]): Promise<void>;
 
   // Alif Payments
   createAlifPayment(data: { bookingId: string; orderId: string; amount: string; gate: string }): Promise<AlifPayment>;
@@ -900,6 +902,20 @@ export class DatabaseStorage implements IStorage {
       await db.insert(settings).values({ key: "loyalty", value: data as any });
     }
     return data;
+  }
+
+  async getHomeLayout(): Promise<string[]> {
+    const [row] = await db.select().from(settings).where(eq(settings.key, "home-layout"));
+    return (row?.value as string[]) ?? ["popular", "destinations", "banners", "hot", "reviews"];
+  }
+
+  async setHomeLayout(order: string[]): Promise<void> {
+    const [existing] = await db.select().from(settings).where(eq(settings.key, "home-layout"));
+    if (existing) {
+      await db.update(settings).set({ value: order as any }).where(eq(settings.key, "home-layout"));
+    } else {
+      await db.insert(settings).values({ key: "home-layout", value: order as any });
+    }
   }
 
   async createAlifPayment(data: { bookingId: string; orderId: string; amount: string; gate: string }) {

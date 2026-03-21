@@ -769,6 +769,16 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // Loyalty Settings
+  app.get("/api/settings/home-layout", async (req, res) => {
+    res.json(await storage.getHomeLayout());
+  });
+  app.post("/api/settings/home-layout", requireAdmin, async (req, res) => {
+    const { order } = req.body as { order: string[] };
+    if (!Array.isArray(order)) return res.status(400).json({ error: "order required" });
+    await storage.setHomeLayout(order);
+    res.json({ success: true });
+  });
+
   app.get("/api/admin/loyalty-settings", requireAdmin, async (req, res) => {
     res.json(await storage.getLoyaltySettings());
   });
