@@ -488,7 +488,7 @@ export default function TourDetail() {
 
                 <Button
                   className="w-full h-12 rounded-2xl font-bold text-base shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
-                  onClick={() => user ? setBookingOpen(true) : setAuthOpen(true)}
+                  onClick={() => setBookingOpen(true)}
                   data-testid="button-book-now"
                 >
                   {t("Забронировать", "Book Now")}
@@ -509,11 +509,6 @@ export default function TourDetail() {
                   <Send className="h-4 w-4 mr-2" />
                   {t("Отправить заявку", "Send Request")}
                 </Button>
-                {!user && (
-                  <p className="text-xs text-muted-foreground text-center mt-2.5">
-                    {t("Войдите чтобы забронировать", "Sign in to book")}
-                  </p>
-                )}
               </div>
             </div>
           </div>
