@@ -638,7 +638,9 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
   const [payGate, setPayGate] = useState("korti_milli");
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
-  const [guestPhone, setGuestPhone] = useState("");
+  const [phoneCode, setPhoneCode] = useState("+992");
+  const [phoneLocal, setPhoneLocal] = useState("");
+  const guestPhone = phoneLocal ? `${phoneCode}${phoneLocal}` : "";
 
   const totalPeople = adults + children;
 
@@ -816,16 +818,44 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="guest-phone" className="text-xs text-muted-foreground">{t("Телефон", "Phone")}</Label>
-                    <Input
-                      id="guest-phone"
-                      type="tel"
-                      data-testid="input-guest-phone"
-                      placeholder="+992 __ ___ __ __"
-                      value={guestPhone}
-                      onChange={e => setGuestPhone(e.target.value)}
-                      className="h-10"
-                    />
+                    <Label className="text-xs text-muted-foreground">{t("Телефон", "Phone")}</Label>
+                    <div className="flex gap-1">
+                      <select
+                        data-testid="select-phone-code"
+                        value={phoneCode}
+                        onChange={e => setPhoneCode(e.target.value)}
+                        className="h-10 rounded-md border border-input bg-background px-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-0 shrink-0"
+                      >
+                        {[
+                          { code: "+992", flag: "🇹🇯", label: "TJ +992" },
+                          { code: "+7",   flag: "🇷🇺", label: "RU +7" },
+                          { code: "+998", flag: "🇺🇿", label: "UZ +998" },
+                          { code: "+996", flag: "🇰🇬", label: "KG +996" },
+                          { code: "+993", flag: "🇹🇲", label: "TM +993" },
+                          { code: "+994", flag: "🇦🇿", label: "AZ +994" },
+                          { code: "+77",  flag: "🇰🇿", label: "KZ +77" },
+                          { code: "+374", flag: "🇦🇲", label: "AM +374" },
+                          { code: "+380", flag: "🇺🇦", label: "UA +380" },
+                          { code: "+971", flag: "🇦🇪", label: "AE +971" },
+                          { code: "+90",  flag: "🇹🇷", label: "TR +90" },
+                          { code: "+49",  flag: "🇩🇪", label: "DE +49" },
+                          { code: "+44",  flag: "🇬🇧", label: "GB +44" },
+                          { code: "+1",   flag: "🇺🇸", label: "US +1" },
+                          { code: "+86",  flag: "🇨🇳", label: "CN +86" },
+                        ].map(c => (
+                          <option key={c.code} value={c.code}>{c.flag} {c.label}</option>
+                        ))}
+                      </select>
+                      <Input
+                        id="guest-phone"
+                        type="tel"
+                        data-testid="input-guest-phone"
+                        placeholder="885 260 101"
+                        value={phoneLocal}
+                        onChange={e => setPhoneLocal(e.target.value.replace(/[^\d\s\-]/g, ""))}
+                        className="h-10 flex-1 min-w-0"
+                      />
+                    </div>
                   </div>
                 </div>
                 <p className="text-[11px] text-muted-foreground">{t("Укажите email или телефон — менеджер свяжется с вами для подтверждения.", "Enter email or phone — manager will contact you to confirm.")}</p>
