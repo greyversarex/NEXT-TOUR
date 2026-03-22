@@ -518,7 +518,7 @@ export default function TourDetail() {
 
       {recommendedTours.length > 0 && (
         <div className="mt-16 pt-12 border-t border-border/40">
-          <h2 className="text-2xl md:text-3xl font-extrabold mb-8">{t("Похожие туры", "Similar Tours")}</h2>
+          <h2 className="text-2xl md:text-3xl font-extrabold mb-8 text-white">{t("Похожие туры", "Similar Tours")}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {recommendedTours.map((tour: any) => <TourCard key={tour.id} tour={tour} />)}
           </div>
