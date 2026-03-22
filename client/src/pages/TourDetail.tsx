@@ -532,6 +532,7 @@ export default function TourDetail() {
           options={options}
           priceTiers={priceTiers}
           onClose={() => setBookingOpen(false)}
+          onOpenAuth={() => { setBookingOpen(false); setAuthOpen(true); }}
         />
       )}
 
@@ -621,7 +622,7 @@ function CounterField({ label, subLabel, value, min, max, onChange }: { label: s
   );
 }
 
-function BookingModal({ tour, dates, options, priceTiers = [], preselectedOptions = [], initialAdults = 1, initialChildren = 0, onClose }: any) {
+function BookingModal({ tour, dates, options, priceTiers = [], preselectedOptions = [], initialAdults = 1, initialChildren = 0, onClose, onOpenAuth }: any) {
   const { t, lang } = useI18n();
   const { formatPrice, convertPrice, currentSymbol } = useCurrency();
   const { toast } = useToast();
@@ -979,6 +980,12 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
               </div>
             </div>
 
+            {!user && (
+              <p className="text-xs text-center text-muted-foreground mb-3">
+                🎁 <button type="button" onClick={onOpenAuth} className="underline underline-offset-2 hover:text-primary transition-colors">{t("Зарегистрируйтесь", "Create an account")}</button>
+                {t(", чтобы получать скидки и накапливать бонусы", " to get discounts and earn loyalty bonuses")}
+              </p>
+            )}
             <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={mutation.isPending} data-testid="button-confirm-booking">
               {mutation.isPending ? (
                 <><Loader2 className="h-4 w-4 animate-spin mr-2" />{t("Создание...", "Creating...")}</>
