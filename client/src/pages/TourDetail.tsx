@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useI18n } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
 import { useAuth } from "@/lib/auth";
@@ -638,6 +640,9 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
   const [paymentType, setPaymentType] = useState<"prepay" | "full">("full");
   const [createdBookingId, setCreatedBookingId] = useState<string | null>(null);
   const [payGate, setPayGate] = useState("korti_milli");
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  const [guestPhone, setGuestPhone] = useState("");
 
   const totalPeople = adults + children;
 
@@ -687,6 +692,10 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user && !guestEmail && !guestPhone) {
+      toast({ title: t("Укажите контакт", "Contact required"), description: t("Введите email или телефон для связи", "Please enter your email or phone"), variant: "destructive" });
+      return;
+    }
     mutation.mutate({
       tourId: tour.id,
       tourDateId: selectedDateId || null,
@@ -695,6 +704,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
       selectedOptions,
       totalPrice: totalPrice.toFixed(2),
       paymentType,
+      ...(!user && { guestName: guestName || undefined, guestEmail: guestEmail || undefined, guestPhone: guestPhone || undefined }),
     });
   };
 
@@ -778,6 +788,53 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
 
         <form onSubmit={handleSubmit} className="overflow-y-auto flex-1">
           <div className="px-6 py-4 space-y-5">
+
+            {!user && (
+              <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-3">
+                <p className="text-sm font-semibold flex items-center gap-1.5 text-foreground">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  {t("Ваши контактные данные", "Your contact details")}
+                </p>
+                <div className="space-y-2">
+                  <Label htmlFor="guest-name" className="text-xs text-muted-foreground">{t("Имя и фамилия", "Full name")}</Label>
+                  <Input
+                    id="guest-name"
+                    data-testid="input-guest-name"
+                    placeholder={t("Иван Иванов", "John Smith")}
+                    value={guestName}
+                    onChange={e => setGuestName(e.target.value)}
+                    className="h-10"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="guest-email" className="text-xs text-muted-foreground">Email</Label>
+                    <Input
+                      id="guest-email"
+                      type="email"
+                      data-testid="input-guest-email"
+                      placeholder="mail@example.com"
+                      value={guestEmail}
+                      onChange={e => setGuestEmail(e.target.value)}
+                      className="h-10"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="guest-phone" className="text-xs text-muted-foreground">{t("Телефон", "Phone")}</Label>
+                    <Input
+                      id="guest-phone"
+                      type="tel"
+                      data-testid="input-guest-phone"
+                      placeholder="+992 __ ___ __ __"
+                      value={guestPhone}
+                      onChange={e => setGuestPhone(e.target.value)}
+                      className="h-10"
+                    />
+                  </div>
+                </div>
+                <p className="text-[11px] text-muted-foreground">{t("Укажите email или телефон — менеджер свяжется с вами для подтверждения.", "Enter email or phone — manager will contact you to confirm.")}</p>
+              </div>
+            )}
 
             {dates.length > 0 && (
               <div>

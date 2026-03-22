@@ -660,8 +660,8 @@ export class DatabaseStorage implements IStorage {
 
   async createBooking(data: InsertBooking) {
     const [b] = await db.insert(bookings).values(data as any).returning();
-    // Update user loyalty
-    if (b.bookingStatus === "paid" || b.bookingStatus === "prepaid") {
+    // Update user loyalty (only for registered users)
+    if (b.userId && (b.bookingStatus === "paid" || b.bookingStatus === "prepaid")) {
       await this.updateUserLoyalty(b.userId);
     }
     return b;
@@ -669,7 +669,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateBooking(id: string, data: Partial<Booking>) {
     const [b] = await db.update(bookings).set(data as any).where(eq(bookings.id, id)).returning();
-    if (data.bookingStatus === "paid") {
+    if (b.userId && data.bookingStatus === "paid") {
       await this.updateUserLoyalty(b.userId);
     }
     return b;

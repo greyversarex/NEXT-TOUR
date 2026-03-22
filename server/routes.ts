@@ -578,13 +578,31 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
     res.json(booking);
   });
-  app.post("/api/bookings", requireAuth, async (req, res) => {
+  app.post("/api/bookings", async (req, res) => {
     try {
       const user = req.user as any;
-      const booking = await storage.createBooking({ ...req.body, userId: user.id });
+      const { guestName, guestEmail, guestPhone, ...rest } = req.body;
 
-      // Send confirmation email asynchronously (don't block response)
-      if (user.email) {
+      // Require either authenticated user or guest contact info
+      if (!user && !guestEmail && !guestPhone) {
+        return res.status(400).json({ message: "Укажите email или телефон для связи" });
+      }
+
+      const bookingData: any = { ...rest };
+      if (user) {
+        bookingData.userId = user.id;
+      } else {
+        bookingData.guestName = guestName || null;
+        bookingData.guestEmail = guestEmail || null;
+        bookingData.guestPhone = guestPhone || null;
+      }
+
+      const booking = await storage.createBooking(bookingData);
+
+      // Send confirmation email
+      const toEmail = user?.email || guestEmail;
+      const toName = user?.name || guestName || "Уважаемый клиент";
+      if (toEmail) {
         const tour = await storage.getTour(booking.tourId);
         let startDate: string | undefined;
         let endDate: string | undefined;
@@ -597,8 +615,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
           }
         }
         sendBookingConfirmationEmail({
-          toEmail: user.email,
-          name: user.name,
+          toEmail,
+          name: toName,
           tourTitle: tour?.titleRu || "Тур",
           bookingId: booking.id,
           adults: booking.adults,

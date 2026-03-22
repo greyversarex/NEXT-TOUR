@@ -188,7 +188,10 @@ export const reviews = pgTable("reviews", {
 
 export const bookings = pgTable("bookings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: varchar("user_id").references(() => users.id),
+  guestName: varchar("guest_name"),
+  guestEmail: varchar("guest_email"),
+  guestPhone: varchar("guest_phone"),
   tourId: varchar("tour_id").notNull().references(() => tours.id),
   tourDateId: varchar("tour_date_id").references(() => tourDates.id),
   adults: integer("adults").notNull().default(1),
@@ -310,7 +313,7 @@ export const insertBannerSchema = createInsertSchema(banners).omit({ id: true })
 export const insertTourFeedSchema = createInsertSchema(tourFeeds).omit({ id: true });
 export const insertTourFeedItemSchema = createInsertSchema(tourFeedItems).omit({ id: true });
 export const insertReviewSchema = createInsertSchema(reviews).omit({ id: true, createdAt: true, status: true, inFeaturedFeed: true });
-export const insertBookingSchema = createInsertSchema(bookings).omit({ id: true, createdAt: true, bookingStatus: true, paidAmount: true });
+export const insertBookingSchema = createInsertSchema(bookings).omit({ id: true, createdAt: true, bookingStatus: true, paidAmount: true }).partial({ userId: true, guestName: true, guestEmail: true, guestPhone: true });
 export const insertNewsSchema = createInsertSchema(news).omit({ id: true });
 export const insertAlifPaymentSchema = createInsertSchema(alifPayments).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertFavoriteSchema = createInsertSchema(favorites).omit({ id: true, createdAt: true });

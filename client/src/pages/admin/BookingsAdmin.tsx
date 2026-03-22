@@ -232,6 +232,11 @@ export default function BookingsAdmin() {
                             <span className="flex items-center gap-1"><CalendarIcon className="h-3 w-3" />{format(new Date(booking.createdAt), "dd.MM.yyyy HH:mm")}</span>
                             <span className="flex items-center gap-1"><Users className="h-3 w-3" />{booking.adults + booking.children} {t("чел.", "pax")}</span>
                             <span className="flex items-center gap-1"><DollarSign className="h-3 w-3" />${Number(booking.totalPrice).toFixed(0)} ({booking.paymentType === "prepay" ? t("Предоплата 30%", "Deposit 30%") : t("Полная", "Full")})</span>
+                            {!booking.userId && (booking.guestEmail || booking.guestPhone) && (
+                              <span className="flex items-center gap-1 text-amber-600 font-medium">
+                                👤 {t("Гость:", "Guest:")} {booking.guestName || ""}{booking.guestName && (booking.guestEmail || booking.guestPhone) ? " · " : ""}{booking.guestEmail || ""}{booking.guestEmail && booking.guestPhone ? " · " : ""}{booking.guestPhone || ""}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
