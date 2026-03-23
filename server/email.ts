@@ -1,20 +1,18 @@
-import sgMail from "@sendgrid/mail";
+import { Resend } from "resend";
 
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || "noreply@nexttour.ru";
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const FROM_EMAIL = "onboarding@resend.dev";
 const FROM_NAME = "NEXT TOUR";
 const APP_URL = process.env.APP_URL || "https://nexttour.ru";
 
-if (SENDGRID_API_KEY) {
-  sgMail.setApiKey(SENDGRID_API_KEY);
-}
+const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
 const brandColor = "#0b1f3a";
 const accentColor = "#3b82f6";
 
 function isConfigured() {
-  if (!SENDGRID_API_KEY) {
-    console.log("[email] SendGrid API key not configured.");
+  if (!resend) {
+    console.log("[email] Resend API key not configured.");
     return false;
   }
   return true;
@@ -23,11 +21,20 @@ function isConfigured() {
 async function send(to: string, subject: string, html: string): Promise<boolean> {
   if (!isConfigured()) return false;
   try {
-    await sgMail.send({ from: { email: FROM_EMAIL, name: FROM_NAME }, to, subject, html });
+    const { error } = await resend!.emails.send({
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      to,
+      subject,
+      html,
+    });
+    if (error) {
+      console.error("[email] Resend error:", error);
+      return false;
+    }
     console.log(`[email] Sent "${subject}" to ${to}`);
     return true;
   } catch (err: any) {
-    console.error("[email] SendGrid error:", err?.response?.body || err);
+    console.error("[email] Resend exception:", err);
     return false;
   }
 }
@@ -165,9 +172,6 @@ export async function sendBulkEmail(opts: {
 }): Promise<{ sent: number; failed: number }> {
   if (!isConfigured()) return { sent: 0, failed: opts.recipients.length };
 
-  let sent = 0;
-  let failed = 0;
-
   const fullHtml = wrap(`
     ${header("Специальное предложение")}
     <div style="background:#fff;padding:32px;border-radius:0 0 8px 8px;box-shadow:0 4px 24px rgba(0,0,0,.08);">
@@ -176,20 +180,29 @@ export async function sendBulkEmail(opts: {
     </div>
   `);
 
-  // SendGrid allows up to 1000 personalizations per request
-  const BATCH = 1000;
+  let sent = 0;
+  let failed = 0;
+
+  // Resend supports batch sending up to 100 per request
+  const BATCH = 100;
   for (let i = 0; i < opts.recipients.length; i += BATCH) {
     const batch = opts.recipients.slice(i, i + BATCH);
     try {
-      await sgMail.sendMultiple({
-        from: { email: FROM_EMAIL, name: FROM_NAME },
-        to: batch.map(r => r.email),
+      const emails = batch.map(r => ({
+        from: `${FROM_NAME} <${FROM_EMAIL}>`,
+        to: r.email,
         subject: opts.subject,
         html: fullHtml,
-      });
-      sent += batch.length;
+      }));
+      const { error } = await resend!.batch.send(emails);
+      if (error) {
+        console.error("[email] Bulk send error:", error);
+        failed += batch.length;
+      } else {
+        sent += batch.length;
+      }
     } catch (err: any) {
-      console.error("[email] Bulk send error:", err?.response?.body || err);
+      console.error("[email] Bulk send exception:", err);
       failed += batch.length;
     }
   }
