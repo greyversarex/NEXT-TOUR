@@ -919,15 +919,16 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     return `${proto}://${host}`;
   };
 
-  // Initiate payment for a booking
-  app.post("/api/payments/initiate", requireAuth, ah(async (req, res) => {
+  // Initiate payment for a booking (guests allowed — booking is identified by ID)
+  app.post("/api/payments/initiate", ah(async (req, res) => {
     const user = req.user as any;
     const { bookingId, gate = "korti_milli" } = req.body;
     if (!bookingId) return res.status(400).json({ message: "bookingId required" });
 
     const booking = await storage.getBooking(bookingId);
     if (!booking) return res.status(404).json({ message: "Booking not found" });
-    if (user.role !== "admin" && booking.userId !== user.id) {
+    // If authenticated, ensure ownership (admins bypass)
+    if (user && user.role !== "admin" && booking.userId && booking.userId !== user.id) {
       return res.status(403).json({ message: "Forbidden" });
     }
 

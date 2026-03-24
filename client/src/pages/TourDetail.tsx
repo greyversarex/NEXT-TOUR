@@ -671,7 +671,14 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
     mutationFn: (data: any) => apiRequest("POST", "/api/bookings", data),
     onSuccess: (booking: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
-      setCreatedBookingId(booking.id);
+      if (payGate === "invoice") {
+        setCreatedBookingId(booking.id);
+      } else {
+        payMutation.mutate({ bookingId: booking.id, gate: payGate });
+      }
+    },
+    onError: (err: any) => {
+      toast({ title: t("Ошибка", "Error"), description: err.message, variant: "destructive" });
     },
   });
 
@@ -984,6 +991,32 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
                 ))}
               </div>
             </div>
+
+            <div>
+              <p className="text-sm font-semibold mb-3">{t("Способ платежа", "Payment Method")}</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { value: "korti_milli", label: "Корти Милли", icon: "💳" },
+                  { value: "wallet",      label: "Alif Mobi",   icon: "📱" },
+                  { value: "salom",       label: "Рассрочка Salom", icon: "🤝" },
+                  { value: "invoice",     label: t("Оставить заявку", "Request Only"), icon: "📋" },
+                ].map(g => (
+                  <button
+                    key={g.value}
+                    type="button"
+                    data-testid={`gate-option-${g.value}`}
+                    onClick={() => setPayGate(g.value)}
+                    className={`rounded-xl border-2 px-3 py-2.5 text-left transition-all flex items-center gap-2 ${payGate === g.value ? "border-primary bg-primary/8 shadow-sm" : "border-border hover:border-primary/50"}`}
+                  >
+                    <span className="text-lg leading-none">{g.icon}</span>
+                    <span className={`text-sm font-medium ${payGate === g.value ? "text-primary" : ""}`}>{g.label}</span>
+                  </button>
+                ))}
+              </div>
+              {payGate === "invoice" && (
+                <p className="text-[11px] text-muted-foreground mt-2">{t("Менеджер свяжется с вами для подтверждения и выставит счёт.", "A manager will contact you to confirm and issue an invoice.")}</p>
+              )}
+            </div>
           </div>
 
           <div className="px-6 pb-6">
@@ -1016,11 +1049,13 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
                 {t(", чтобы получать скидки и накапливать бонусы", " to get discounts and earn loyalty bonuses")}
               </p>
             )}
-            <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={mutation.isPending} data-testid="button-confirm-booking">
-              {mutation.isPending ? (
-                <><Loader2 className="h-4 w-4 animate-spin mr-2" />{t("Создание...", "Creating...")}</>
-              ) : (
+            <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={mutation.isPending || payMutation.isPending} data-testid="button-confirm-booking">
+              {(mutation.isPending || payMutation.isPending) ? (
+                <><Loader2 className="h-4 w-4 animate-spin mr-2" />{payMutation.isPending ? t("Переход к оплате...", "Redirecting...") : t("Создание...", "Creating...")}</>
+              ) : payGate === "invoice" ? (
                 t("Подтвердить бронирование", "Confirm Booking")
+              ) : (
+                t("Забронировать и оплатить", "Book & Pay Now")
               )}
             </Button>
           </div>
