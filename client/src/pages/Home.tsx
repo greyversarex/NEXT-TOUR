@@ -1048,11 +1048,14 @@ export default function Home() {
     setSectionOrder(layout);
   }, [savedLayout, banners, feeds]);
 
-  const moveSection = (idx: number, dir: -1 | 1) => {
+  const moveSection = (orderedIdx: number, dir: -1 | 1) => {
+    const id = orderedSections[orderedIdx];
+    const swapId = orderedSections[orderedIdx + dir];
+    if (!id || !swapId) return;
+    const idxInOrder = sectionOrder.indexOf(id);
+    const swapIdxInOrder = sectionOrder.indexOf(swapId);
     const next = [...sectionOrder];
-    const swapIdx = idx + dir;
-    if (swapIdx < 0 || swapIdx >= next.length) return;
-    [next[idx], next[swapIdx]] = [next[swapIdx], next[idx]];
+    [next[idxInOrder], next[swapIdxInOrder]] = [next[swapIdxInOrder], next[idxInOrder]];
     setSectionOrder(next);
     layoutMutation.mutate(next);
   };
