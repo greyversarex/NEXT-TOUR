@@ -98,7 +98,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
     <>
     <Link href={`/tours/${tour.id}`} className="block h-full">
       <div
-        className="group relative rounded-2xl overflow-hidden cursor-pointer h-[300px] sm:h-[320px]
+        className="group/card relative rounded-2xl overflow-hidden cursor-pointer h-[300px] sm:h-[320px]
           shadow-[0_4px_20px_rgba(0,0,0,0.10)]
           hover:shadow-[0_20px_56px_-8px_rgba(0,0,0,0.30)]
           hover:-translate-y-1.5
@@ -111,7 +111,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
         <img
           src={allImages[imgIdx] || "/images/hero-banner.png"}
           alt={title}
-          className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.07]"
+          className="absolute inset-0 w-full h-full object-cover group-hover/card:scale-[1.07]"
           style={{
             objectPosition: imgIdx === 0 ? ((tour as any).mainImagePosition || "50% 50%") : "50% 50%",
             opacity: fading ? 0 : 1,
@@ -119,28 +119,12 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
           }}
         />
 
-        {/* Dot indicators — only when multiple images */}
-        {allImages.length > 1 && (
-          <div className="absolute bottom-[4.5rem] left-0 right-0 flex justify-center gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            {allImages.map((_, i) => (
-              <div
-                key={i}
-                className={`rounded-full transition-all duration-300 ${
-                  i === imgIdx
-                    ? "w-4 h-1.5 bg-white"
-                    : "w-1.5 h-1.5 bg-white/50"
-                }`}
-              />
-            ))}
-          </div>
-        )}
-
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
 
         {/* Hover shimmer line */}
         <div className="absolute top-0 left-0 right-0 h-[2px] z-20 overflow-hidden rounded-t-2xl">
-          <div className="h-full bg-gradient-to-r from-primary via-cyan-400 to-sky-300 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
+          <div className="h-full bg-gradient-to-r from-primary via-cyan-400 to-sky-300 scale-x-0 group-hover/card:scale-x-100 origin-left transition-transform duration-500" />
         </div>
 
         {/* Top-left badges */}
@@ -168,7 +152,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
           </div>
           {isAdmin && tour.mainImage && (
             <button
-              className="w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-black/60"
+              className="w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover/card:opacity-100 transition-opacity duration-200 hover:bg-black/60"
               title="Настроить позицию"
               data-testid={`btn-position-${tour.id}`}
               onClick={(e) => {
@@ -203,7 +187,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
           )}
 
           <h3
-            className="font-bold text-white text-base sm:text-lg leading-snug line-clamp-2 mb-3 group-hover:text-primary transition-colors duration-300 drop-shadow-sm"
+            className="font-bold text-white text-base sm:text-lg leading-snug line-clamp-2 mb-3 group-hover/card:text-primary transition-colors duration-300 drop-shadow-sm"
             data-testid={`text-tour-title-${tour.id}`}
           >
             {title}
@@ -227,7 +211,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
             </div>
 
             <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white/15 backdrop-blur-sm text-white border border-white/20
-              group-hover:bg-primary group-hover:border-primary
+              group-hover/card:bg-primary group-hover/card:border-primary
               transition-all duration-300">
               <ArrowRight className="h-4 w-4" />
             </div>
