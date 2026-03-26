@@ -28,14 +28,26 @@ export default function FeedsAdmin() {
     enabled: !!manageFeed?.id,
   });
 
+  const invalidateFeeds = () => {
+    queryClient.invalidateQueries({ queryKey: ["/api/tour-feeds"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/tour-feeds?withTours=true&active=true"] });
+  };
+
   const saveMutation = useMutation({
-    mutationFn: (data: any) => editing?.id ? apiRequest("PUT", `/api/tour-feeds/${editing.id}`, data) : apiRequest("POST", "/api/tour-feeds", data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/tour-feeds"] }); toast({ title: t("Сохранено", "Saved") }); setEditing(null); },
+    mutationFn: (data: any) => {
+      const { id, createdAt, updatedAt, tours, ...payload } = data;
+      return editing?.id
+        ? apiRequest("PUT", `/api/tour-feeds/${editing.id}`, payload)
+        : apiRequest("POST", "/api/tour-feeds", payload);
+    },
+    onSuccess: () => { invalidateFeeds(); toast({ title: t("Сохранено", "Saved") }); setEditing(null); },
+    onError: (err: any) => { toast({ title: t("Ошибка", "Error"), description: err.message, variant: "destructive" }); },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => apiRequest("DELETE", `/api/tour-feeds/${id}`, {}),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/tour-feeds"] }); },
+    onSuccess: () => { invalidateFeeds(); },
+    onError: (err: any) => { toast({ title: t("Ошибка", "Error"), description: err.message, variant: "destructive" }); },
   });
 
   const addToFeedMutation = useMutation({
