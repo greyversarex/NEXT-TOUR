@@ -1004,10 +1004,13 @@ export default function Home() {
 
   const layoutMutation = useMutation({
     mutationFn: (order: string[]) => apiRequest("POST", "/api/settings/home-layout", { order }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/settings/home-layout"] });
+    },
   });
 
   useEffect(() => {
-    if (!savedLayout) return;
+    if (!savedLayout || isLoading) return;
 
     let layout = [...savedLayout];
 
@@ -1046,7 +1049,7 @@ export default function Home() {
     }
 
     setSectionOrder(layout);
-  }, [savedLayout, banners, feeds]);
+  }, [savedLayout, banners, feeds, isLoading]);
 
   const moveSection = (orderedIdx: number, dir: -1 | 1) => {
     const id = orderedSections[orderedIdx];
