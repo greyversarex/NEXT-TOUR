@@ -84,7 +84,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
           <div className="h-full bg-gradient-to-r from-primary via-cyan-400 to-sky-300 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
         </div>
 
-        <div className="relative h-[140px] sm:h-[160px] overflow-hidden shrink-0">
+        <div className="relative h-[190px] sm:h-[220px] overflow-hidden shrink-0">
           <img
             src={tour.mainImage || "/images/hero-banner.png"}
             alt={title}
@@ -141,26 +141,22 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
           </div>
         </div>
 
-        <div className="p-3 sm:p-4 flex flex-col flex-grow">
+        <div className="p-3 sm:p-4 flex flex-col gap-1.5">
           {locationLabel && (
-            <div className="flex items-center gap-1 mb-1 overflow-hidden">
+            <div className="flex items-center gap-1 overflow-hidden">
               <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0 text-primary/70" />
               <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{locationLabel}</span>
             </div>
           )}
 
           <h3
-            className="font-bold text-sm sm:text-base leading-snug line-clamp-2 mb-1 sm:mb-1.5 group-hover:text-primary transition-colors duration-200 min-h-[2.5em] sm:min-h-[2.75em]"
+            className="font-bold text-sm sm:text-base leading-snug line-clamp-2 group-hover:text-primary transition-colors duration-200"
             data-testid={`text-tour-title-${tour.id}`}
           >
             {title}
           </h3>
 
-          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 leading-relaxed overflow-hidden min-h-[2.4em] sm:min-h-[2.6em]" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-            {description}
-          </p>
-
-          <div className="flex items-center justify-between pt-2 sm:pt-3 mt-2 sm:mt-3 border-t border-border/50">
+          <div className="flex items-center justify-between pt-1.5 mt-0.5 border-t border-border/50">
             <div className="flex items-baseline gap-1 flex-wrap">
               <span className="text-[10px] sm:text-xs text-muted-foreground font-bold">
                 {t("от", "from")}
