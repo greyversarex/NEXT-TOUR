@@ -131,7 +131,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
         <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
           {tour.discountPercent > 0 && (
             <div
-              className="flex items-center bg-gradient-to-r from-red-500 to-rose-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow-md"
+              className="inline-flex items-center bg-gradient-to-r from-red-500 to-rose-600 text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-md w-fit"
               data-testid={`badge-discount-${tour.id}`}
             >
               -{tour.discountPercent}%
