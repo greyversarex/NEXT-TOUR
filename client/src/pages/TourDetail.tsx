@@ -649,14 +649,15 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
 
   const resolveTier = (count: number) => {
     if (priceTiers.length === 0) return null;
-    const sorted = [...priceTiers].sort((a: any, b: any) => a.minPeople - b.minPeople);
+    // Sort descending by minPeople so the most specific (highest min) tier wins first
+    const sorted = [...priceTiers].sort((a: any, b: any) => b.minPeople - a.minPeople);
     const exact = sorted.find((t: any) => tierMatches(t, count));
     if (exact) return exact;
-    // Fallback: use the highest-min tier whose minimum we have already reached
-    const below = [...sorted].reverse().find((t: any) => count >= t.minPeople);
+    // No exact match: use the highest-min tier whose minimum we have already reached
+    const below = sorted.find((t: any) => count >= t.minPeople);
     if (below) return below;
-    // Count is below all tier minimums — use first tier
-    return sorted[0];
+    // Count is below all tier minimums — use tier with the smallest min (last in desc sort)
+    return sorted[sorted.length - 1];
   };
 
   const tierPrice = priceTiers.length > 0 ? Number(resolveTier(totalPeople)!.pricePerPerson) : null;
