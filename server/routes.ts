@@ -378,10 +378,11 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   }));
   app.post("/api/tours/:id/price-tiers", requireAdmin, ah(async (req, res) => {
     const { minPeople, maxPeople, pricePerPerson, labelRu, labelEn } = req.body;
-    if (!minPeople || !maxPeople || !pricePerPerson || minPeople < 1 || maxPeople < minPeople || Number(pricePerPerson) <= 0) {
-      return res.status(400).json({ message: "Invalid tier data: minPeople must be >= 1, maxPeople >= minPeople, price > 0" });
+    const maxPeopleVal = maxPeople != null && maxPeople !== "" ? Number(maxPeople) : null;
+    if (!minPeople || !pricePerPerson || minPeople < 1 || (maxPeopleVal !== null && maxPeopleVal < minPeople) || Number(pricePerPerson) <= 0) {
+      return res.status(400).json({ message: "Invalid tier data: minPeople must be >= 1, maxPeople >= minPeople (optional), price > 0" });
     }
-    res.json(await storage.createTourPriceTier({ minPeople: Number(minPeople), maxPeople: Number(maxPeople), pricePerPerson: String(pricePerPerson), labelRu: labelRu || null, labelEn: labelEn || null, tourId: req.params.id }));
+    res.json(await storage.createTourPriceTier({ minPeople: Number(minPeople), maxPeople: maxPeopleVal, pricePerPerson: String(pricePerPerson), labelRu: labelRu || null, labelEn: labelEn || null, tourId: req.params.id }));
   }));
   app.put("/api/tour-price-tiers/:id", requireAdmin, ah(async (req, res) => {
     res.json(await storage.updateTourPriceTier(req.params.id, req.body));
