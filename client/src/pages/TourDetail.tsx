@@ -647,20 +647,20 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
   const tierMatches = (tier: any, count: number) =>
     count >= tier.minPeople && (tier.maxPeople == null || count <= tier.maxPeople);
 
-  const getTierPrice = () => {
+  const resolveTier = (count: number) => {
     if (priceTiers.length === 0) return null;
     const sorted = [...priceTiers].sort((a: any, b: any) => a.minPeople - b.minPeople);
-    const tier = sorted.find((t: any) => tierMatches(t, totalPeople));
-    if (tier) return Number(tier.pricePerPerson);
-    const lastTier = sorted[sorted.length - 1];
-    if (lastTier.maxPeople != null && totalPeople > lastTier.maxPeople) return Number(lastTier.pricePerPerson);
-    const nextTier = sorted.find((t: any) => totalPeople < t.minPeople);
-    if (nextTier) return Number(nextTier.pricePerPerson);
-    return Number(sorted[0].pricePerPerson);
+    const exact = sorted.find((t: any) => tierMatches(t, count));
+    if (exact) return exact;
+    // Fallback: use the highest-min tier whose minimum we have already reached
+    const below = [...sorted].reverse().find((t: any) => count >= t.minPeople);
+    if (below) return below;
+    // Count is below all tier minimums — use first tier
+    return sorted[0];
   };
 
-  const tierPrice = getTierPrice();
-  const activeTier = priceTiers.length > 0 ? priceTiers.find((t: any) => tierMatches(t, totalPeople)) : null;
+  const tierPrice = priceTiers.length > 0 ? Number(resolveTier(totalPeople)!.pricePerPerson) : null;
+  const activeTier = resolveTier(totalPeople);
   const basePrice = tierPrice !== null ? tierPrice : Number(tour.basePrice) * (1 - tour.discountPercent / 100);
   const optionsTotal = options
     .filter((o: any) => selectedOptions.includes(o.id))
