@@ -513,38 +513,6 @@ function TourScrollFeed({ tours, cardWidth = "medium" }: { tours: Tour[]; cardWi
   );
 }
 
-function PopularToursSection({ tours, cardWidth }: { tours: Tour[]; cardWidth?: string }) {
-  const { t } = useI18n();
-  if (tours.length === 0) return null;
-  return (
-    <section className="pt-8 pb-6 sm:pt-14 sm:pb-12 md:pt-24 md:pb-20 relative overflow-hidden">
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Reveal className="flex items-end justify-between mb-5 sm:mb-8 md:mb-12">
-          <div>
-            <p className="text-cyan-300 font-semibold text-xs sm:text-sm uppercase tracking-widest mb-1.5 sm:mb-3 flex items-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
-              <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> {t("Лучшие предложения", "Top Offers")}
-            </p>
-            <h2 className="text-xl sm:text-2xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Популярные туры", "Popular Tours")}</h2>
-          </div>
-          <Link href="/tours">
-            <Button className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm hover:-translate-y-0.5 transition-all duration-200 shadow-lg">
-              {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-        </Reveal>
-        <TourScrollFeed tours={tours} cardWidth={cardWidth} />
-        <div className="mt-8 flex justify-center md:hidden">
-          <Link href="/tours">
-            <Button className="rounded-full px-8 py-4 bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm">
-              {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function HotToursSection({ tours, cardWidth }: { tours: Tour[]; cardWidth?: string }) {
   const { t } = useI18n();
   if (tours.length === 0) return null;
@@ -569,6 +537,36 @@ function HotToursSection({ tours, cardWidth }: { tours: Tour[]; cardWidth?: stri
           <Link href="/promotions">
             <Button className="rounded-full px-8 py-4 bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm">
               {t("Все акции", "All Deals")} <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FeedSection({ feed }: { feed: any }) {
+  const { t, lang } = useI18n();
+  const name = lang === "ru" ? feed.nameRu : (feed.nameEn || feed.nameRu);
+  if (!feed.tours?.length) return null;
+  return (
+    <section className="py-6 sm:py-12 md:py-20 relative overflow-hidden">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Reveal className="flex items-end justify-between mb-5 sm:mb-8 md:mb-12">
+          <div>
+            <h2 className="text-xl sm:text-2xl md:text-5xl font-bold leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{name}</h2>
+          </div>
+          <Link href="/tours">
+            <Button className="hidden md:flex items-center gap-2 rounded-full px-7 py-5 text-sm font-semibold bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm hover:-translate-y-0.5 transition-all duration-200 shadow-lg">
+              {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        </Reveal>
+        <TourScrollFeed tours={feed.tours} cardWidth={feed.cardWidth} />
+        <div className="mt-8 flex justify-center md:hidden">
+          <Link href="/tours">
+            <Button className="rounded-full px-8 py-4 bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm">
+              {t("Все туры", "All Tours")} <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>
         </div>
@@ -1013,33 +1011,42 @@ export default function Home() {
 
     let layout = [...savedLayout];
 
-    if (banners.length > 0) {
-      // Migrate old "banners" group → individual banner entries
-      if (layout.includes("banners")) {
-        const idx = layout.indexOf("banners");
-        const bannerIds = (banners as any[]).map((b) => `banner:${b.id}`);
-        layout = [...layout.slice(0, idx), ...bannerIds, ...layout.slice(idx + 1)];
-      }
+    // Migrate old "banners" group → individual banner entries
+    if (layout.includes("banners")) {
+      const idx = layout.indexOf("banners");
+      const bannerIds = (banners as any[]).map((b) => `banner:${b.id}`);
+      layout = [...layout.slice(0, idx), ...bannerIds, ...layout.slice(idx + 1)];
+    }
 
-      // Remove stale banner IDs (deleted banners)
-      layout = layout.filter(
-        (id) => !id.startsWith("banner:") || (banners as any[]).some((b) => `banner:${b.id}` === id)
-      );
+    // Remove stale banner IDs (deleted banners)
+    layout = layout.filter(
+      (id) => !id.startsWith("banner:") || (banners as any[]).some((b) => `banner:${b.id}` === id)
+    );
 
-      // Add new banners not yet in layout (append at end)
-      const inLayout = new Set(layout);
-      (banners as any[]).forEach((b) => {
-        if (!inLayout.has(`banner:${b.id}`)) layout = [...layout, `banner:${b.id}`];
-      });
+    // Add new banners not yet in layout
+    const inLayout = new Set(layout);
+    (banners as any[]).forEach((b) => {
+      if (!inLayout.has(`banner:${b.id}`)) layout = [...layout, `banner:${b.id}`];
+    });
 
-      // If layout changed from original, save to DB
-      if (JSON.stringify(layout) !== JSON.stringify(savedLayout)) {
-        layoutMutation.mutate(layout);
-      }
+    // Remove stale feed IDs (deleted feeds)
+    layout = layout.filter(
+      (id) => !id.startsWith("feed:") || feeds.some((f: any) => `feed:${f.id}` === id)
+    );
+
+    // Add new feeds not yet in layout
+    const inLayout2 = new Set(layout);
+    feeds.forEach((f: any) => {
+      if (!inLayout2.has(`feed:${f.id}`)) layout = [...layout, `feed:${f.id}`];
+    });
+
+    // If layout changed from original, save to DB
+    if (JSON.stringify(layout) !== JSON.stringify(savedLayout)) {
+      layoutMutation.mutate(layout);
     }
 
     setSectionOrder(layout);
-  }, [savedLayout, banners]);
+  }, [savedLayout, banners, feeds]);
 
   const moveSection = (idx: number, dir: -1 | 1) => {
     const next = [...sectionOrder];
@@ -1050,29 +1057,11 @@ export default function Home() {
     layoutMutation.mutate(next);
   };
 
-  const hotFeed = feeds.find((f: any) => f.slug === "hot" || f.nameRu?.includes("Горящ"));
-  const featuredFeed = feeds.find((f: any) => f.slug === "featured" || f.nameRu?.includes("Рекоменд") || f.nameRu?.includes("Популяр"));
-  const allFeed = feeds.find((f: any) => f.slug === "all" || (!hotFeed && !featuredFeed));
-  const hotTours: Tour[] = hotFeed?.tours || [];
-  const popularTours: Tour[] = featuredFeed?.tours || allFeed?.tours || (feeds[0]?.tours ?? []);
-  const hotCardWidth: string = hotFeed?.cardWidth || "medium";
-  const popularCardWidth: string = (featuredFeed || allFeed || feeds[0])?.cardWidth || "medium";
-
   const SECTIONS: Record<string, { labelRu: string; labelEn: string; editHref?: string; node: React.ReactNode }> = {
-    popular: {
-      labelRu: "Популярные туры",
-      labelEn: "Popular Tours",
-      node: <><PopularToursSection tours={popularTours} cardWidth={popularCardWidth} /><div className="py-2 sm:py-6 md:py-8" /></>,
-    },
     destinations: {
       labelRu: "Направления",
       labelEn: "Destinations",
       node: <><DestinationsSection /><div className="py-2 sm:py-6 md:py-8" /></>,
-    },
-    hot: {
-      labelRu: "Горящие туры",
-      labelEn: "Hot Tours",
-      node: <HotToursSection tours={hotTours} cardWidth={hotCardWidth} />,
     },
     reviews: {
       labelRu: "Отзывы",
@@ -1087,6 +1076,17 @@ export default function Home() {
           labelEn: `Banner: ${b.titleEn || b.titleRu}`,
           editHref: "/admin/banners",
           node: <SingleBannerSection banner={b} isAdmin={isAdmin} />,
+        },
+      ])
+    )),
+    ...(Object.fromEntries(
+      feeds.map((f: any) => [
+        `feed:${f.id}`,
+        {
+          labelRu: f.nameRu,
+          labelEn: f.nameEn || f.nameRu,
+          editHref: "/admin/feeds",
+          node: <FeedSection feed={f} />,
         },
       ])
     )),
