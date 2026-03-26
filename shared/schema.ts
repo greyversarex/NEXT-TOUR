@@ -87,7 +87,7 @@ export const tourPriceTiers = pgTable("tour_price_tiers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   tourId: varchar("tour_id").notNull().references(() => tours.id, { onDelete: "cascade" }),
   minPeople: integer("min_people").notNull(),
-  maxPeople: integer("max_people").notNull(),
+  maxPeople: integer("max_people"),
   pricePerPerson: decimal("price_per_person", { precision: 10, scale: 2 }).notNull(),
   labelRu: text("label_ru"),
   labelEn: text("label_en"),

@@ -419,7 +419,7 @@ export default function TourDetail() {
                     <div className="mt-3 space-y-1.5">
                       {priceTiers.map((tier: any) => (
                         <div key={tier.id} className="flex items-center justify-between bg-white/15 rounded-xl px-3 py-1.5">
-                          <span className="text-white/90 text-xs">{tier.minPeople}–{tier.maxPeople} {t("чел.", "ppl")}{(tier.labelRu || tier.labelEn) ? ` · ${lang === "ru" ? (tier.labelRu || tier.labelEn) : (tier.labelEn || tier.labelRu)}` : ""}</span>
+                          <span className="text-white/90 text-xs">{tier.minPeople}{tier.maxPeople ? `–${tier.maxPeople}` : "+"} {t("чел.", "ppl")}{(tier.labelRu || tier.labelEn) ? ` · ${lang === "ru" ? (tier.labelRu || tier.labelEn) : (tier.labelEn || tier.labelRu)}` : ""}</span>
                           <span className="text-white font-bold text-sm">{formatPrice(tier.pricePerPerson)}</span>
                         </div>
                       ))}
@@ -644,19 +644,23 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
 
   const totalPeople = adults + children;
 
+  const tierMatches = (tier: any, count: number) =>
+    count >= tier.minPeople && (tier.maxPeople == null || count <= tier.maxPeople);
+
   const getTierPrice = () => {
     if (priceTiers.length === 0) return null;
     const sorted = [...priceTiers].sort((a: any, b: any) => a.minPeople - b.minPeople);
-    const tier = sorted.find((t: any) => totalPeople >= t.minPeople && totalPeople <= t.maxPeople);
+    const tier = sorted.find((t: any) => tierMatches(t, totalPeople));
     if (tier) return Number(tier.pricePerPerson);
-    if (totalPeople > sorted[sorted.length - 1].maxPeople) return Number(sorted[sorted.length - 1].pricePerPerson);
+    const lastTier = sorted[sorted.length - 1];
+    if (lastTier.maxPeople != null && totalPeople > lastTier.maxPeople) return Number(lastTier.pricePerPerson);
     const nextTier = sorted.find((t: any) => totalPeople < t.minPeople);
     if (nextTier) return Number(nextTier.pricePerPerson);
     return Number(sorted[0].pricePerPerson);
   };
 
   const tierPrice = getTierPrice();
-  const activeTier = priceTiers.length > 0 ? priceTiers.find((t: any) => totalPeople >= t.minPeople && totalPeople <= t.maxPeople) : null;
+  const activeTier = priceTiers.length > 0 ? priceTiers.find((t: any) => tierMatches(t, totalPeople)) : null;
   const basePrice = tierPrice !== null ? tierPrice : Number(tour.basePrice) * (1 - tour.discountPercent / 100);
   const optionsTotal = options
     .filter((o: any) => selectedOptions.includes(o.id))
