@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useI18n } from "@/lib/i18n";
+import { useCurrency } from "@/lib/currency";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ImageUpload } from "@/components/ui/image-upload";
@@ -72,7 +73,7 @@ export default function ToursAdmin() {
                   <div className="min-w-0">
                     <p className="font-medium text-sm truncate">{lang === "ru" ? tour.titleRu : tour.titleEn}</p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-muted-foreground">{tour.duration} {t("дн.", "days")} · ${Number(tour.basePrice).toFixed(0)}</span>
+                      <span className="text-xs text-muted-foreground">{tour.duration} {t("дн.", "days")} · {Number(tour.basePrice).toFixed(0)} TJS</span>
                       {tour.isHot && <Badge className="text-xs py-0 bg-orange-100 text-orange-700">{t("Горящий", "Hot")}</Badge>}
                       {tour.discountPercent > 0 && <Badge variant="secondary" className="text-xs py-0">-{tour.discountPercent}%</Badge>}
                     </div>
@@ -115,6 +116,8 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
   const { t, lang } = useI18n();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { currencies } = useCurrency();
+  const baseCurrency = currencies.find((c: any) => c.isBase)?.code || "TJS";
   const isEdit = !!tour.id;
 
   const [saving, setSaving] = useState(false);
@@ -302,7 +305,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div><Label>{t("Длительность (дней)", "Duration (days)")}</Label><Input type="number" value={form.duration} onChange={e => set("duration", Number(e.target.value))} className="mt-1" min={1} /></div>
-                  <div><Label>{t("Цена ($)", "Price ($)")}</Label><Input type="number" value={form.basePrice} onChange={e => set("basePrice", e.target.value)} className="mt-1" min={0} /></div>
+                  <div><Label>{t("Цена", "Price")} ({baseCurrency})</Label><Input type="number" value={form.basePrice} onChange={e => set("basePrice", e.target.value)} className="mt-1" min={0} /></div>
                   <div><Label>{t("Скидка (%)", "Discount (%)")}</Label><Input type="number" value={form.discountPercent} onChange={e => set("discountPercent", Number(e.target.value))} className="mt-1" min={0} max={100} /></div>
                 </div>
                 <div>
@@ -574,6 +577,8 @@ function LocalDatesManager({ dates, setDates }: { dates: any[]; setDates: (d: an
 
 function LocalOptionsManager({ options, setOptions }: { options: any[]; setOptions: (o: any[]) => void }) {
   const { t, lang } = useI18n();
+  const { currencies } = useCurrency();
+  const baseCurrency = currencies.find((c: any) => c.isBase)?.code || "TJS";
   const [form, setForm] = useState({ nameRu: "", nameEn: "", price: 0 });
   const add = () => {
     if (!form.nameRu) return;
@@ -587,7 +592,7 @@ function LocalOptionsManager({ options, setOptions }: { options: any[]; setOptio
         <div className="grid grid-cols-3 gap-3">
           <div><Label className="text-xs">{t("Название (RU)", "Name (RU)")}</Label><Input value={form.nameRu} onChange={e => setForm(p => ({ ...p, nameRu: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
           <div><Label className="text-xs">{t("Название (EN)", "Name (EN)")}</Label><Input value={form.nameEn} onChange={e => setForm(p => ({ ...p, nameEn: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
-          <div><Label className="text-xs">{t("Цена ($)", "Price ($)")}</Label><Input type="number" value={form.price} onChange={e => setForm(p => ({ ...p, price: Number(e.target.value) }))} className="mt-1 h-9 text-sm" min={0} /></div>
+          <div><Label className="text-xs">{t("Цена", "Price")} ({baseCurrency})</Label><Input type="number" value={form.price} onChange={e => setForm(p => ({ ...p, price: Number(e.target.value) }))} className="mt-1 h-9 text-sm" min={0} /></div>
         </div>
         <Button type="button" size="sm" onClick={add}>{t("Добавить", "Add")}</Button>
       </div>
@@ -799,6 +804,8 @@ function OptionsManager({ tourId }: { tourId: string }) {
   const { t, lang } = useI18n();
   const { toast } = useToast();
   const qc = useQueryClient();
+  const { currencies } = useCurrency();
+  const baseCurrency = currencies.find((c: any) => c.isBase)?.code || "TJS";
   const { data: options = [], isLoading } = useQuery<any[]>({ queryKey: [`/api/tours/${tourId}/options`] });
   const [form, setForm] = useState({ nameRu: "", nameEn: "", price: 0 });
   const [editing, setEditing] = useState<any>(null);
@@ -833,7 +840,7 @@ function OptionsManager({ tourId }: { tourId: string }) {
             <Input value={activeForm.nameEn} onChange={e => setF("nameEn", e.target.value)} className="mt-1 h-9 text-sm" />
           </div>
           <div>
-            <Label className="text-xs">{t("Цена ($)", "Price ($)")}</Label>
+            <Label className="text-xs">{t("Цена", "Price")} ({baseCurrency})</Label>
             <Input type="number" value={activeForm.price} onChange={e => setF("price", Number(e.target.value))} className="mt-1 h-9 text-sm" min={0} />
           </div>
         </div>
@@ -1005,6 +1012,8 @@ function ItineraryManager({ tourId }: { tourId: string }) {
 
 function LocalPriceTiersManager({ tiers, setTiers }: { tiers: any[]; setTiers: (t: any[]) => void }) {
   const { t } = useI18n();
+  const { currencies } = useCurrency();
+  const baseCurrency = currencies.find((c: any) => c.isBase)?.code || "TJS";
   const [form, setForm] = useState({ minPeople: "", maxPeople: "", pricePerPerson: "", labelRu: "", labelEn: "" });
   const add = () => {
     if (!form.minPeople || !form.pricePerPerson) return;
@@ -1019,7 +1028,7 @@ function LocalPriceTiersManager({ tiers, setTiers }: { tiers: any[]; setTiers: (
         <div className="grid grid-cols-5 gap-2">
           <div><Label className="text-xs">{t("Мин. чел.", "Min ppl")}</Label><Input type="number" min={1} value={form.minPeople} onChange={e => setForm(p => ({ ...p, minPeople: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
           <div><Label className="text-xs">{t("Макс. чел. (необяз.)", "Max ppl (opt.)")}</Label><Input type="number" min={1} value={form.maxPeople} onChange={e => setForm(p => ({ ...p, maxPeople: e.target.value }))} className="mt-1 h-9 text-sm" placeholder="∞" /></div>
-          <div><Label className="text-xs">{t("Цена ($)", "Price ($)")}</Label><Input type="number" min={0} step="0.01" value={form.pricePerPerson} onChange={e => setForm(p => ({ ...p, pricePerPerson: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Цена", "Price")} ({baseCurrency})</Label><Input type="number" min={0} step="0.01" value={form.pricePerPerson} onChange={e => setForm(p => ({ ...p, pricePerPerson: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
           <div><Label className="text-xs">{t("Метка (RU)", "Label (RU)")}</Label><Input value={form.labelRu} onChange={e => setForm(p => ({ ...p, labelRu: e.target.value }))} className="mt-1 h-9 text-sm" placeholder={t("Малая группа", "Small group")} /></div>
           <div><Label className="text-xs">{t("Метка (EN)", "Label (EN)")}</Label><Input value={form.labelEn} onChange={e => setForm(p => ({ ...p, labelEn: e.target.value }))} className="mt-1 h-9 text-sm" placeholder="Small group" /></div>
         </div>
@@ -1034,7 +1043,7 @@ function LocalPriceTiersManager({ tiers, setTiers }: { tiers: any[]; setTiers: (
             <div key={tier.id} className="flex items-center justify-between border rounded-lg px-4 py-3 bg-card">
               <div className="flex items-center gap-4">
                 <Badge variant="secondary" className="text-xs">{tier.minPeople}{tier.maxPeople ? `–${tier.maxPeople}` : "+"} {t("чел.", "ppl")}</Badge>
-                <span className="text-sm font-bold text-primary">${Number(tier.pricePerPerson).toFixed(0)}</span>
+                <span className="text-sm font-bold text-primary">{Number(tier.pricePerPerson).toFixed(0)} {baseCurrency}</span>
                 <span className="text-xs text-muted-foreground">{t("за человека", "per person")}</span>
                 {(tier.labelRu || tier.labelEn) && (
                   <span className="text-xs text-muted-foreground italic">({tier.labelRu || tier.labelEn})</span>
@@ -1055,6 +1064,8 @@ function PriceTiersManager({ tourId }: { tourId: string }) {
   const { t } = useI18n();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { currencies } = useCurrency();
+  const baseCurrency = currencies.find((c: any) => c.isBase)?.code || "TJS";
   const [form, setForm] = useState({ minPeople: "", maxPeople: "", pricePerPerson: "", labelRu: "", labelEn: "" });
 
   const { data: tiers = [] } = useQuery<any[]>({ queryKey: ["/api/tours", tourId, "price-tiers"], queryFn: () => fetch(`/api/tours/${tourId}/price-tiers`).then(r => r.json()) });
@@ -1085,7 +1096,7 @@ function PriceTiersManager({ tourId }: { tourId: string }) {
         <div className="grid grid-cols-5 gap-2">
           <div><Label className="text-xs">{t("Мин. чел.", "Min ppl")}</Label><Input type="number" min={1} value={form.minPeople} onChange={e => setForm(p => ({ ...p, minPeople: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
           <div><Label className="text-xs">{t("Макс. чел. (необяз.)", "Max ppl (opt.)")}</Label><Input type="number" min={1} value={form.maxPeople} onChange={e => setForm(p => ({ ...p, maxPeople: e.target.value }))} className="mt-1 h-9 text-sm" placeholder="∞" /></div>
-          <div><Label className="text-xs">{t("Цена ($)", "Price ($)")}</Label><Input type="number" min={0} step="0.01" value={form.pricePerPerson} onChange={e => setForm(p => ({ ...p, pricePerPerson: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
+          <div><Label className="text-xs">{t("Цена", "Price")} ({baseCurrency})</Label><Input type="number" min={0} step="0.01" value={form.pricePerPerson} onChange={e => setForm(p => ({ ...p, pricePerPerson: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
           <div><Label className="text-xs">{t("Метка (RU)", "Label (RU)")}</Label><Input value={form.labelRu} onChange={e => setForm(p => ({ ...p, labelRu: e.target.value }))} className="mt-1 h-9 text-sm" placeholder={t("Малая группа", "Small group")} /></div>
           <div><Label className="text-xs">{t("Метка (EN)", "Label (EN)")}</Label><Input value={form.labelEn} onChange={e => setForm(p => ({ ...p, labelEn: e.target.value }))} className="mt-1 h-9 text-sm" placeholder="Small group" /></div>
         </div>
@@ -1101,7 +1112,7 @@ function PriceTiersManager({ tourId }: { tourId: string }) {
             <div key={tier.id} className="flex items-center justify-between border rounded-lg px-4 py-3 bg-card">
               <div className="flex items-center gap-4">
                 <Badge variant="secondary" className="text-xs">{tier.minPeople}{tier.maxPeople ? `–${tier.maxPeople}` : "+"} {t("чел.", "ppl")}</Badge>
-                <span className="text-sm font-bold text-primary">${Number(tier.pricePerPerson).toFixed(0)}</span>
+                <span className="text-sm font-bold text-primary">{Number(tier.pricePerPerson).toFixed(0)} {baseCurrency}</span>
                 <span className="text-xs text-muted-foreground">{t("за человека", "per person")}</span>
                 {(tier.labelRu || tier.labelEn) && (
                   <span className="text-xs text-muted-foreground italic">({tier.labelRu || tier.labelEn})</span>
