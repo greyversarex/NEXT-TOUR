@@ -637,7 +637,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
   const [selectedOptions, setSelectedOptions] = useState<string[]>(preselectedOptions);
   const [paymentType, setPaymentType] = useState<"prepay" | "full">("full");
   const [createdBookingId, setCreatedBookingId] = useState<string | null>(null);
-  const [payGate, setPayGate] = useState("korti_milli");
+  const [payGate] = useState("visa_mastercard");
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [phoneCode, setPhoneCode] = useState("+992");
@@ -678,11 +678,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
     mutationFn: (data: any) => apiRequest("POST", "/api/bookings", data),
     onSuccess: (booking: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
-      if (payGate === "invoice") {
-        setCreatedBookingId(booking.id);
-      } else {
-        payMutation.mutate({ bookingId: booking.id, gate: payGate });
-      }
+      payMutation.mutate({ bookingId: booking.id, gate: payGate });
     },
     onError: (err: any) => {
       toast({ title: t("Ошибка", "Error"), description: err.message, variant: "destructive" });
@@ -753,25 +749,15 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
               </div>
             </div>
 
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground text-left font-medium mb-1">{t("Способ оплаты:", "Payment method:")}</p>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { value: "korti_milli", label: "Корти Милли" },
-                  { value: "wallet", label: "Alif Mobi" },
-                  { value: "salom", label: "Рассрочка Salom" },
-                  { value: "invoice", label: t("Наличными", "Cash Invoice") },
-                ].map((g) => (
-                  <button
-                    key={g.value}
-                    type="button"
-                    onClick={() => setPayGate(g.value)}
-                    className={`rounded-lg border-2 px-3 py-2.5 text-sm font-medium transition-all text-left ${payGate === g.value ? "border-primary bg-primary/5 text-primary" : "border-border hover:border-primary/50"}`}
-                  >
-                    {g.label}
-                  </button>
-                ))}
-              </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <svg className="h-4 w-auto" viewBox="0 0 48 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="28" height="16" rx="3" fill="#1A1F71"/>
+                <text x="14" y="12" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold" fontFamily="Arial">VISA</text>
+                <rect x="30" width="18" height="16" rx="3" fill="#EB001B" fillOpacity="0.15"/>
+                <circle cx="36" cy="8" r="5" fill="#EB001B"/>
+                <circle cx="42" cy="8" r="5" fill="#F79E1B"/>
+              </svg>
+              <span>{t("Оплата картой Visa / Mastercard", "Pay by Visa / Mastercard")}</span>
             </div>
 
             <div className="flex gap-3">
@@ -1001,28 +987,16 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
 
             <div>
               <p className="text-sm font-semibold mb-3">{t("Способ платежа", "Payment Method")}</p>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { value: "korti_milli", label: "Корти Милли", icon: "💳" },
-                  { value: "wallet",      label: "Alif Mobi",   icon: "📱" },
-                  { value: "salom",       label: "Рассрочка Salom", icon: "🤝" },
-                  { value: "invoice",     label: t("Оставить заявку", "Request Only"), icon: "📋" },
-                ].map(g => (
-                  <button
-                    key={g.value}
-                    type="button"
-                    data-testid={`gate-option-${g.value}`}
-                    onClick={() => setPayGate(g.value)}
-                    className={`rounded-xl border-2 px-3 py-2.5 text-left transition-all flex items-center gap-2 ${payGate === g.value ? "border-primary bg-primary/8 shadow-sm" : "border-border hover:border-primary/50"}`}
-                  >
-                    <span className="text-lg leading-none">{g.icon}</span>
-                    <span className={`text-sm font-medium ${payGate === g.value ? "text-primary" : ""}`}>{g.label}</span>
-                  </button>
-                ))}
+              <div className="flex items-center gap-3 rounded-xl border-2 border-primary bg-primary/5 px-4 py-3">
+                <svg className="h-5 w-auto shrink-0" viewBox="0 0 56 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="32" height="18" rx="3" fill="#1A1F71"/>
+                  <text x="16" y="13" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">VISA</text>
+                  <circle cx="39" cy="9" r="6" fill="#EB001B"/>
+                  <circle cx="47" cy="9" r="6" fill="#F79E1B"/>
+                  <path d="M43 4.8a6 6 0 010 8.4A6 6 0 0143 4.8z" fill="#FF5F00"/>
+                </svg>
+                <span className="text-sm font-medium text-primary">{t("Visa / Mastercard", "Visa / Mastercard")}</span>
               </div>
-              {payGate === "invoice" && (
-                <p className="text-[11px] text-muted-foreground mt-2">{t("Менеджер свяжется с вами для подтверждения и выставит счёт.", "A manager will contact you to confirm and issue an invoice.")}</p>
-              )}
             </div>
           </div>
 
@@ -1059,8 +1033,6 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
             <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={mutation.isPending || payMutation.isPending} data-testid="button-confirm-booking">
               {(mutation.isPending || payMutation.isPending) ? (
                 <><Loader2 className="h-4 w-4 animate-spin mr-2" />{payMutation.isPending ? t("Переход к оплате...", "Redirecting...") : t("Создание...", "Creating...")}</>
-              ) : payGate === "invoice" ? (
-                t("Подтвердить бронирование", "Confirm Booking")
               ) : (
                 t("Забронировать и оплатить", "Book & Pay Now")
               )}
