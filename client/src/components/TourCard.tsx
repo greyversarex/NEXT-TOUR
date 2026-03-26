@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Tour, Country, City } from "@shared/schema";
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ImagePositionPicker } from "@/components/ui/image-position-picker";
@@ -25,6 +25,34 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
   const [showPositionEditor, setShowPositionEditor] = useState(false);
   const [pendingPosition, setPendingPosition] = useState((tour as any).mainImagePosition || "50% 50%");
   const isAdmin = (user as any)?.role === "admin";
+
+  const allImages = [tour.mainImage, ...(tour.images || [])].filter(Boolean) as string[];
+  const [imgIdx, setImgIdx] = useState(0);
+  const [fading, setFading] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startCycling = useCallback(() => {
+    if (allImages.length <= 1) return;
+    intervalRef.current = setInterval(() => {
+      setFading(true);
+      setTimeout(() => {
+        setImgIdx(prev => (prev + 1) % allImages.length);
+        setFading(false);
+      }, 300);
+    }, 1200);
+  }, [allImages.length]);
+
+  const stopCycling = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setFading(true);
+    setTimeout(() => {
+      setImgIdx(0);
+      setFading(false);
+    }, 300);
+  }, []);
 
   const savePositionMutation = useMutation({
     mutationFn: (position: string) =>
@@ -76,14 +104,36 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
           hover:-translate-y-1.5
           transition-all duration-500"
         data-testid={`card-tour-${tour.id}`}
+        onMouseEnter={startCycling}
+        onMouseLeave={stopCycling}
       >
-        {/* Full-bleed image */}
+        {/* Full-bleed image with fade on change */}
         <img
-          src={tour.mainImage || "/images/hero-banner.png"}
+          src={allImages[imgIdx] || "/images/hero-banner.png"}
           alt={title}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
-          style={{ objectPosition: (tour as any).mainImagePosition || "50% 50%" }}
+          className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.07]"
+          style={{
+            objectPosition: imgIdx === 0 ? ((tour as any).mainImagePosition || "50% 50%") : "50% 50%",
+            opacity: fading ? 0 : 1,
+            transition: "opacity 0.3s ease, transform 0.7s ease",
+          }}
         />
+
+        {/* Dot indicators — only when multiple images */}
+        {allImages.length > 1 && (
+          <div className="absolute bottom-[4.5rem] left-0 right-0 flex justify-center gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            {allImages.map((_, i) => (
+              <div
+                key={i}
+                className={`rounded-full transition-all duration-300 ${
+                  i === imgIdx
+                    ? "w-4 h-1.5 bg-white"
+                    : "w-1.5 h-1.5 bg-white/50"
+                }`}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
