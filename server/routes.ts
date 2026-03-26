@@ -328,7 +328,13 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   app.post("/api/tours", requireAdmin, async (req, res) => {
     try {
-      const tour = await storage.createTour(req.body);
+      const { categoryIds, ...tourData } = req.body;
+      const tour = await storage.createTour(tourData);
+      if (Array.isArray(categoryIds) && categoryIds.length > 0) {
+        await storage.setTourCategories(tour.id, categoryIds);
+      } else if (tour.categoryId) {
+        await storage.setTourCategories(tour.id, [tour.categoryId]);
+      }
       res.json(tour);
     } catch (e: any) {
       res.status(400).json({ message: e.message });
@@ -336,7 +342,13 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   app.put("/api/tours/:id", requireAdmin, async (req, res) => {
-    const tour = await storage.updateTour(req.params.id, req.body);
+    const { categoryIds, ...tourData } = req.body;
+    const tour = await storage.updateTour(req.params.id, tourData);
+    if (tour) {
+      if (Array.isArray(categoryIds)) {
+        await storage.setTourCategories(tour.id, categoryIds);
+      }
+    }
     res.json(tour);
   });
 
@@ -345,11 +357,16 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json({ success: true });
   });
 
+  app.get("/api/tours/:id/categories", async (req, res) => {
+    const categoryIds = await storage.getTourCategoryIds(req.params.id);
+    res.json({ categoryIds });
+  });
+
   // Tour full details
   app.get("/api/tours/:id/full", async (req, res) => {
     const tour = await storage.getTour(req.params.id);
     if (!tour) return res.status(404).json({ message: "Tour not found" });
-    const [dates, priceComponents, options, days, allStops, reviews, priceTiers, country, city, category] = await Promise.all([
+    const [dates, priceComponents, options, days, allStops, reviews, priceTiers, country, city, category, categoryIds] = await Promise.all([
       storage.getTourDates(req.params.id),
       storage.getTourPriceComponents(req.params.id),
       storage.getTourOptions(req.params.id),
@@ -360,6 +377,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       tour.countryId ? storage.getCountry(tour.countryId) : Promise.resolve(undefined),
       tour.cityId ? storage.getCity(tour.cityId) : Promise.resolve(undefined),
       tour.categoryId ? storage.getCategory(tour.categoryId) : Promise.resolve(undefined),
+      storage.getTourCategoryIds(req.params.id),
     ]);
     const itinerary = days.map(day => ({
       ...day,
@@ -369,7 +387,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     if (req.user) {
       isFavorite = await storage.isFavorite((req.user as any).id, req.params.id);
     }
-    res.json({ tour, dates, priceComponents, options, itinerary, reviews, priceTiers, isFavorite, country, city, category });
+    const allCategories = await storage.getCategories();
+    const categories = allCategories.filter(c => categoryIds.includes(c.id));
+    res.json({ tour, dates, priceComponents, options, itinerary, reviews, priceTiers, isFavorite, country, city, category, categories, categoryIds });
   });
 
   // Tour Dates

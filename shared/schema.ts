@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
-  pgTable, text, varchar, integer, boolean, timestamp, decimal, pgEnum, jsonb
+  pgTable, text, varchar, integer, boolean, timestamp, decimal, pgEnum, jsonb, primaryKey
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -82,6 +82,13 @@ export const tours = pgTable("tours", {
   customDatesTextEn: text("custom_dates_text_en"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+
+export const tourCategories = pgTable("tour_categories", {
+  tourId: varchar("tour_id").notNull().references(() => tours.id, { onDelete: "cascade" }),
+  categoryId: varchar("category_id").notNull().references(() => categories.id, { onDelete: "cascade" }),
+}, (t) => ({
+  pk: primaryKey({ columns: [t.tourId, t.categoryId] }),
+}));
 
 export const tourPriceTiers = pgTable("tour_price_tiers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -319,6 +326,7 @@ export const insertAlifPaymentSchema = createInsertSchema(alifPayments).omit({ i
 export const insertFavoriteSchema = createInsertSchema(favorites).omit({ id: true, createdAt: true });
 export const insertIntroScreenSchema = createInsertSchema(introScreen).omit({ id: true });
 export const insertHeroSlideSchema = createInsertSchema(heroSlides).omit({ id: true });
+export const insertTourCategorySchema = createInsertSchema(tourCategories);
 
 // Types
 export type User = typeof users.$inferSelect;

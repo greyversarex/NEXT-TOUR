@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "./AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -129,6 +129,31 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
   const [showPositionPicker, setShowPositionPicker] = useState(false);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const replaceGalleryRef = useRef<HTMLInputElement>(null);
+  const [categoryIds, setCategoryIds] = useState<string[]>(
+    tour.categoryId ? [tour.categoryId] : []
+  );
+
+  const { data: existingCats } = useQuery<{ categoryIds: string[] }>({
+    queryKey: ["/api/tours", tour.id, "categories"],
+    enabled: !!tour.id,
+  });
+
+  useEffect(() => {
+    if (existingCats) {
+      if (existingCats.categoryIds.length > 0) {
+        setCategoryIds(existingCats.categoryIds);
+      } else if (tour.categoryId) {
+        setCategoryIds([tour.categoryId]);
+      }
+    }
+  }, [existingCats]);
+
+  const toggleCategory = (id: string) => {
+    setCategoryIds(prev =>
+      prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]
+    );
+  };
+
   const [form, setForm] = useState({
     titleRu: tour.titleRu || "",
     titleEn: tour.titleEn || "",
@@ -136,7 +161,6 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
     descriptionEn: tour.descriptionEn || "",
     countryId: tour.countryId || "",
     cityId: tour.cityId || "",
-    categoryId: tour.categoryId || "",
     duration: tour.duration || 7,
     basePrice: tour.basePrice || 500,
     discountPercent: tour.discountPercent || 0,
@@ -215,7 +239,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
       const res = await apiRequest(
         isEdit ? "PUT" : "POST",
         isEdit ? `/api/tours/${tour.id}` : "/api/tours",
-        form
+        { ...form, categoryId: categoryIds[0] || null, categoryIds }
       );
       const saved = await res.json();
       const tourId = saved.id;
@@ -296,11 +320,23 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
                     </Select>
                   </div>
                   <div>
-                    <Label>{t("Категория", "Category")}</Label>
-                    <Select value={form.categoryId} onValueChange={v => set("categoryId", v)}>
-                      <SelectTrigger className="mt-1"><SelectValue placeholder={t("Выберите", "Select")} /></SelectTrigger>
-                      <SelectContent>{categories.map((c: any) => <SelectItem key={c.id} value={c.id}>{lang === "ru" ? c.nameRu : c.nameEn}</SelectItem>)}</SelectContent>
-                    </Select>
+                    <Label>{t("Категории", "Categories")}</Label>
+                    <div className="mt-1 border rounded-md p-2 space-y-1 max-h-36 overflow-y-auto">
+                      {categories.map((c: any) => (
+                        <label key={c.id} className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 rounded px-1 py-0.5">
+                          <input
+                            type="checkbox"
+                            checked={categoryIds.includes(c.id)}
+                            onChange={() => toggleCategory(c.id)}
+                            className="accent-primary"
+                          />
+                          <span className="text-sm">{lang === "ru" ? c.nameRu : c.nameEn}</span>
+                        </label>
+                      ))}
+                      {categories.length === 0 && (
+                        <p className="text-xs text-muted-foreground px-1">{t("Нет категорий", "No categories")}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-4">

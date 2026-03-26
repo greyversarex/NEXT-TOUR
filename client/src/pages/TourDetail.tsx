@@ -69,14 +69,16 @@ export default function TourDetail() {
     );
   }
 
-  const { tour, dates, options, itinerary, reviews, priceTiers = [], isFavorite, country, city, category } = data;
+  const { tour, dates, options, itinerary, reviews, priceTiers = [], isFavorite, country, city, category, categories: tourCategoriesList } = data;
   const title = lang === "ru" ? tour.titleRu : tour.titleEn;
   const description = lang === "ru" ? tour.descriptionRu : tour.descriptionEn;
   const included = lang === "ru" ? tour.includedRu : tour.includedEn;
   const notIncluded = lang === "ru" ? tour.notIncludedRu : tour.notIncludedEn;
   const countryName = country ? (lang === "ru" ? country.nameRu : country.nameEn) : null;
   const cityName = city ? (lang === "ru" ? city.nameRu : city.nameEn) : null;
-  const categoryName = category ? (lang === "ru" ? category.nameRu : category.nameEn) : null;
+  const categoryNames: string[] = (tourCategoriesList && tourCategoriesList.length > 0)
+    ? tourCategoriesList.map((c: any) => lang === "ru" ? c.nameRu : c.nameEn)
+    : category ? [lang === "ru" ? category.nameRu : category.nameEn] : [];
 
   const { formatPrice, convertPrice, currentSymbol } = useCurrency();
   const price = Number(tour.basePrice);
@@ -225,13 +227,13 @@ export default function TourDetail() {
                 </span>
               )}
 
-              {/* Category */}
-              {categoryName && (
-                <span className="flex items-center gap-1.5 text-sm font-medium bg-primary/10 text-primary rounded-full px-3 py-1.5">
+              {/* Categories */}
+              {categoryNames.map((name, i) => (
+                <span key={i} className="flex items-center gap-1.5 text-sm font-medium bg-primary/10 text-primary rounded-full px-3 py-1.5">
                   <Tag className="h-4 w-4" />
-                  {categoryName}
+                  {name}
                 </span>
-              )}
+              ))}
 
               {/* Hot deal */}
               {tour.isHot && (

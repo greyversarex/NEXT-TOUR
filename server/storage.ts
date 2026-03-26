@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { eq, and, desc, asc, ilike, or, inArray, sql, ne } from "drizzle-orm";
 import {
-  users, countries, cities, categories, tours, tourDates, tourPriceTiers,
+  users, countries, cities, categories, tours, tourCategories, tourDates, tourPriceTiers,
   priceComponents, tourPriceComponents, tourOptions, tourItinerary, itineraryStops,
   banners, tourFeeds, tourFeedItems, reviews, bookings, news,
   favorites, introScreen, heroSlides, passwordResetTokens, currencies, settings,
@@ -56,6 +56,8 @@ export interface IStorage {
   // Tours
   getTours(filters?: { countryId?: string; cityId?: string; categoryId?: string; search?: string; minPrice?: number; maxPrice?: number; duration?: number; isHot?: boolean }): Promise<Tour[]>;
   getTour(id: string): Promise<Tour | undefined>;
+  getTourCategoryIds(tourId: string): Promise<string[]>;
+  setTourCategories(tourId: string, categoryIds: string[]): Promise<void>;
   createTour(data: InsertTour): Promise<Tour>;
   updateTour(id: string, data: Partial<Tour>): Promise<Tour | undefined>;
   deleteTour(id: string): Promise<void>;
@@ -359,6 +361,19 @@ export class DatabaseStorage implements IStorage {
   async getTour(id: string) {
     const [t] = await db.select().from(tours).where(eq(tours.id, id));
     return t;
+  }
+
+  async getTourCategoryIds(tourId: string): Promise<string[]> {
+    const rows = await db.select({ categoryId: tourCategories.categoryId })
+      .from(tourCategories).where(eq(tourCategories.tourId, tourId));
+    return rows.map(r => r.categoryId);
+  }
+
+  async setTourCategories(tourId: string, categoryIds: string[]): Promise<void> {
+    await db.delete(tourCategories).where(eq(tourCategories.tourId, tourId));
+    if (categoryIds.length > 0) {
+      await db.insert(tourCategories).values(categoryIds.map(cid => ({ tourId, categoryId: cid })));
+    }
   }
 
   async createTour(data: InsertTour) {
