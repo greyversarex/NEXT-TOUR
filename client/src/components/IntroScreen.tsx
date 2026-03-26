@@ -96,7 +96,7 @@ export default function IntroScreen() {
     : t("Открой мир путешествий", "Discover the World");
   const typedSlogan = useTypingEffect(slogan, phase >= 3, 40);
 
-  if (status === "gone") return null;
+  if (status === "gone" || status === "checking") return null;
 
   return (
     <div
