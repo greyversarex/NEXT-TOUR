@@ -43,3 +43,8 @@ outputType = "webview"
 
 [agent]
 expertMode = true
+
+[userenv]
+
+[userenv.shared]
+ALIF_TEST_MODE = "false"
