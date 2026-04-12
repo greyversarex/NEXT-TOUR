@@ -689,8 +689,20 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
     mutationFn: ({ bookingId, gate }: { bookingId: string; gate: string }) =>
       apiRequest("POST", "/api/payments/initiate", { bookingId, gate }).then(res => res.json()),
     onSuccess: (data: any) => {
-      if (data.url) {
-        window.location.href = data.url;
+      if (data.success && data.data) {
+        const { method, action, formData } = data.data;
+        const form = document.createElement("form");
+        form.method = method;
+        form.action = action;
+        Object.entries(formData).forEach(([key, value]) => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = key;
+          input.value = String(value);
+          form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
       }
     },
     onError: (err: any) => {

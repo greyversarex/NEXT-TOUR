@@ -11,7 +11,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import path from "path";
 import { sendPasswordResetEmail, sendWelcomeEmail, sendBookingConfirmationEmail, sendBulkEmail } from "./email";
-import { initiateAlifPayment, checkAlifTransaction } from "./payment";
+import { buildAlifFormData, checkAlifTransaction } from "./payment";
 import multer from "multer";
 import { storage } from "./storage";
 import {
@@ -987,7 +987,6 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     return `${proto}://${host}`;
   };
 
-  // Initiate payment for a booking (guests allowed — booking is identified by ID)
   app.post("/api/payments/initiate", ah(async (req, res) => {
     const user = req.user as any;
     const { bookingId, gate = "korti_milli" } = req.body;
@@ -995,7 +994,6 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
     const booking = await storage.getBooking(bookingId);
     if (!booking) return res.status(404).json({ message: "Booking not found" });
-    // If authenticated, ensure ownership (admins bypass)
     if (user && user.role !== "admin" && booking.userId && booking.userId !== user.id) {
       return res.status(403).json({ message: "Forbidden" });
     }
@@ -1009,63 +1007,76 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     const totalPrice = Number(booking.totalPrice);
     const amount = paymentType === "prepay" ? totalPrice * 0.3 : totalPrice;
 
-    const baseUrl = getAppBaseUrl(req);
+    const appUrl = process.env.APP_URL || getAppBaseUrl(req);
     const orderId = `TOUR-${bookingId.slice(0, 8)}-${Date.now()}`;
-    const callbackUrl = `${baseUrl}/api/payments/callback`;
-    const returnUrl = `${baseUrl}/payment/result?orderId=${orderId}`;
+    const callbackUrl = `${appUrl}/api/payments/callback`;
+    const returnUrl = `${appUrl}/payment/result?orderId=${orderId}`;
 
-    let alifResult;
     try {
-      alifResult = await initiateAlifPayment({
+      const formData = buildAlifFormData({
         orderId,
         amount,
         gate,
         callbackUrl,
         returnUrl,
-        info: `Тур: ${(booking as any).tour?.titleRu || ""}`,
-        email: user.email,
+        info: `Тур: ${(booking as any).tour?.titleRu || "Бронирование"}`,
+        email: user?.email || (booking as any).guestEmail || "",
+        phone: (booking as any).guestPhone || "",
       });
-    } catch (err: any) {
-      console.error("[alif] initiateAlifPayment error:", err.message);
-      return res.status(500).json({ message: err.message || "Payment service error" });
-    }
 
-    if (alifResult.code === 200 && alifResult.url) {
       await storage.createAlifPayment({
         bookingId,
         orderId,
         amount: amount.toFixed(2),
         gate,
       });
-      return res.json({ url: alifResult.url, orderId });
-    }
 
-    return res.status(400).json({ message: alifResult.message || "Failed to initiate payment" });
+      return res.json({ success: true, data: formData, orderId });
+    } catch (err: any) {
+      console.error("[alif] buildAlifFormData error:", err.message);
+      return res.status(500).json({ message: err.message || "Payment service error" });
+    }
   }));
 
-  // Callback from Alif (no auth — public endpoint)
   app.post("/api/payments/callback", async (req, res) => {
     try {
-      const { orderId, transactionId, status, amount } = req.body;
-      console.log(`[alif] Callback received: orderId=${orderId} status=${status} txn=${transactionId}`);
+      const body = req.body || {};
+      const query = req.query || {};
 
-      if (!orderId) return res.status(400).send("Missing orderId");
+      const orderId = body.orderId || body.order_id || body.orderid
+        || query.orderId || query.order_id;
+      const status = body.status || body.Status || body.STATUS
+        || query.status || query.Status;
+      const transactionId = body.transactionId || body.transaction_id;
+      const amount = body.amount || body.Amount;
 
-      const payment = await storage.getAlifPaymentByOrderId(orderId);
+      console.log(`[alif] Callback received: orderId=${orderId} status=${status} txn=${transactionId} body=${JSON.stringify(body)}`);
+
+      if (!orderId) return res.status(200).send("OK");
+
+      const payment = await storage.getAlifPaymentByOrderId(String(orderId));
       if (!payment) {
         console.warn(`[alif] Payment not found for orderId=${orderId}`);
         return res.status(200).send("OK");
       }
 
-      const normalized = status === "ok" ? "ok" : status === "canceled" ? "canceled" : status === "failed" ? "failed" : "pending";
+      const normalizedStatus = status ? String(status).toLowerCase().trim() : "";
+      const successStatuses = ["ok", "success", "paid", "charged", "complete", "completed", "1", "true"];
+      const failStatuses = ["fail", "failed", "error", "declined", "rejected", "cancel", "cancelled", "canceled", "0", "false"];
+
+      const isSuccess = successStatuses.includes(normalizedStatus);
+      const isFail = failStatuses.includes(normalizedStatus);
+      const treatAsSuccess = isSuccess || (!isSuccess && !isFail);
+
+      const finalStatus = treatAsSuccess ? "ok" : "failed";
 
       await storage.updateAlifPayment(payment.id, {
-        status: normalized as any,
+        status: finalStatus as any,
         transactionId: transactionId?.toString(),
-        alifResponse: req.body,
+        alifResponse: body,
       });
 
-      if (normalized === "ok") {
+      if (treatAsSuccess) {
         const booking = await storage.getBooking(payment.bookingId);
         if (booking) {
           const newBookingStatus = booking.paymentType === "prepay" ? "prepaid" : "paid";
@@ -1074,6 +1085,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
             paidAmount: amount?.toString() || payment.amount,
           });
         }
+        console.log(`[alif] Payment ${orderId} marked as OK`);
+      } else {
+        console.log(`[alif] Payment ${orderId} marked as FAILED (status=${status})`);
       }
 
       res.status(200).send("OK");
