@@ -78,7 +78,16 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
       toast({ title: t("Регистрация успешна!", "Registration successful!"), description: t("Добро пожаловать в NEXT TOUR!", "Welcome to NEXT TOUR!") });
       onClose();
     } catch (err: any) {
-      toast({ title: t("Ошибка регистрации", "Registration failed"), description: err?.message || t("Попробуйте снова", "Please try again"), variant: "destructive" });
+      const msg = err?.message || "";
+      const isEmailTaken = msg.toLowerCase().includes("email already") || msg.toLowerCase().includes("already registered");
+      toast({
+        title: t("Ошибка регистрации", "Registration failed"),
+        description: isEmailTaken
+          ? t("Этот email уже зарегистрирован. Войдите в аккаунт или используйте другой email.", "This email is already registered. Please sign in or use a different email.")
+          : msg || t("Попробуйте снова", "Please try again"),
+        variant: "destructive",
+      });
+      if (isEmailTaken) setTab("login");
     } finally {
       setLoading(false);
     }
