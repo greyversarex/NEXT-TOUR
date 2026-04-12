@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = "onboarding@resend.dev";
+const FROM_EMAIL = "info@nexttour.tj";
 const FROM_NAME = "NEXT TOUR";
 const APP_URL = process.env.APP_URL || "https://nexttour.tj";
 
