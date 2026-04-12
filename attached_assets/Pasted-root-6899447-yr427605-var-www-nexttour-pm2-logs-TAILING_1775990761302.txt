@@ -1,0 +1,43 @@
+root@6899447-yr427605:/var/www/nexttour# pm2 logs
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-04-12T10:31:50: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T10:31:50: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T10:31:50: PM2 log: pid=27456 msg=process killed
+PM2        | 2026-04-12T10:31:50: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T10:31:50: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-12T10:33:52: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T10:33:52: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T10:33:53: PM2 log: pid=27499 msg=process killed
+PM2        | 2026-04-12T10:33:53: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T10:33:53: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-12T10:42:04: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T10:42:04: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T10:42:04: PM2 log: pid=27568 msg=process killed
+PM2        | 2026-04-12T10:42:05: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T10:42:05: PM2 log: App [nexttour:0] online
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | Ru":"Встреча гостей","titleEn":"Meeting time","descriptionRu":"Наш гид встретит вас в месте вашего проживания в городн душанбе","descriptionEn":"Our guide will meet in hotel","durationMinutes":10},{"id":"cb2451c2-5e96-4579-8e31-af6fb4111f57","itineraryDayId":"0ac6106b-2e9a-425c-b99b-24b0ce4cd5fd","stopOrder":2,"titleRu":"Путь в гиссар ","titleEn":"Way to Gissar","descriptionRu":"Путь в гиссар составить 40 минут в одну сторону по пути вы увидите красоту ","descriptionEn":"The way to Gissar takes 40 minutes one side ","durationMinutes":40}]},{"id":"e5ba3044-332a-4c2a-865d-a38ed3f8a548","tourId":"22eac233-f2ee-402b-87b8-33b2bb3f0a53","dayNumber":2,"titleRu":"Душанбе Искандаркуль ","titleEn":"Dushabe Iskandarkul","descriptionRu":"Этот день будет четким ","descriptionEn":"This day gonna be perfect","durationHours":12,"stops":[{"id":"d436305d-a380-432f-badc-3640a16c5810","itineraryDayId":"e5ba3044-332a-4c2a-865d-a38ed3f8a548","stopOrder":1,"titleRu":"Путь в исаандаркулт","titleEn":"Way to iskandarkul","descriptionRu":"Кайфш мени сагерача","descriptionEn":" Enjoy bitch ","durationMinutes":3}]}],"reviews":[],"priceTiers":[],"isFavorite":false,"country":{"id":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Таджикистан","nameEn":"Tajikistan","imageUrl":"/uploads/1774859735714-9th3i2z9di.mp4","countryCode":"TJ","tagsRu":["Природа","Культура","История"],"tagsEn":["Nature","Culture","History"],"cardSize":"normal","showOnHome":true},"city":{"id":"573f6d64-c5e1-4b78-8cba-fdd603766e19","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Душанбе","nameEn":"Dushanbe","imageUrl":null},"category":{"id":"47fc6f1d-09c3-401c-8685-d44e7301388b","nameRu":"однодневный тур","nameEn":"one day tour"},"categories":[{"id":"47fc6f1d-09c3-401c-8685-d44e7301388b","nameRu":"однодневный тур","nameEn":"one day tour"}],"categoryIds":["47fc6f1d-09c3-401c-8685-d44e7301388b"]}
+0|nexttour | 10:45:21 AM [express] GET /api/auth/providers 304 in 7ms :: {"google":false,"facebook":false,"mailru":false}
+0|nexttour | [email] Resend API key not configured.
+0|nexttour | 10:45:31 AM [express] POST /api/bookings 200 in 20ms :: {"id":"0bc79603-bb4e-44c9-969f-e1d0958de929","userId":"ad568552-531b-46d6-9caf-f45774eef09d","guestName":null,"guestEmail":null,"guestPhone":null,"tourId":"22eac233-f2ee-402b-87b8-33b2bb3f0a53","tourDateId":null,"adults":1,"children":0,"selectedOptions":[],"totalPrice":"150.00","paidAmount":"0.00","paymentType":"full","bookingStatus":"new","notes":null,"createdAt":"2026-04-12T10:45:31.031Z"}
+0|nexttour | [alif] Initiating payment orderId=TOUR-0bc79603-1775990731158 amount=150.00 gate=visa_mastercard env=prod
+0|nexttour | 10:45:31 AM [express] POST /api/payments/initiate 500 in 553ms :: {"message":"Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON"}
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour |   position: undefined,
+0|nexttour |   internalPosition: undefined,
+0|nexttour |   internalQuery: undefined,
+0|nexttour |   where: undefined,
+0|nexttour |   schema: 'public',
+0|nexttour |   table: 'tours',
+0|nexttour |   column: undefined,
+0|nexttour |   dataType: undefined,
+0|nexttour |   constraint: 'tours_city_id_cities_id_fk',
+0|nexttour |   file: 'ri_triggers.c',
+0|nexttour |   line: '2621',
+0|nexttour |   routine: 'ri_ReportViolation'
+0|nexttour | }
+0|nexttour | [alif] initiateAlifPayment error: Unexpected token '<', "<html>
+0|nexttour | <h"... is not valid JSON

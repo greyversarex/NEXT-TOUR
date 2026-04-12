@@ -82,7 +82,17 @@ export async function initiateAlifPayment(params: InitiatePaymentParams): Promis
     body: JSON.stringify(body),
   });
 
-  const data = await response.json() as AlifInitResponse;
+  const rawText = await response.text();
+  console.log(`[alif] HTTP status: ${response.status}`);
+  console.log(`[alif] Raw response: ${rawText.slice(0, 500)}`);
+
+  let data: AlifInitResponse;
+  try {
+    data = JSON.parse(rawText) as AlifInitResponse;
+  } catch {
+    throw new Error(`Alif API returned non-JSON (HTTP ${response.status}): ${rawText.slice(0, 200)}`);
+  }
+
   console.log(`[alif] Response: code=${data.code} message=${data.message}`);
   return data;
 }
