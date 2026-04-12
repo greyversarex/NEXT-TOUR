@@ -37,7 +37,7 @@ export interface AlifFormData {
 }
 
 export function buildAlifFormData(params: BuildFormParams): AlifFormData {
-  const { orderId, amount, gate = "korti_milli", callbackUrl, returnUrl, info, email, phone } = params;
+  const { orderId, amount, gate = "vsa", callbackUrl, returnUrl, info, email, phone } = params;
 
   if (!TERMINAL_ID || !TERMINAL_PASSWORD) {
     throw new Error("ALIF_TERMINAL_ID and ALIF_TERMINAL_PASSWORD must be configured");

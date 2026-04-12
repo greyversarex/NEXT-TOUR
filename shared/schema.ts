@@ -219,7 +219,7 @@ export const alifPayments = pgTable("alif_payments", {
   transactionId: text("transaction_id"),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   status: alifPaymentStatusEnum("status").notNull().default("pending"),
-  gate: text("gate").notNull().default("korti_milli"),
+  gate: text("gate").notNull().default("vsa"),
   alifResponse: jsonb("alif_response"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

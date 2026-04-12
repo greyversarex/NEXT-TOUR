@@ -989,7 +989,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   app.post("/api/payments/initiate", ah(async (req, res) => {
     const user = req.user as any;
-    const { bookingId, gate = "korti_milli" } = req.body;
+    const { bookingId, gate = "vsa" } = req.body;
     if (!bookingId) return res.status(400).json({ message: "bookingId required" });
 
     const booking = await storage.getBooking(bookingId);
