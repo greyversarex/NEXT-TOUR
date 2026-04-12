@@ -1,0 +1,46 @@
+root@6899447-yr427605:/var/www/nexttour# pm2 logs
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-04-12T21:48:24: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T21:48:24: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T21:48:25: PM2 log: pid=39644 msg=process killed
+PM2        | 2026-04-12T21:48:25: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T21:48:25: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-12T21:52:33: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T21:52:33: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T21:52:33: PM2 log: pid=39906 msg=process killed
+PM2        | 2026-04-12T21:52:33: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T21:52:33: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-12T21:58:21: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T21:58:21: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T21:58:21: PM2 log: pid=40078 msg=process killed
+PM2        | 2026-04-12T21:58:21: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T21:58:21: PM2 log: App [nexttour:0] online
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour |     at OAuth2Strategy._createOAuthError (/var/www/nexttour/node_modules/passport-oauth2/lib/strategy.js:420:16)
+0|nexttour |     at /var/www/nexttour/node_modules/passport-oauth2/lib/strategy.js:177:45
+0|nexttour |     at /var/www/nexttour/node_modules/oauth/lib/oauth2.js:196:18
+0|nexttour |     at passBackControl (/var/www/nexttour/node_modules/oauth/lib/oauth2.js:132:9)
+0|nexttour |     at IncomingMessage.<anonymous> (/var/www/nexttour/node_modules/oauth/lib/oauth2.js:157:7)
+0|nexttour |     at IncomingMessage.emit (node:events:536:35)
+0|nexttour |     at endReadableNT (node:internal/streams/readable:1698:12)
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+0|nexttour |   code: 'invalid_grant',
+0|nexttour |   uri: undefined,
+0|nexttour |   status: 500
+0|nexttour | }
+0|nexttour | Error: ENOENT: no such file or directory, stat '/var/www/nexttour/dist/public/index.html'
+0|nexttour | Error: ENOENT: no such file or directory, stat '/var/www/nexttour/dist/public/index.html'
+0|nexttour | Error: ENOENT: no such file or directory, stat '/var/www/nexttour/dist/public/index.html'
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | 6e19","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","categoryId":"47fc6f1d-09c3-401c-8685-d44e7301388b","duration":1,"basePrice":"150.00","discountPercent":0,"mainImage":"/uploads/1773828715563-8woyx3rdme6.jpg","mainImagePosition":"50% 50%","images":["/uploads/1774205121447-364dhz2mzmf.jpg"],"imagesMeta":[],"isHot":false,"isFeatured":false,"isActive":true,"includedRu":"Транспорт\nГид \nОбед\nВходные билеты","includedEn":"Transportation\nGuide\nLunch\nEntrance fees","notIncludedRu":"Страховка \nЛичные расходы ","notIncludedEn":"Insurance\nPersonal expenses","mapUrl":"","customDatesTextRu":"Даты по желанию","customDatesTextEn":"Flexible dates","createdAt":"2026-03-18T10:21:25.583Z"}]
+0|nexttour | 10:05:08 PM [express] GET /api/cities 304 in 56ms :: [{"id":"573f6d64-c5e1-4b78-8cba-fdd603766e19","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Душанбе","nameEn":"Dushanbe","imageUrl":null},{"id":"a3e0fb0f-ca95-42e6-b745-90c495134b74","countryId":"26591d55-4360-41a0-bfd7-50f291bb6e0f","nameRu":"Женева","nameEn":"Geneva","imageUrl":null},{"id":"ead7ec54-b088-467b-9d25-a17ece1224d8","countryId":"2fa4b10f-04b7-4605-bcaa-54c46bfad7b1","nameRu":"Киото","nameEn":"Kyoto","imageUrl":null},{"id":"f206213c-6797-4aa3-8cb8-f5dc4fcc3737","countryId":"12a16b6b-e8c5-4a1f-b1b3-6e63fd5711d5","nameRu":"Лима","nameEn":"Lima","imageUrl":null},{"id":"46a21180-30b2-45e6-a5fa-44845225c20c","countryId":"7d72c8e9-6115-44db-922f-adf3264f69d7","nameRu":"Мале","nameEn":"Male","imageUrl":null},{"id":"1295200c-bd7b-4c9e-bb81-7f9b4e7979ec","countryId":"b238150d-1115-4f25-bb69-fea81b4979f8","nameRu":"Париж","nameEn":"Paris","imageUrl":null},{"id":"27948356-9ad8-469a-b380-36b567b1690e","countryId":"2a1ef1f5-cbb1-4efe-ae64-3f07d2d0e940","nameRu":"Санторини","nameEn":"Santorini","imageUrl":null},{"id":"b40fe296-12f3-4a81-9533-9d4881fffa5c","countryId":"2fa4b10f-04b7-4605-bcaa-54c46bfad7b1","nameRu":"Токио","nameEn":"Tokyo","imageUrl":null}]
+0|nexttour | 10:05:08 PM [express] GET /api/banners 304 in 8ms :: []
+0|nexttour | 10:05:08 PM [express] GET /api/settings/home-layout 304 in 4ms :: ["popular","feed:5bf920af-a56e-40de-aacd-bd0e886bb764","destinations","hot","reviews"]
+0|nexttour | 10:05:08 PM [express] GET /api/auth/me 401 in 4ms :: {"message":"Not authenticated"}
+0|nexttour | 10:05:08 PM [express] GET /api/countries 304 in 8ms :: [{"id":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Таджикистан","nameEn":"Tajikistan","imageUrl":"/uploads/1774859735714-9th3i2z9di.mp4","countryCode":"TJ","tagsRu":["Природа","Культура","История"],"tagsEn":["Nature","Culture","History"],"cardSize":"normal","showOnHome":true}]
+0|nexttour | 10:05:08 PM [express] GET /api/reviews/featured 304 in 10ms :: []
+0|nexttour | 10:05:15 PM [express] POST /api/auth/register 200 in 95ms :: {"needsVerification":true,"message":"Verification email sent"}
+0|nexttour | [email] Sent "NEXT TOUR — Подтвердите ваш email ✉️" to greyversarex@gmail.com

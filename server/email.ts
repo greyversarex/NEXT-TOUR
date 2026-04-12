@@ -26,6 +26,9 @@ async function send(to: string, subject: string, html: string): Promise<boolean>
       to,
       subject,
       html,
+      headers: {
+        "X-Entity-Ref-ID": `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      },
     });
     if (error) {
       console.error("[email] Resend error:", error);
