@@ -1,3 +1,5 @@
+import { Link } from "wouter";
+
 export default function Footer() {
   return (
     <footer className="relative mt-12 sm:mt-24 overflow-hidden" style={{ background: "linear-gradient(160deg, hsl(215 40% 12%) 0%, hsl(220 45% 9%) 100%)" }}>
@@ -19,8 +21,16 @@ export default function Footer() {
           />
         </div>
 
-        <div className="border-t border-white/8 mt-5 sm:mt-8 pt-4 sm:pt-5 text-center text-[10px] sm:text-xs text-white/25">
-          © {new Date().getFullYear()} NEXT TOUR. Все права защищены.
+        <div className="border-t border-white/8 mt-5 sm:mt-8 pt-4 sm:pt-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] sm:text-xs text-white/25">
+          <span>© {new Date().getFullYear()} NEXT TOUR. Все права защищены.</span>
+          <div className="flex items-center gap-4">
+            <Link href="/privacy" className="hover:text-white/50 transition-colors" data-testid="link-privacy">
+              Политика конфиденциальности
+            </Link>
+            <Link href="/terms" className="hover:text-white/50 transition-colors" data-testid="link-terms">
+              Условия использования
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
