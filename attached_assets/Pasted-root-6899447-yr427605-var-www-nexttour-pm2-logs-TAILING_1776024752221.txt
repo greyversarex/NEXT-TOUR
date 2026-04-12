@@ -1,0 +1,51 @@
+root@6899447-yr427605:/var/www/nexttour# pm2 logs
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-04-12T20:00:38: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T20:00:38: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T20:00:38: PM2 log: pid=37269 msg=process killed
+PM2        | 2026-04-12T20:00:39: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T20:00:39: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-12T20:05:56: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T20:05:57: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T20:05:57: PM2 log: pid=37512 msg=process killed
+PM2        | 2026-04-12T20:05:57: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T20:05:58: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-12T20:10:14: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T20:10:14: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T20:10:14: PM2 log: pid=37713 msg=process killed
+PM2        | 2026-04-12T20:10:15: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T20:10:15: PM2 log: App [nexttour:0] online
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour |     at OAuth2Strategy._createOAuthError (/var/www/nexttour/node_modules/passport-oauth2/lib/strategy.js:420:16)
+0|nexttour |     at /var/www/nexttour/node_modules/passport-oauth2/lib/strategy.js:177:45
+0|nexttour |     at /var/www/nexttour/node_modules/oauth/lib/oauth2.js:196:18
+0|nexttour |     at passBackControl (/var/www/nexttour/node_modules/oauth/lib/oauth2.js:132:9)
+0|nexttour |     at IncomingMessage.<anonymous> (/var/www/nexttour/node_modules/oauth/lib/oauth2.js:157:7)
+0|nexttour |     at IncomingMessage.emit (node:events:536:35)
+0|nexttour |     at endReadableNT (node:internal/streams/readable:1698:12)
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+0|nexttour |   code: 'invalid_grant',
+0|nexttour |   uri: undefined,
+0|nexttour |   status: 500
+0|nexttour | }
+0|nexttour | Error: ENOENT: no such file or directory, stat '/var/www/nexttour/dist/public/index.html'
+0|nexttour | Error: ENOENT: no such file or directory, stat '/var/www/nexttour/dist/public/index.html'
+0|nexttour | Error: ENOENT: no such file or directory, stat '/var/www/nexttour/dist/public/index.html'
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | criptionRu":"Наш гид встретит вас в месте вашего проживания в городн душанбе","descriptionEn":"Our guide will meet in hotel","durationMinutes":10},{"id":"cb2451c2-5e96-4579-8e31-af6fb4111f57","itineraryDayId":"0ac6106b-2e9a-425c-b99b-24b0ce4cd5fd","stopOrder":2,"titleRu":"Путь в гиссар ","titleEn":"Way to Gissar","descriptionRu":"Путь в гиссар составить 40 минут в одну сторону по пути вы увидите красоту ","descriptionEn":"The way to Gissar takes 40 minutes one side ","durationMinutes":40}]},{"id":"e5ba3044-332a-4c2a-865d-a38ed3f8a548","tourId":"22eac233-f2ee-402b-87b8-33b2bb3f0a53","dayNumber":2,"titleRu":"Душанбе Искандаркуль ","titleEn":"Dushabe Iskandarkul","descriptionRu":"Этот день будет четким ","descriptionEn":"This day gonna be perfect","durationHours":12,"stops":[{"id":"d436305d-a380-432f-badc-3640a16c5810","itineraryDayId":"e5ba3044-332a-4c2a-865d-a38ed3f8a548","stopOrder":1,"titleRu":"Путь в исаандаркулт","titleEn":"Way to iskandarkul","descriptionRu":"Кайфш мени сагерача","descriptionEn":" Enjoy bitch ","durationMinutes":3}]}],"reviews":[],"priceTiers":[],"isFavorite":false,"country":{"id":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Таджикистан","nameEn":"Tajikistan","imageUrl":"/uploads/1774859735714-9th3i2z9di.mp4","countryCode":"TJ","tagsRu":["Природа","Культура","История"],"tagsEn":["Nature","Culture","History"],"cardSize":"normal","showOnHome":true},"city":{"id":"573f6d64-c5e1-4b78-8cba-fdd603766e19","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Душанбе","nameEn":"Dushanbe","imageUrl":null},"category":{"id":"47fc6f1d-09c3-401c-8685-d44e7301388b","nameRu":"однодневный тур","nameEn":"one day tour"},"categories":[{"id":"47fc6f1d-09c3-401c-8685-d44e7301388b","nameRu":"однодневный тур","nameEn":"one day tour"}],"categoryIds":["47fc6f1d-09c3-401c-8685-d44e7301388b"]}
+0|nexttour | 8:11:25 PM [express] GET /api/auth/providers 200 in 7ms :: {"google":true,"facebook":false,"mailru":false}
+0|nexttour | [email] Resend API key not configured.
+0|nexttour | 8:11:38 PM [express] POST /api/bookings 200 in 14ms :: {"id":"5f5d5ebf-61b1-4379-aecd-9b2ad846a39b","userId":"ad568552-531b-46d6-9caf-f45774eef09d","guestName":null,"guestEmail":null,"guestPhone":null,"tourId":"22eac233-f2ee-402b-87b8-33b2bb3f0a53","tourDateId":null,"adults":1,"children":0,"selectedOptions":[],"totalPrice":"150.00","paidAmount":"0.00","paymentType":"full","bookingStatus":"new","notes":null,"createdAt":"2026-04-12T20:11:38.843Z"}
+0|nexttour | [alif] Trying API: orderId=1776024698988 amount=150.00 gate=vsa
+0|nexttour | [alif] API HTTP 403: <html>
+0|nexttour | <head><title>403 Forbidden</title></head>
+0|nexttour | <body>
+0|nexttour | <center><h1>403 Forbidden</h1></center>
+0|nexttour | </body>
+0|nexttour | </html>
+0|nexttour |
+0|nexttour | [alif] API failed (403), falling back to form
+0|nexttour | 8:11:39 PM [express] POST /api/payments/initiate 200 in 206ms
