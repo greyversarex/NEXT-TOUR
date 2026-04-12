@@ -686,24 +686,22 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
   });
 
   const payMutation = useMutation({
-    mutationFn: ({ bookingId, gate }: { bookingId: string; gate: string }) =>
-      apiRequest("POST", "/api/payments/initiate", { bookingId, gate }).then(res => res.json()),
-    onSuccess: (data: any) => {
-      if (data.success && data.data) {
-        const { method, action, formData } = data.data;
-        const form = document.createElement("form");
-        form.method = method;
-        form.action = action;
-        Object.entries(formData).forEach(([key, value]) => {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = key;
-          input.value = String(value);
-          form.appendChild(input);
-        });
-        document.body.appendChild(form);
-        form.submit();
-      }
+    mutationFn: async ({ bookingId, gate }: { bookingId: string; gate: string }) => {
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = `/api/payments/initiate?redirect=true`;
+      const addField = (name: string, value: string) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      };
+      addField("bookingId", bookingId);
+      addField("gate", gate);
+      document.body.appendChild(form);
+      form.submit();
+      return new Promise(() => {});
     },
     onError: (err: any) => {
       toast({ title: t("Ошибка оплаты", "Payment error"), description: err.message, variant: "destructive" });

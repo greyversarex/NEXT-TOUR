@@ -1031,6 +1031,19 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         gate,
       });
 
+      if (req.query.redirect === "true") {
+        const fields = Object.entries(formData.formData)
+          .map(([k, v]) => `<input type="hidden" name="${k}" value="${v}" />`)
+          .join("\n");
+        const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Переход к оплате...</title></head><body>
+          <form id="alifForm" method="${formData.method}" action="${formData.action}">${fields}</form>
+          <p style="text-align:center;margin-top:50px;font-family:sans-serif;">Переход к оплате...</p>
+          <script>document.getElementById("alifForm").submit();</script>
+        </body></html>`;
+        res.setHeader("Content-Type", "text/html");
+        return res.send(html);
+      }
+
       return res.json({ success: true, data: formData, orderId });
     } catch (err: any) {
       console.error("[alif] buildAlifFormData error:", err.message);
