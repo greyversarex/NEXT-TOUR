@@ -1005,16 +1005,17 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     if (!subject || !html) return res.status(400).json({ message: "subject and html are required" });
 
     const allUsers = await storage.getAllUsers();
+    const verified = allUsers.filter(u => u.emailVerified);
 
     let recipients: Array<{ email: string; name: string }>;
     if (audience === "all") {
-      recipients = allUsers.map(u => ({ email: u.email, name: u.name }));
+      recipients = verified.map(u => ({ email: u.email, name: u.name }));
     } else if (audience === "booked") {
       const allBookings = await storage.getBookings();
       const bookedUserIds = new Set(allBookings.map((b: any) => b.userId));
-      recipients = allUsers.filter(u => bookedUserIds.has(u.id)).map(u => ({ email: u.email, name: u.name }));
+      recipients = verified.filter(u => bookedUserIds.has(u.id)).map(u => ({ email: u.email, name: u.name }));
     } else {
-      recipients = allUsers.filter(u => u.role === "user").map(u => ({ email: u.email, name: u.name }));
+      recipients = verified.filter(u => u.role === "user").map(u => ({ email: u.email, name: u.name }));
     }
 
     if (recipients.length === 0) return res.json({ sent: 0, failed: 0, total: 0 });
