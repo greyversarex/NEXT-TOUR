@@ -49,7 +49,7 @@ export interface AlifInitResponse {
 }
 
 export async function initiateAlifPayment(params: InitiatePaymentParams): Promise<AlifInitResponse> {
-  const { orderId, amount, gate = "visa_mastercard", callbackUrl, returnUrl, info, email, phone } = params;
+  const { orderId, amount, gate = "korti_milli", callbackUrl, returnUrl, info, email, phone } = params;
 
   if (!TERMINAL_ID || !TERMINAL_PASSWORD) {
     throw new Error("ALIF_TERMINAL_ID and ALIF_TERMINAL_PASSWORD must be configured");
