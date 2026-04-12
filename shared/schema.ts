@@ -11,6 +11,7 @@ export const reviewStatusEnum = pgEnum("review_status", ["pending", "approved", 
 export const bookingStatusEnum = pgEnum("booking_status", ["new", "prepaid", "paid", "cancelled"]);
 export const paymentTypeEnum = pgEnum("payment_type", ["prepay", "full"]);
 export const alifPaymentStatusEnum = pgEnum("alif_payment_status", ["pending", "ok", "failed", "canceled"]);
+export const inquiryStatusEnum = pgEnum("inquiry_status", ["new", "processing", "completed", "rejected"]);
 
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -277,6 +278,18 @@ export const passwordResetTokens = pgTable("password_reset_tokens", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const inquiries = pgTable("inquiries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tourId: varchar("tour_id").notNull().references(() => tours.id),
+  name: text("name").notNull(),
+  phone: text("phone"),
+  email: text("email"),
+  message: text("message"),
+  status: inquiryStatusEnum("status").notNull().default("new"),
+  adminNotes: text("admin_notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const currencies = pgTable("currencies", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   code: text("code").notNull().unique(),
@@ -324,6 +337,7 @@ export const insertBookingSchema = createInsertSchema(bookings).omit({ id: true,
 export const insertNewsSchema = createInsertSchema(news).omit({ id: true });
 export const insertAlifPaymentSchema = createInsertSchema(alifPayments).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertFavoriteSchema = createInsertSchema(favorites).omit({ id: true, createdAt: true });
+export const insertInquirySchema = createInsertSchema(inquiries).omit({ id: true, createdAt: true, status: true, adminNotes: true });
 export const insertIntroScreenSchema = createInsertSchema(introScreen).omit({ id: true });
 export const insertHeroSlideSchema = createInsertSchema(heroSlides).omit({ id: true });
 export const insertTourCategorySchema = createInsertSchema(tourCategories);
@@ -363,6 +377,8 @@ export type InsertAlifPayment = z.infer<typeof insertAlifPaymentSchema>;
 export type News = typeof news.$inferSelect;
 export type InsertNews = z.infer<typeof insertNewsSchema>;
 export type Favorite = typeof favorites.$inferSelect;
+export type Inquiry = typeof inquiries.$inferSelect;
+export type InsertInquiry = z.infer<typeof insertInquirySchema>;
 export type IntroScreen = typeof introScreen.$inferSelect;
 export type HeroSlide = typeof heroSlides.$inferSelect;
 export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;

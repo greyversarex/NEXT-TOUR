@@ -26,7 +26,7 @@ TravelPro is a bilingual (Russian/English) travel booking platform. It lets user
 Key pages:
 - **Public**: Home (hero slider, featured tours), Tours (search/filter), Tour Detail, Promotions, News, About
 - **User**: Profile (bookings, favorites, loyalty level), Payment Result (`/payment/result?orderId=...`)
-- **Admin**: Dashboard, Tours (with Dates/Options/Itinerary/Pricing sub-tabs), Bookings, Reviews, Users, Countries, Categories, Feeds, News, Banners, Hero Slides, Intro Screen, Currencies, Email Broadcasts
+- **Admin**: Dashboard, Tours (with Dates/Options/Itinerary/Pricing sub-tabs), Inquiries, Bookings, Reviews, Users, Countries, Categories, Feeds, News, Banners, Hero Slides, Intro Screen, Currencies, Email Broadcasts
 
 The app is a monorepo with a React frontend, an Express backend, and a shared schema. Everything runs in a single Node.js process in development.
 

@@ -3,7 +3,7 @@ import AdminLayout from "./AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useI18n } from "@/lib/i18n";
-import { Globe, BookOpen, Users, DollarSign, TrendingUp } from "lucide-react";
+import { Globe, BookOpen, Users, DollarSign, FileText } from "lucide-react";
 
 export default function Dashboard() {
   const { t } = useI18n();
@@ -11,6 +11,7 @@ export default function Dashboard() {
 
   const cards = [
     { icon: Globe, label: t("Туры", "Tours"), value: stats?.tours, color: "text-blue-600 bg-blue-50" },
+    { icon: FileText, label: t("Заявки", "Inquiries"), value: stats?.inquiries, color: "text-orange-600 bg-orange-50" },
     { icon: BookOpen, label: t("Бронирования", "Bookings"), value: stats?.bookings, color: "text-green-600 bg-green-50" },
     { icon: Users, label: t("Пользователи", "Users"), value: stats?.users, color: "text-purple-600 bg-purple-50" },
     { icon: DollarSign, label: t("Выручка", "Revenue"), value: stats ? `$${Number(stats.revenue).toFixed(0)}` : null, color: "text-yellow-600 bg-yellow-50" },
@@ -18,7 +19,7 @@ export default function Dashboard() {
 
   return (
     <AdminLayout title={t("Дашборд", "Dashboard")}>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         {cards.map(({ icon: Icon, label, value, color }) => (
           <Card key={label}>
             <CardContent className="pt-4">
@@ -50,13 +51,13 @@ export default function Dashboard() {
 function RecentBookings() {
   const { t, lang } = useI18n();
   const { data: bookings = [], isLoading } = useQuery<any[]>({ queryKey: ["/api/bookings"] });
-  const recent = bookings.slice(0, 5);
+  const paidBookings = bookings.filter((b: any) => b.bookingStatus === "prepaid" || b.bookingStatus === "paid");
+  const recent = paidBookings.slice(0, 5);
 
-  const statusColors: Record<string, string> = {
-    new: "bg-blue-100 text-blue-700",
-    prepaid: "bg-yellow-100 text-yellow-700",
-    paid: "bg-green-100 text-green-700",
-    cancelled: "bg-red-100 text-red-700",
+  const statusLabels: Record<string, { ru: string; en: string; color: string }> = {
+    prepaid: { ru: "Предоплата", en: "Deposit", color: "bg-yellow-100 text-yellow-700" },
+    paid: { ru: "Оплачено", en: "Paid", color: "bg-green-100 text-green-700" },
+    cancelled: { ru: "Отменено", en: "Cancelled", color: "bg-red-100 text-red-700" },
   };
 
   return (
@@ -67,17 +68,24 @@ function RecentBookings() {
           <div className="space-y-3">
             {recent.length === 0 ? (
               <p className="text-muted-foreground text-sm">{t("Нет бронирований", "No bookings yet")}</p>
-            ) : recent.map((b: any) => (
-              <div key={b.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                <div>
-                  <p className="text-sm font-medium">{lang === "ru" ? b.tour?.titleRu : b.tour?.titleEn}</p>
-                  <p className="text-xs text-muted-foreground">${Number(b.totalPrice).toFixed(0)} · {b.adults + b.children} {t("чел.", "pax")}</p>
+            ) : recent.map((b: any) => {
+              const st = statusLabels[b.bookingStatus];
+              const customerName = b.userId ? b.user?.name : b.guestName;
+              return (
+                <div key={b.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                  <div>
+                    <p className="text-sm font-medium">{lang === "ru" ? b.tour?.titleRu : b.tour?.titleEn}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {customerName && <span>{customerName} · </span>}
+                      ${Number(b.totalPrice).toFixed(0)} · {b.adults + b.children} {t("чел.", "pax")}
+                    </p>
+                  </div>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${st?.color || ""}`}>
+                    {lang === "ru" ? st?.ru : st?.en}
+                  </span>
                 </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[b.bookingStatus] || ""}`}>
-                  {b.bookingStatus}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </CardContent>

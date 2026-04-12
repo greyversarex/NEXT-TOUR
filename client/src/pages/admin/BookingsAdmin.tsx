@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Calendar, DollarSign, Users, Table as TableIcon, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, DollarSign, Users, Table as TableIcon, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Phone, Mail, MapPin } from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
 import { useState, useMemo } from "react";
@@ -23,7 +23,7 @@ export default function BookingsAdmin() {
   const { t, lang } = useI18n();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("confirmed");
   const [viewMode, setViewMode] = useState<"table" | "calendar">("table");
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
@@ -32,7 +32,9 @@ export default function BookingsAdmin() {
   
   const filtered = useMemo(() => {
     let result = bookings;
-    if (statusFilter !== "all") {
+    if (statusFilter === "confirmed") {
+      result = result.filter((b: any) => b.bookingStatus === "prepaid" || b.bookingStatus === "paid");
+    } else if (statusFilter !== "all") {
       result = result.filter((b: any) => b.bookingStatus === statusFilter);
     }
     if (viewMode === "calendar" && selectedDay) {
@@ -80,6 +82,7 @@ export default function BookingsAdmin() {
               <SelectValue placeholder={t("Все статусы", "All Statuses")} />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="confirmed">{t("Оплаченные", "Confirmed")}</SelectItem>
               <SelectItem value="all">{t("Все", "All")}</SelectItem>
               {Object.entries(STATUS_LABELS).map(([key, v]) => (
                 <SelectItem key={key} value={key}>{lang === "ru" ? v.ru : v.en}</SelectItem>
@@ -217,6 +220,10 @@ export default function BookingsAdmin() {
           filtered.map((booking: any) => {
             const st = STATUS_LABELS[booking.bookingStatus] || STATUS_LABELS.new;
             const tourTitle = lang === "ru" ? booking.tour?.titleRu : booking.tour?.titleEn;
+            const customerName = booking.userId ? booking.user?.name : booking.guestName;
+            const customerEmail = booking.userId ? booking.user?.email : booking.guestEmail;
+            const customerPhone = booking.guestPhone;
+            const tourDate = booking.tourDate;
             return (
               <Card key={booking.id} data-testid={`card-booking-${booking.id}`}>
                 <CardContent className="pt-4">
@@ -224,17 +231,44 @@ export default function BookingsAdmin() {
                     <div className="flex-1">
                       <div className="flex items-start gap-3 mb-2">
                         {booking.tour?.mainImage && (
-                          <img src={booking.tour.mainImage} alt="" className="w-12 h-9 object-cover rounded shrink-0" />
+                          <img src={booking.tour.mainImage} alt="" className="w-14 h-10 object-cover rounded shrink-0" />
                         )}
-                        <div>
+                        <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm">{tourTitle}</p>
-                          <div className="flex flex-wrap gap-3 mt-1 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1"><CalendarIcon className="h-3 w-3" />{format(new Date(booking.createdAt), "dd.MM.yyyy HH:mm")}</span>
-                            <span className="flex items-center gap-1"><Users className="h-3 w-3" />{booking.adults + booking.children} {t("чел.", "pax")}</span>
-                            <span className="flex items-center gap-1"><DollarSign className="h-3 w-3" />${Number(booking.totalPrice).toFixed(0)} ({booking.paymentType === "prepay" ? t("Предоплата 30%", "Deposit 30%") : t("Полная", "Full")})</span>
-                            {!booking.userId && (booking.guestEmail || booking.guestPhone) && (
-                              <span className="flex items-center gap-1 text-amber-600 font-medium">
-                                👤 {t("Гость:", "Guest:")} {booking.guestName || ""}{booking.guestName && (booking.guestEmail || booking.guestPhone) ? " · " : ""}{booking.guestEmail || ""}{booking.guestEmail && booking.guestPhone ? " · " : ""}{booking.guestPhone || ""}
+                          {customerName && (
+                            <p className="text-sm font-semibold text-foreground mt-0.5">
+                              {customerName}
+                              {!booking.userId && <span className="text-xs text-amber-600 ml-1">({t("гость", "guest")})</span>}
+                            </p>
+                          )}
+                          <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <CalendarIcon className="h-3 w-3" />
+                              {format(new Date(booking.createdAt), "dd.MM.yyyy HH:mm")}
+                            </span>
+                            {tourDate && (
+                              <span className="flex items-center gap-1 text-primary font-medium">
+                                <MapPin className="h-3 w-3" />
+                                {format(new Date(tourDate.startDate), "dd.MM.yyyy")} — {format(new Date(tourDate.endDate), "dd.MM.yyyy")}
+                              </span>
+                            )}
+                            <span className="flex items-center gap-1">
+                              <Users className="h-3 w-3" />
+                              {booking.adults} {t("взр.", "ad.")}
+                              {booking.children > 0 && <>, {booking.children} {t("дет.", "ch.")}</>}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <DollarSign className="h-3 w-3" />
+                              ${Number(booking.totalPrice).toFixed(0)} ({booking.paymentType === "prepay" ? t("30%", "30%") : t("Полная", "Full")})
+                            </span>
+                            {customerEmail && (
+                              <span className="flex items-center gap-1">
+                                <Mail className="h-3 w-3" />{customerEmail}
+                              </span>
+                            )}
+                            {customerPhone && (
+                              <span className="flex items-center gap-1">
+                                <Phone className="h-3 w-3" />{customerPhone}
                               </span>
                             )}
                           </div>

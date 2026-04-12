@@ -35,6 +35,7 @@ export default function TourDetail() {
   const [currentImg, setCurrentImg] = useState(0);
   const [authOpen, setAuthOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [inquiryOpen, setInquiryOpen] = useState(false);
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const [datesOpen, setDatesOpen] = useState(!isMobile);
 
@@ -498,14 +499,7 @@ export default function TourDetail() {
                 <Button
                   variant="outline"
                   className="w-full h-10 rounded-2xl text-sm font-medium mt-2.5"
-                  onClick={() => {
-                    const tourTitle = lang === "ru" ? tour.titleRu : tour.titleEn;
-                    const msg = encodeURIComponent(t(
-                      `Здравствуйте! Хочу узнать подробнее о туре "${tourTitle}".`,
-                      `Hello! I'd like to learn more about the tour "${tourTitle}".`
-                    ));
-                    window.open(`https://wa.me/992885260101?text=${msg}`, "_blank");
-                  }}
+                  onClick={() => setInquiryOpen(true)}
                   data-testid="button-send-request"
                 >
                   <Send className="h-4 w-4 mr-2" />
@@ -538,8 +532,112 @@ export default function TourDetail() {
         />
       )}
 
+      {inquiryOpen && (
+        <InquiryModal
+          tour={tour}
+          onClose={() => setInquiryOpen(false)}
+        />
+      )}
+
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </div>
+  );
+}
+
+function InquiryModal({ tour, onClose }: { tour: any; onClose: () => void }) {
+  const { t, lang } = useI18n();
+  const { toast } = useToast();
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [sent, setSent] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: (data: any) => apiRequest("POST", "/api/inquiries", data),
+    onSuccess: () => {
+      setSent(true);
+    },
+    onError: (err: any) => {
+      toast({ title: t("Ошибка", "Error"), description: err.message, variant: "destructive" });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) {
+      toast({ title: t("Укажите имя", "Enter your name"), variant: "destructive" });
+      return;
+    }
+    if (!phone.trim() && !email.trim()) {
+      toast({ title: t("Укажите телефон или email", "Enter phone or email"), variant: "destructive" });
+      return;
+    }
+    mutation.mutate({
+      tourId: tour.id,
+      name: name.trim(),
+      phone: phone.trim() || undefined,
+      email: email.trim() || undefined,
+      message: message.trim() || undefined,
+    });
+  };
+
+  const tourTitle = lang === "ru" ? tour.titleRu : tour.titleEn;
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden">
+        <div className="bg-gradient-to-r from-primary to-primary/80 px-6 py-5 text-primary-foreground">
+          <DialogTitle className="text-lg font-bold text-white">
+            {sent ? t("Заявка отправлена!", "Request Sent!") : t("Отправить заявку", "Send Request")}
+          </DialogTitle>
+          <p className="text-sm text-white/80 mt-0.5 truncate">{tourTitle}</p>
+        </div>
+
+        {sent ? (
+          <div className="px-6 py-8 space-y-4 text-center">
+            <CheckCircle className="h-14 w-14 text-green-500 mx-auto" />
+            <h3 className="text-lg font-semibold">{t("Спасибо за заявку!", "Thank you!")}</h3>
+            <p className="text-sm text-muted-foreground">
+              {t("Наш менеджер свяжется с вами в ближайшее время.", "Our manager will contact you shortly.")}
+            </p>
+            <Button onClick={onClose} className="w-full" data-testid="button-inquiry-close">
+              {t("Закрыть", "Close")}
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
+            <div>
+              <Label htmlFor="inq-name" className="text-xs text-muted-foreground">{t("Имя *", "Name *")}</Label>
+              <Input id="inq-name" value={name} onChange={e => setName(e.target.value)} placeholder={t("Ваше имя", "Your name")} data-testid="input-inquiry-name" />
+            </div>
+            <div>
+              <Label htmlFor="inq-phone" className="text-xs text-muted-foreground">{t("Телефон", "Phone")}</Label>
+              <Input id="inq-phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+992 ..." data-testid="input-inquiry-phone" />
+            </div>
+            <div>
+              <Label htmlFor="inq-email" className="text-xs text-muted-foreground">{t("Email", "Email")}</Label>
+              <Input id="inq-email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@example.com" data-testid="input-inquiry-email" />
+            </div>
+            <div>
+              <Label htmlFor="inq-message" className="text-xs text-muted-foreground">{t("Комментарий", "Message")}</Label>
+              <textarea
+                id="inq-message"
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                placeholder={t("Ваш вопрос или пожелания...", "Your question or preferences...")}
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                data-testid="input-inquiry-message"
+              />
+            </div>
+            <Button type="submit" className="w-full font-semibold" disabled={mutation.isPending} data-testid="button-inquiry-submit">
+              {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+              {t("Отправить", "Submit")}
+            </Button>
+          </form>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 

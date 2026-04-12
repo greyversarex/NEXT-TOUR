@@ -708,6 +708,35 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json(await storage.updateBooking(req.params.id, req.body));
   });
 
+  // Inquiries
+  app.get("/api/inquiries", requireAdmin, async (req, res) => {
+    res.json(await storage.getInquiries());
+  });
+  app.post("/api/inquiries", async (req, res) => {
+    try {
+      const { tourId, name, phone, email, message } = req.body;
+      if (!tourId || !name) {
+        return res.status(400).json({ message: "Укажите имя и тур" });
+      }
+      if (!phone && !email) {
+        return res.status(400).json({ message: "Укажите телефон или email" });
+      }
+      const inquiry = await storage.createInquiry({ tourId, name, phone: phone || null, email: email || null, message: message || null });
+      res.json(inquiry);
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
+  });
+  app.put("/api/inquiries/:id", requireAdmin, async (req, res) => {
+    const inquiry = await storage.getInquiry(req.params.id);
+    if (!inquiry) return res.status(404).json({ message: "Not found" });
+    res.json(await storage.updateInquiry(req.params.id, req.body));
+  });
+  app.delete("/api/inquiries/:id", requireAdmin, async (req, res) => {
+    await storage.deleteInquiry(req.params.id);
+    res.json({ success: true });
+  });
+
   // News
   app.get("/api/news", async (req, res) => {
     const publishedOnly = req.query.all !== "true" || !(req.user && (req.user as any).role === "admin");

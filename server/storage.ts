@@ -5,7 +5,7 @@ import {
   priceComponents, tourPriceComponents, tourOptions, tourItinerary, itineraryStops,
   banners, tourFeeds, tourFeedItems, reviews, bookings, news,
   favorites, introScreen, heroSlides, passwordResetTokens, currencies, settings,
-  alifPayments,
+  alifPayments, inquiries,
   type User, type InsertUser, type Country, type InsertCountry,
   type City, type InsertCity, type Category, type InsertCategory,
   type Tour, type InsertTour, type TourDate, type InsertTourDate,
@@ -17,6 +17,7 @@ import {
   type AlifPayment,
   type News, type InsertNews, type Favorite, type IntroScreen, type HeroSlide,
   type PasswordResetToken, type Currency, type InsertCurrency,
+  type Inquiry, type InsertInquiry,
   type AnalyticsData, type LoyaltySettings,
 } from "@shared/schema";
 import bcrypt from "bcryptjs";
@@ -127,8 +128,8 @@ export interface IStorage {
   updateReviewStatus(id: string, status: "approved" | "rejected", inFeatured?: boolean): Promise<Review | undefined>;
 
   // Bookings
-  getBookings(userId?: string): Promise<(Booking & { tour: Tour; tourDate?: TourDate })[]>;
-  getBooking(id: string): Promise<(Booking & { tour: Tour; tourDate?: TourDate }) | undefined>;
+  getBookings(userId?: string): Promise<(Booking & { tour: Tour; tourDate?: TourDate; user?: Pick<User, "id" | "name" | "email"> })[]>;
+  getBooking(id: string): Promise<(Booking & { tour: Tour; tourDate?: TourDate; user?: Pick<User, "id" | "name" | "email"> }) | undefined>;
   createBooking(data: InsertBooking): Promise<Booking>;
   updateBooking(id: string, data: Partial<Booking>): Promise<Booking | undefined>;
 
@@ -155,7 +156,7 @@ export interface IStorage {
   deleteHeroSlide(id: string): Promise<void>;
 
   // Stats
-  getStats(): Promise<{ tours: number; bookings: number; users: number; revenue: string }>;
+  getStats(): Promise<{ tours: number; bookings: number; users: number; revenue: string; inquiries: number }>;
 
   // Password Reset
   createPasswordResetToken(userId: string, token: string): Promise<void>;
@@ -177,6 +178,13 @@ export interface IStorage {
   getAlifPaymentByOrderId(orderId: string): Promise<AlifPayment | undefined>;
   getAlifPaymentByBookingId(bookingId: string): Promise<AlifPayment | undefined>;
   updateAlifPayment(id: string, data: Partial<AlifPayment>): Promise<AlifPayment | undefined>;
+
+  // Inquiries
+  getInquiries(): Promise<any[]>;
+  getInquiry(id: string): Promise<Inquiry | undefined>;
+  createInquiry(data: InsertInquiry): Promise<Inquiry>;
+  updateInquiry(id: string, data: Partial<Inquiry>): Promise<Inquiry | undefined>;
+  deleteInquiry(id: string): Promise<void>;
 
   // Currencies
   getCurrencies(activeOnly?: boolean): Promise<Currency[]>;
@@ -725,8 +733,10 @@ export class DatabaseStorage implements IStorage {
     const items = await db.select({
       booking: bookings,
       tour: tours,
+      user: { id: users.id, name: users.name, email: users.email },
     }).from(bookings)
       .leftJoin(tours, eq(bookings.tourId, tours.id))
+      .leftJoin(users, eq(bookings.userId, users.id))
       .where(conditions.length > 0 ? and(...conditions) : undefined)
       .orderBy(desc(bookings.createdAt));
     const result = [];
@@ -736,7 +746,7 @@ export class DatabaseStorage implements IStorage {
         const [d] = await db.select().from(tourDates).where(eq(tourDates.id, item.booking.tourDateId));
         tourDate = d;
       }
-      result.push({ ...item.booking, tour: item.tour!, tourDate });
+      result.push({ ...item.booking, tour: item.tour!, tourDate, user: item.user || undefined });
     }
     return result;
   }
@@ -878,14 +888,16 @@ export class DatabaseStorage implements IStorage {
 
   async getStats() {
     const [toursCount] = await db.select({ count: sql<number>`count(*)` }).from(tours).where(eq(tours.isActive, true));
-    const [bookingsCount] = await db.select({ count: sql<number>`count(*)` }).from(bookings);
+    const [bookingsCount] = await db.select({ count: sql<number>`count(*)` }).from(bookings).where(or(eq(bookings.bookingStatus, "prepaid"), eq(bookings.bookingStatus, "paid")));
     const [usersCount] = await db.select({ count: sql<number>`count(*)` }).from(users).where(eq(users.role, "user"));
     const [revenue] = await db.select({ total: sql<string>`coalesce(sum(paid_amount), 0)` }).from(bookings);
+    const [inquiriesCount] = await db.select({ count: sql<number>`count(*)` }).from(inquiries).where(eq(inquiries.status, "new"));
     return {
       tours: Number(toursCount.count),
       bookings: Number(bookingsCount.count),
       users: Number(usersCount.count),
       revenue: revenue.total || "0",
+      inquiries: Number(inquiriesCount.count),
     };
   }
 
@@ -1056,6 +1068,35 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCurrency(id: string) {
     await db.delete(currencies).where(eq(currencies.id, id));
+  }
+
+  async getInquiries() {
+    const rows = await db.select().from(inquiries).orderBy(desc(inquiries.createdAt));
+    const result = [];
+    for (const row of rows) {
+      const tour = await this.getTour(row.tourId);
+      result.push({ ...row, tour });
+    }
+    return result;
+  }
+
+  async getInquiry(id: string) {
+    const [row] = await db.select().from(inquiries).where(eq(inquiries.id, id));
+    return row;
+  }
+
+  async createInquiry(data: InsertInquiry) {
+    const [row] = await db.insert(inquiries).values(data).returning();
+    return row;
+  }
+
+  async updateInquiry(id: string, data: Partial<Inquiry>) {
+    const [row] = await db.update(inquiries).set(data as any).where(eq(inquiries.id, id)).returning();
+    return row;
+  }
+
+  async deleteInquiry(id: string) {
+    await db.delete(inquiries).where(eq(inquiries.id, id));
   }
 }
 
