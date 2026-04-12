@@ -30,7 +30,7 @@ export default function ToursAdmin() {
   const [showForm, setShowForm] = useState(false);
 
   const { data: tours = [] } = useQuery<Tour[]>({ queryKey: ["/api/tours", "admin"],
-    queryFn: () => fetch("/api/tours", { credentials: "include" }).then(r => r.json()),
+    queryFn: () => fetch("/api/tours?includeInactive=true", { credentials: "include" }).then(r => r.json()),
   });
   const { data: countries = [] } = useQuery<Country[]>({ queryKey: ["/api/countries"] });
   const { data: categories = [] } = useQuery<any[]>({ queryKey: ["/api/categories"] });
@@ -46,13 +46,20 @@ export default function ToursAdmin() {
   });
 
   const cloneMutation = useMutation({
-    mutationFn: (id: string) => apiRequest("POST", `/api/tours/${id}/clone`, {}).then(r => r.json()),
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/tours/${id}/clone`, { method: "POST", credentials: "include" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || "Clone failed");
+      }
+      return res.json();
+    },
     onSuccess: (cloned: Tour) => {
       queryClient.invalidateQueries({ queryKey: ["/api/tours", "admin"] });
       toast({ title: t("Тур скопирован", "Tour cloned"), description: t(`Создана копия: ${cloned.titleRu}`, `Created: ${cloned.titleEn}`) });
     },
-    onError: () => {
-      toast({ title: t("Ошибка клонирования", "Clone failed"), variant: "destructive" });
+    onError: (err: any) => {
+      toast({ title: t("Ошибка клонирования", "Clone failed"), description: err.message, variant: "destructive" });
     },
   });
 
