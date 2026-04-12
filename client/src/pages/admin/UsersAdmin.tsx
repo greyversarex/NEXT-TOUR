@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "./AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Trash2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -20,6 +23,7 @@ export default function UsersAdmin() {
   const { t, lang } = useI18n();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [deleteTarget, setDeleteTarget] = useState<any>(null);
 
   const { data: users = [] } = useQuery<any[]>({ queryKey: ["/api/admin/users"] });
 
@@ -31,6 +35,18 @@ export default function UsersAdmin() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/admin/users/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      setDeleteTarget(null);
+      toast({ title: t("Пользователь удалён", "User deleted") });
+    },
+    onError: (err: any) => {
+      toast({ title: t("Ошибка", "Error"), description: err.message, variant: "destructive" });
+    },
+  });
+
   return (
     <AdminLayout title={t("Пользователи", "Users")}>
       <p className="text-sm text-muted-foreground mb-6">{users.length} {t("пользователей", "users")}</p>
@@ -38,7 +54,7 @@ export default function UsersAdmin() {
         {users.map((user: any) => {
           const loyalty = LOYALTY_LABELS[user.loyaltyLevel] || LOYALTY_LABELS.beginner;
           return (
-            <Card key={user.id}>
+            <Card key={user.id} data-testid={`card-user-${user.id}`}>
               <CardContent className="pt-4">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
@@ -47,7 +63,7 @@ export default function UsersAdmin() {
                       <AvatarFallback className="text-sm bg-primary text-primary-foreground">{user.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium text-sm">{user.name}</p>
+                      <p className="font-medium text-sm" data-testid={`text-username-${user.id}`}>{user.name}</p>
                       <p className="text-xs text-muted-foreground">{user.email} · @{user.username}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <span className={`text-xs px-2 py-0.5 rounded-full ${loyalty.color}`}>
@@ -72,6 +88,17 @@ export default function UsersAdmin() {
                         <SelectItem value="admin">Admin</SelectItem>
                       </SelectContent>
                     </Select>
+                    {user.role !== "admin" && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => setDeleteTarget(user)}
+                        data-testid={`button-delete-user-${user.id}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -79,6 +106,39 @@ export default function UsersAdmin() {
           );
         })}
       </div>
+
+      <Dialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("Удалить пользователя?", "Delete user?")}</DialogTitle>
+            <DialogDescription>
+              {deleteTarget && (
+                <>
+                  <strong>{deleteTarget.name}</strong> ({deleteTarget.email})
+                  <br />
+                  {t(
+                    "Будут удалены: избранное, отзывы, токены сброса пароля. Бронирования сохранятся. Пользователь сможет заново зарегистрироваться по этому email.",
+                    "Favorites, reviews, and password reset tokens will be deleted. Bookings will be preserved. The user will be able to re-register with this email."
+                  )}
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)} data-testid="button-cancel-delete">
+              {t("Отмена", "Cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+              data-testid="button-confirm-delete-user"
+            >
+              {deleteMutation.isPending ? t("Удаление...", "Deleting...") : t("Удалить", "Delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

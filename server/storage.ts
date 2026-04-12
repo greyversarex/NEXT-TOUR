@@ -31,6 +31,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   upsertOAuthUser(profile: { provider: string; providerId: string; email: string; name: string; avatar?: string }): Promise<User>;
   updateUser(id: string, data: Partial<User>): Promise<User | undefined>;
+  deleteUser(id: string): Promise<void>;
   getAllUsers(): Promise<User[]>;
 
   // Countries
@@ -270,6 +271,14 @@ export class DatabaseStorage implements IStorage {
     }
     const [user] = await db.update(users).set(data).where(eq(users.id, id)).returning();
     return user;
+  }
+
+  async deleteUser(id: string) {
+    await db.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, id));
+    await db.delete(favorites).where(eq(favorites.userId, id));
+    await db.delete(reviews).where(eq(reviews.userId, id));
+    await db.update(bookings).set({ userId: null }).where(eq(bookings.userId, id));
+    await db.delete(users).where(eq(users.id, id));
   }
 
   async getAllUsers() {

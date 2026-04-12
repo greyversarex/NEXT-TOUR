@@ -803,6 +803,13 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     const { password: _, ...safeUser } = user;
     res.json(safeUser);
   });
+  app.delete("/api/admin/users/:id", requireAdmin, async (req, res) => {
+    const user = await storage.getUser(req.params.id);
+    if (!user) return res.status(404).json({ message: "Not found" });
+    if (user.role === "admin") return res.status(400).json({ message: "Cannot delete admin user" });
+    await storage.deleteUser(req.params.id);
+    res.json({ success: true });
+  });
 
   // Stats
   app.get("/api/admin/stats", requireAdmin, async (req, res) => {
