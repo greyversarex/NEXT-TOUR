@@ -1,0 +1,32 @@
+root@6899447-yr427605:/var/www/nexttour# cd /var/www/nexttour && git log --oneline -3
+b7a91a4 (HEAD -> main, origin/main, origin/HEAD) Update payment gateway to support Visa and Mastercard transactions
+716996b Update payment process to use a form submission for better integration
+2bfc8ca Implement AlifPay payment using a form submission approach
+root@6899447-yr427605:/var/www/nexttour# pm2 logs nexttour --lines 20
+[TAILING] Tailing last 20 lines for [nexttour] process (change the value with --lines option)
+/root/.pm2/logs/nexttour-error.log last 20 lines:
+0|nexttour |   position: undefined,
+0|nexttour |   internalPosition: undefined,
+0|nexttour |   internalQuery: undefined,
+0|nexttour |   where: undefined,
+0|nexttour |   schema: 'public',
+0|nexttour |   table: 'tours',
+0|nexttour |   column: undefined,
+0|nexttour |   dataType: undefined,
+0|nexttour |   constraint: 'tours_city_id_cities_id_fk',
+0|nexttour |   file: 'ri_triggers.c',
+0|nexttour |   line: '2621',
+0|nexttour |   routine: 'ri_ReportViolation'
+0|nexttour | }
+0|nexttour | [alif] initiateAlifPayment error: Alif API returned non-JSON (HTTP 403): <html>
+0|nexttour | <head><title>403 Forbidden</title></head>
+0|nexttour | <body>
+0|nexttour | <center><h1>403 Forbidden</h1></center>
+0|nexttour | </body>
+0|nexttour | </html>
+0|nexttour |
+
+/root/.pm2/logs/nexttour-out.log last 20 lines:
+0|nexttour | 1-4ccb-bb48-9c745a62ba59","titleRu":"Топ-5 направлений лета 2024","titleEn":"Top 5 Summer 2024 Destinations","contentRu":"Лето 2024 обещает быть насыщенным на путешествия! Мы собрали для вас лучшие направления, которые стоит посетить этим летом.\n\n1. Санторини, Греция — невероятные закаты и белоснежная архитектура.\n\n2. Бали, Индонезия — тропический рай для любителей природы и культуры.\n\n3. Париж, Франция — вечная романтика и искусство.\n\n4. Токио, Япония — будущее и традиции в одном городе.\n\n5. Мальдивы — идеальный пляжный отдых.","contentEn":"Summer 2024 promises to be full of travel opportunities! We have gathered the best destinations worth visiting this summer.\n\n1. Santorini, Greece — incredible sunsets and white architecture.\n\n2. Bali, Indonesia — a tropical paradise for nature and culture lovers.\n\n3. Paris, France — eternal romance and art.\n\n4. Tokyo, Japan — future and tradition in one city.\n\n5. Maldives — perfect beach vacation.","imageUrl":"/images/tour-santorini.png","isPublished":true,"publishedAt":"2026-03-06T18:01:35.404Z"},{"id":"adb5af36-78c6-4f2c-b93d-6e9629055a3b","titleRu":"Советы опытного путешественника","titleEn":"Tips from an Experienced Traveler","contentRu":"Опытные путешественники знают, как сделать любую поездку комфортнее и дешевле. Вот несколько проверенных советов.\n\nБронируйте заранее — ранее бронирование может сэкономить до 40% стоимости тура.\n\nПакуйте разумно — список необходимых вещей поможет не взять лишнего.\n\nИзучайте культуру — знание местных обычаев сделает путешествие богаче.\n\nВсегда берите страховку — это небольшие расходы, которые могут спасти вас в непредвиденных ситуациях.","contentEn":"Experienced travelers know how to make any trip more comfortable and affordable. Here are some proven tips.\n\nBook early — early booking can save up to 40% of tour costs.\n\nPack wisely — a packing list helps avoid unnecessary items.\n\nLearn the culture — knowing local customs enriches travel.\n\nAlways get insurance — a small expense that can save you in unforeseen situations.","imageUrl":"/images/tour-swiss.png","isPublished":true,"publishedAt":"2026-03-06T18:01:35.404Z"},{"id":"46d61a3a-dfe0-4fce-9563-c34429d9a610","titleRu":"Новый сезон в Японии: сакура 2024","titleEn":"New Season in Japan: Cherry Blossom 2024","contentRu":"Весенний сезон в Японии — это время цветения сакуры, одного из самых завораживающих природных явлений в мире. В 2024 году прогнозируется особенно красивое цветение. Лучшие места для наблюдения: парк Уэно в Токио, Философская тропа в Киото, замок Химэдзи.","contentEn":"Spring season in Japan is cherry blossom time, one of the most mesmerizing natural phenomena in the world. 2024 forecasts particularly beautiful blooming. Best viewing spots: Ueno Park in Tokyo, Philosopher's Path in Kyoto, Himeji Castle.","imageUrl":"/images/tour-tokyo.png","isPublished":true,"publishedAt":"2026-03-06T18:01:35.404Z"}]
+0|nexttour | [seed] Database already seeded, skipping.
+0|nexttour | 5:52:53 PM [express] serving on port 3000
