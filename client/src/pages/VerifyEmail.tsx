@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,9 @@ import { Button } from "@/components/ui/button";
 export default function VerifyEmail() {
   const { t } = useI18n();
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
   const [status, setStatus] = useState<"loading" | "success" | "already" | "error">("loading");
+  const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -16,19 +19,36 @@ export default function VerifyEmail() {
       setStatus("error");
       return;
     }
-    fetch(`/api/auth/verify-email?token=${token}`)
+    fetch(`/api/auth/verify-email?token=${token}`, { credentials: "include" })
       .then(r => r.json().then(data => ({ ok: r.ok, data })))
       .then(({ ok, data }) => {
         if (!ok) {
           setStatus("error");
         } else if (data.alreadyVerified) {
           setStatus("already");
+          queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
         } else {
           setStatus("success");
+          queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
         }
       })
       .catch(() => setStatus("error"));
   }, []);
+
+  useEffect(() => {
+    if (status !== "success" && status !== "already") return;
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setLocation("/");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [status]);
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">
@@ -47,9 +67,12 @@ export default function VerifyEmail() {
             <h1 className="text-2xl font-bold text-foreground">{t("Email подтверждён!", "Email verified!")}</h1>
             <p className="text-muted-foreground">
               {t(
-                "Ваш аккаунт активирован. Теперь вы можете войти и бронировать туры!",
-                "Your account is activated. You can now sign in and book tours!"
+                "Ваш аккаунт активирован. Вы автоматически вошли в систему.",
+                "Your account is activated. You are now signed in."
               )}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {t(`Переход на главную через ${countdown}...`, `Redirecting in ${countdown}...`)}
             </p>
             <Button className="w-full h-11 text-base font-semibold" onClick={() => setLocation("/")} data-testid="button-go-home">
               {t("Перейти на главную", "Go to homepage")}
@@ -63,7 +86,10 @@ export default function VerifyEmail() {
             </div>
             <h1 className="text-2xl font-bold text-foreground">{t("Email уже подтверждён", "Email already verified")}</h1>
             <p className="text-muted-foreground">
-              {t("Ваш аккаунт уже активирован. Можете войти.", "Your account is already activated. You can sign in.")}
+              {t("Ваш аккаунт уже активирован. Вы вошли в систему.", "Your account is already activated. You are signed in.")}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {t(`Переход на главную через ${countdown}...`, `Redirecting in ${countdown}...`)}
             </p>
             <Button className="w-full h-11 text-base font-semibold" onClick={() => setLocation("/")} data-testid="button-go-home-already">
               {t("Перейти на главную", "Go to homepage")}

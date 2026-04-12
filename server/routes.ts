@@ -150,10 +150,18 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       if (!token || typeof token !== "string") return res.status(400).json({ message: "Invalid token" });
       const user = await storage.getUserByVerificationToken(token);
       if (!user) return res.status(400).json({ message: "Invalid or expired verification link" });
-      if (user.emailVerified) return res.json({ success: true, alreadyVerified: true });
-      await storage.updateUser(user.id, { emailVerified: true, emailVerificationToken: null });
+      if (user.emailVerified) {
+        return req.login(user, (err) => {
+          if (err) return res.json({ success: true, alreadyVerified: true });
+          res.json({ success: true, alreadyVerified: true });
+        });
+      }
+      const updated = await storage.updateUser(user.id, { emailVerified: true, emailVerificationToken: null });
       sendWelcomeEmail(user.email, user.name).catch(() => {});
-      res.json({ success: true });
+      req.login(updated || user, (err) => {
+        if (err) return res.json({ success: true });
+        res.json({ success: true });
+      });
     } catch (e: any) {
       res.status(500).json({ message: "Verification failed" });
     }
