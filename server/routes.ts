@@ -196,8 +196,26 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   app.get("/api/auth/google/callback",
-    passport.authenticate("google", { failureRedirect: "/?auth=error&provider=google" }),
-    (req, res) => res.redirect("/?auth=success")
+    (req, res, next) => {
+      passport.authenticate("google", (err: any, user: any, _info: any) => {
+        if (err) {
+          console.error("[google oauth] passport error:", err);
+          return res.redirect("/?auth=error&provider=google");
+        }
+        if (!user) {
+          console.error("[google oauth] no user returned");
+          return res.redirect("/?auth=error&provider=google");
+        }
+        req.login(user, (loginErr) => {
+          if (loginErr) {
+            console.error("[google oauth] login error:", loginErr);
+            return res.redirect("/?auth=error&provider=google");
+          }
+          console.log("[google oauth] success, user:", user.id, user.email);
+          res.redirect("/?auth=success");
+        });
+      })(req, res, next);
+    }
   );
 
   // Facebook OAuth routes
