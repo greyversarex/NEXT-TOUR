@@ -3,7 +3,7 @@ import { Resend } from "resend";
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL = "onboarding@resend.dev";
 const FROM_NAME = "NEXT TOUR";
-const APP_URL = process.env.APP_URL || "https://nexttour.ru";
+const APP_URL = process.env.APP_URL || "https://nexttour.tj";
 
 const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
@@ -51,7 +51,7 @@ function footer() {
   return `
     <hr style="border:none;border-top:1px solid #e2e8f0;margin:28px 0 20px;">
     <p style="color:#94a3b8;font-size:12px;margin:0;text-align:center;">
-      © 2026 NEXT TOUR · <a href="${APP_URL}" style="color:#94a3b8;">nexttour.ru</a>
+      © 2026 NEXT TOUR · <a href="${APP_URL}" style="color:#94a3b8;">nexttour.tj</a>
     </p>`;
 }
 
