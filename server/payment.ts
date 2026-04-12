@@ -3,6 +3,7 @@ import crypto from "crypto";
 const TERMINAL_ID = process.env.ALIF_TERMINAL_ID || "";
 const TERMINAL_PASSWORD = process.env.ALIF_TERMINAL_PASSWORD || "";
 
+const ALIF_API_URL = "https://acquiring.alif.tj";
 const ALIF_FORM_URL = "https://web.alif.tj/";
 
 function hmacSha256(secret: string, data: string): string {
@@ -19,7 +20,7 @@ function generateToken(orderId: string, amount: string, callbackUrl: string): st
   return hmacSha256(hashedPassword, dataToSign);
 }
 
-export interface BuildFormParams {
+export interface PaymentParams {
   orderId: string;
   amount: number;
   gate?: string;
@@ -30,13 +31,13 @@ export interface BuildFormParams {
   phone?: string;
 }
 
-export interface AlifFormData {
-  method: "POST";
-  action: string;
-  formData: Record<string, string>;
+export interface AlifPaymentResult {
+  type: "redirect" | "form";
+  url?: string;
+  formHtml?: string;
 }
 
-export function buildAlifFormData(params: BuildFormParams): AlifFormData {
+export async function initiateAlifPayment(params: PaymentParams): Promise<AlifPaymentResult> {
   const { orderId, amount, gate = "vsa", callbackUrl, returnUrl, info, email, phone } = params;
 
   if (!TERMINAL_ID || !TERMINAL_PASSWORD) {
@@ -45,6 +46,44 @@ export function buildAlifFormData(params: BuildFormParams): AlifFormData {
 
   const amountStr = amount.toFixed(2);
   const token = generateToken(orderId, amountStr, callbackUrl);
+
+  const apiBody: Record<string, any> = {
+    order_id: orderId,
+    token,
+    key: TERMINAL_ID,
+    callback_url: callbackUrl,
+    return_url: returnUrl,
+    amount: amountStr,
+    gate,
+  };
+  if (info) apiBody.info = info;
+  if (email) apiBody.email = email;
+  if (phone) apiBody.phone = phone;
+
+  console.log(`[alif] Trying API: orderId=${orderId} amount=${amountStr} gate=${gate}`);
+
+  try {
+    const response = await fetch(`${ALIF_API_URL}/v2/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", gate },
+      body: JSON.stringify(apiBody),
+    });
+
+    const rawText = await response.text();
+    console.log(`[alif] API HTTP ${response.status}: ${rawText.slice(0, 300)}`);
+
+    if (response.ok) {
+      const data = JSON.parse(rawText);
+      if (data.code === 200 && data.url) {
+        console.log(`[alif] API success, redirect to: ${data.url}`);
+        return { type: "redirect", url: data.url };
+      }
+    }
+
+    console.log(`[alif] API failed (${response.status}), falling back to form`);
+  } catch (err: any) {
+    console.log(`[alif] API error: ${err.message}, falling back to form`);
+  }
 
   const formData: Record<string, string> = {
     key: TERMINAL_ID,
@@ -59,13 +98,17 @@ export function buildAlifFormData(params: BuildFormParams): AlifFormData {
   if (email) formData.email = email;
   if (phone) formData.phone = phone;
 
-  console.log(`[alif] Form data prepared: orderId=${orderId} amount=${amountStr} gate=${gate}`);
+  const fields = Object.entries(formData)
+    .map(([k, v]) => `<input type="hidden" name="${k}" value="${v}" />`)
+    .join("\n");
 
-  return {
-    method: "POST",
-    action: ALIF_FORM_URL,
-    formData,
-  };
+  const formHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Переход к оплате...</title></head><body>
+    <form id="alifForm" method="POST" action="${ALIF_FORM_URL}">${fields}</form>
+    <p style="text-align:center;margin-top:50px;font-family:sans-serif;">Переход к оплате...</p>
+    <script>document.getElementById("alifForm").submit();</script>
+  </body></html>`;
+
+  return { type: "form", formHtml };
 }
 
 export interface CheckTxnParams {
@@ -87,7 +130,7 @@ export async function checkAlifTransaction(params: CheckTxnParams): Promise<any>
     callback_url: callbackUrl,
   };
 
-  const response = await fetch(`https://acquiring.alif.tj/checktxn`, {
+  const response = await fetch(`${ALIF_API_URL}/checktxn`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),

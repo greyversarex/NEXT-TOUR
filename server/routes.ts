@@ -11,7 +11,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import path from "path";
 import { sendPasswordResetEmail, sendWelcomeEmail, sendBookingConfirmationEmail, sendBulkEmail } from "./email";
-import { buildAlifFormData, checkAlifTransaction } from "./payment";
+import { initiateAlifPayment, checkAlifTransaction } from "./payment";
 import multer from "multer";
 import { storage } from "./storage";
 import {
@@ -1013,7 +1013,14 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     const returnUrl = `${appUrl}/payment/result?orderId=${orderId}`;
 
     try {
-      const formData = buildAlifFormData({
+      await storage.createAlifPayment({
+        bookingId,
+        orderId,
+        amount: amount.toFixed(2),
+        gate,
+      });
+
+      const result = await initiateAlifPayment({
         orderId,
         amount,
         gate,
@@ -1024,29 +1031,24 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         phone: (booking as any).guestPhone || "",
       });
 
-      await storage.createAlifPayment({
-        bookingId,
-        orderId,
-        amount: amount.toFixed(2),
-        gate,
-      });
-
-      if (req.query.redirect === "true") {
-        const fields = Object.entries(formData.formData)
-          .map(([k, v]) => `<input type="hidden" name="${k}" value="${v}" />`)
-          .join("\n");
-        const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Переход к оплате...</title></head><body>
-          <form id="alifForm" method="${formData.method}" action="${formData.action}">${fields}</form>
-          <p style="text-align:center;margin-top:50px;font-family:sans-serif;">Переход к оплате...</p>
-          <script>document.getElementById("alifForm").submit();</script>
-        </body></html>`;
-        res.setHeader("Content-Type", "text/html");
-        return res.send(html);
+      if (result.type === "redirect" && result.url) {
+        if (req.query.redirect === "true") {
+          return res.redirect(result.url);
+        }
+        return res.json({ success: true, url: result.url, orderId });
       }
 
-      return res.json({ success: true, data: formData, orderId });
+      if (result.type === "form" && result.formHtml) {
+        if (req.query.redirect === "true") {
+          res.setHeader("Content-Type", "text/html");
+          return res.send(result.formHtml);
+        }
+        return res.json({ success: true, formHtml: result.formHtml, orderId });
+      }
+
+      return res.status(500).json({ message: "Payment initiation failed" });
     } catch (err: any) {
-      console.error("[alif] buildAlifFormData error:", err.message);
+      console.error("[alif] payment error:", err.message);
       return res.status(500).json({ message: err.message || "Payment service error" });
     }
   }));
