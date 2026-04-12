@@ -48,3 +48,4 @@ expertMode = true
 
 [userenv.shared]
 ALIF_TEST_MODE = "false"
+APP_URL = "https://nexttour.tj"
