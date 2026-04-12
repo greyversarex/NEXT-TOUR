@@ -289,8 +289,12 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json(await storage.updateCountry(req.params.id, req.body));
   });
   app.delete("/api/countries/:id", requireAdmin, async (req, res) => {
-    await storage.deleteCountry(req.params.id);
-    res.json({ success: true });
+    try {
+      await storage.deleteCountry(req.params.id);
+      res.json({ success: true });
+    } catch (e: any) {
+      res.status(400).json({ message: e.message || "Cannot delete country" });
+    }
   });
 
   // Cities
@@ -305,8 +309,12 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json(await storage.updateCity(req.params.id, req.body));
   });
   app.delete("/api/cities/:id", requireAdmin, async (req, res) => {
-    await storage.deleteCity(req.params.id);
-    res.json({ success: true });
+    try {
+      await storage.deleteCity(req.params.id);
+      res.json({ success: true });
+    } catch (e: any) {
+      res.status(400).json({ message: e.message || "Cannot delete city" });
+    }
   });
 
   // Categories

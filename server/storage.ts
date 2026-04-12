@@ -291,6 +291,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteCountry(id: string) {
+    const citiesInCountry = await db.select({ id: cities.id }).from(cities).where(eq(cities.countryId, id));
+    const cityIds = citiesInCountry.map(c => c.id);
+
+    const activeToursByCountry = await db.select({ id: tours.id }).from(tours)
+      .where(and(eq(tours.countryId, id), eq(tours.isActive, true))).limit(1);
+    if (activeToursByCountry.length > 0) {
+      throw new Error("Невозможно удалить страну: есть активные туры, привязанные к этой стране.");
+    }
+
+    if (cityIds.length > 0) {
+      for (const cityId of cityIds) {
+        const activeToursByCity = await db.select({ id: tours.id }).from(tours)
+          .where(and(eq(tours.cityId, cityId), eq(tours.isActive, true))).limit(1);
+        if (activeToursByCity.length > 0) {
+          throw new Error("Невозможно удалить страну: один из её городов используется в активных турах.");
+        }
+      }
+      await db.update(tours).set({ cityId: null }).where(and(inArray(tours.cityId, cityIds), eq(tours.isActive, false)));
+      await db.delete(cities).where(inArray(cities.id, cityIds));
+    }
+
+    await db.update(tours).set({ countryId: null }).where(and(eq(tours.countryId, id), eq(tours.isActive, false)));
     await db.delete(countries).where(eq(countries.id, id));
   }
 
@@ -316,6 +338,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteCity(id: string) {
+    const activeTours = await db.select({ id: tours.id }).from(tours)
+      .where(and(eq(tours.cityId, id), eq(tours.isActive, true))).limit(1);
+    if (activeTours.length > 0) {
+      throw new Error("Невозможно удалить город: есть активные туры, привязанные к этому городу.");
+    }
+    await db.update(tours).set({ cityId: null }).where(and(eq(tours.cityId, id), eq(tours.isActive, false)));
     await db.delete(cities).where(eq(cities.id, id));
   }
 
