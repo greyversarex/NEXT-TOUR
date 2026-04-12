@@ -61,6 +61,7 @@ export interface IStorage {
   createTour(data: InsertTour): Promise<Tour>;
   updateTour(id: string, data: Partial<Tour>): Promise<Tour | undefined>;
   deleteTour(id: string): Promise<void>;
+  cloneTour(id: string): Promise<Tour>;
 
   // Tour Price Tiers
   getTourPriceTiers(tourId: string): Promise<TourPriceTier[]>;
@@ -391,6 +392,45 @@ export class DatabaseStorage implements IStorage {
     await db.update(tours).set({ isActive: false }).where(eq(tours.id, id));
   }
 
+  async cloneTour(id: string) {
+    const original = await this.getTour(id);
+    if (!original) throw new Error("Tour not found");
+
+    const { id: _id, createdAt: _ca, ...tourData } = original as any;
+    const [cloned] = await db.insert(tours).values({
+      ...tourData,
+      titleRu: `${original.titleRu} (копия)`,
+      titleEn: `${original.titleEn} (copy)`,
+      isActive: false,
+    }).returning();
+
+    const [categoryIds, priceTiers, options, itineraryDays] = await Promise.all([
+      this.getTourCategoryIds(id),
+      db.select().from(tourPriceTiers).where(eq(tourPriceTiers.tourId, id)),
+      db.select().from(tourOptions).where(eq(tourOptions.tourId, id)),
+      db.select().from(tourItinerary).where(eq(tourItinerary.tourId, id)).orderBy(asc(tourItinerary.dayNumber)),
+    ]);
+
+    if (categoryIds.length > 0) await this.setTourCategories(cloned.id, categoryIds);
+
+    if (priceTiers.length > 0) {
+      await db.insert(tourPriceTiers).values(priceTiers.map(({ id: _id, ...t }) => ({ ...t, tourId: cloned.id })));
+    }
+    if (options.length > 0) {
+      await db.insert(tourOptions).values(options.map(({ id: _id, ...o }) => ({ ...o, tourId: cloned.id })));
+    }
+    for (const day of itineraryDays) {
+      const { id: dayId, ...dayData } = day;
+      const [newDay] = await db.insert(tourItinerary).values({ ...dayData, tourId: cloned.id }).returning();
+      const stops = await db.select().from(itineraryStops).where(eq(itineraryStops.itineraryDayId, dayId));
+      if (stops.length > 0) {
+        await db.insert(itineraryStops).values(stops.map(({ id: _id, ...s }) => ({ ...s, itineraryDayId: newDay.id })));
+      }
+    }
+
+    return cloned;
+  }
+
   async permanentDeleteTour(id: string) {
     const existingBookings = await db.select({ id: bookings.id }).from(bookings).where(eq(bookings.tourId, id)).limit(1);
     if (existingBookings.length > 0) {
@@ -598,7 +638,7 @@ export class DatabaseStorage implements IStorage {
   async getTourFeedItems(feedId: string) {
     const items = await db.select().from(tourFeedItems)
       .leftJoin(tours, eq(tourFeedItems.tourId, tours.id))
-      .where(eq(tourFeedItems.feedId, feedId))
+      .where(and(eq(tourFeedItems.feedId, feedId), eq(tours.isActive, true)))
       .orderBy(asc(tourFeedItems.order));
     return items.map(i => ({ ...i.tour_feed_items, tour: i.tours! }));
   }

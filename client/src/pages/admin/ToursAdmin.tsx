@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { ImagePositionPicker } from "@/components/ui/image-position-picker";
-import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route, ChevronDown, ChevronRight, MapPin, Clock, DollarSign, X, Upload, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route, ChevronDown, ChevronRight, MapPin, Clock, DollarSign, X, Upload, Loader2, Copy } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Tour, Country, Category } from "@shared/schema";
@@ -42,6 +42,17 @@ export default function ToursAdmin() {
       queryClient.invalidateQueries({ queryKey: ["/api/tours", "admin"] });
       queryClient.invalidateQueries({ queryKey: ["/api/tours", "trash"] });
       toast({ title: t("Тур перемещён в корзину", "Tour moved to trash") });
+    },
+  });
+
+  const cloneMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("POST", `/api/tours/${id}/clone`, {}).then(r => r.json()),
+    onSuccess: (cloned: Tour) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tours", "admin"] });
+      toast({ title: t("Тур скопирован", "Tour cloned"), description: t(`Создана копия: ${cloned.titleRu}`, `Created: ${cloned.titleEn}`) });
+    },
+    onError: () => {
+      toast({ title: t("Ошибка клонирования", "Clone failed"), variant: "destructive" });
     },
   });
 
@@ -84,12 +95,15 @@ export default function ToursAdmin() {
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Link href={`/tours/${tour.id}`}>
-                    <Button variant="ghost" size="icon" title="View"><Eye className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" title={t("Просмотр", "View")}><Eye className="h-4 w-4" /></Button>
                   </Link>
-                  <Button variant="ghost" size="icon" onClick={() => openEdit(tour)} data-testid={`button-edit-tour-${tour.id}`}>
+                  <Button variant="ghost" size="icon" onClick={() => openEdit(tour)} data-testid={`button-edit-tour-${tour.id}`} title={t("Редактировать", "Edit")}>
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(tour.id)} className="text-destructive" data-testid={`button-delete-tour-${tour.id}`}>
+                  <Button variant="ghost" size="icon" onClick={() => cloneMutation.mutate(tour.id)} disabled={cloneMutation.isPending} data-testid={`button-clone-tour-${tour.id}`} title={t("Клонировать", "Clone")}>
+                    {cloneMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Copy className="h-4 w-4" />}
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(tour.id)} className="text-destructive" data-testid={`button-delete-tour-${tour.id}`} title={t("В корзину", "Move to trash")}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>

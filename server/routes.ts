@@ -387,6 +387,15 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
   });
 
+  app.post("/api/tours/:id/clone", requireAdmin, async (req, res) => {
+    try {
+      const cloned = await storage.cloneTour(req.params.id);
+      res.json(cloned);
+    } catch (e: any) {
+      res.status(400).json({ message: e.message || "Cannot clone tour" });
+    }
+  });
+
   app.get("/api/tours/:id/categories", async (req, res) => {
     const categoryIds = await storage.getTourCategoryIds(req.params.id);
     res.json({ categoryIds });
