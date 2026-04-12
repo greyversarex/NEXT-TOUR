@@ -1,0 +1,44 @@
+root@6899447-yr427605:/var/www/nexttour# pm2 logs
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-04-12T14:19:06: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T14:19:06: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T14:19:07: PM2 log: pid=30917 msg=process killed
+PM2        | 2026-04-12T14:19:07: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T14:19:07: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-12T16:34:35: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T16:34:36: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T16:34:36: PM2 log: pid=32017 msg=process killed
+PM2        | 2026-04-12T16:34:36: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T16:34:36: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-12T17:19:58: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T17:19:58: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T17:19:58: PM2 log: pid=33917 msg=process killed
+PM2        | 2026-04-12T17:19:59: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T17:19:59: PM2 log: App [nexttour:0] online
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour |   table: 'tours',
+0|nexttour |   column: undefined,
+0|nexttour |   dataType: undefined,
+0|nexttour |   constraint: 'tours_city_id_cities_id_fk',
+0|nexttour |   file: 'ri_triggers.c',
+0|nexttour |   line: '2621',
+0|nexttour |   routine: 'ri_ReportViolation'
+0|nexttour | }
+0|nexttour | [alif] initiateAlifPayment error: Alif API returned non-JSON (HTTP 403): <html>
+0|nexttour | <head><title>403 Forbidden</title></head>
+0|nexttour | <body>
+0|nexttour | <center><h1>403 Forbidden</h1></center>
+0|nexttour | </body>
+0|nexttour | </html>
+0|nexttour |
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | En":" Enjoy bitch ","durationMinutes":3}]}],"reviews":[],"priceTiers":[],"isFavorite":false,"country":{"id":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Таджикистан","nameEn":"Tajikistan","imageUrl":"/uploads/1774859735714-9th3i2z9di.mp4","countryCode":"TJ","tagsRu":["Природа","Культура","История"],"tagsEn":["Nature","Culture","History"],"cardSize":"normal","showOnHome":true},"city":{"id":"573f6d64-c5e1-4b78-8cba-fdd603766e19","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Душанбе","nameEn":"Dushanbe","imageUrl":null},"category":{"id":"47fc6f1d-09c3-401c-8685-d44e7301388b","nameRu":"однодневный тур","nameEn":"one day tour"},"categories":[{"id":"47fc6f1d-09c3-401c-8685-d44e7301388b","nameRu":"однодневный тур","nameEn":"one day tour"}],"categoryIds":["47fc6f1d-09c3-401c-8685-d44e7301388b"]}
+0|nexttour | 5:22:00 PM [express] GET /api/currencies 200 in 9ms :: [{"id":"03c627ae-de20-4d62-a9c3-03152c51894a","code":"TJS","symbol":"TJS","nameRu":"Сомони","nameEn":"Somoni","rateToBase":"1.0000","isBase":true,"isActive":true,"sortOrder":0},{"id":"02afba4a-4387-4b21-8545-d8933f80d1ac","code":"USD","symbol":"$","nameRu":"Доллар США","nameEn":"US Dollar","rateToBase":"10.8900","isBase":false,"isActive":true,"sortOrder":1},{"id":"8930e3ff-cedf-434e-bcea-44f60e9c9b2e","code":"EUR","symbol":"€","nameRu":"Евро","nameEn":"Euro","rateToBase":"11.8500","isBase":false,"isActive":true,"sortOrder":2},{"id":"bab68ec7-0c5f-47cf-a62f-d64c5e912ec9","code":"RUB","symbol":"₽","nameRu":"Рубль","nameEn":"Ruble","rateToBase":"0.1300","isBase":false,"isActive":true,"sortOrder":3}]
+0|nexttour | 5:22:00 PM [express] GET /api/auth/providers 200 in 13ms :: {"google":true,"facebook":false,"mailru":false}
+0|nexttour | [email] Resend API key not configured.
+0|nexttour | 5:22:17 PM [express] POST /api/bookings 200 in 9ms :: {"id":"638054bd-1765-4c0e-8557-02fa59e23d18","userId":"ad568552-531b-46d6-9caf-f45774eef09d","guestName":null,"guestEmail":null,"guestPhone":null,"tourId":"22eac233-f2ee-402b-87b8-33b2bb3f0a53","tourDateId":null,"adults":1,"children":0,"selectedOptions":[],"totalPrice":"150.00","paidAmount":"0.00","paymentType":"prepay","bookingStatus":"new","notes":null,"createdAt":"2026-04-12T17:22:17.285Z"}
+0|nexttour | [alif] Form data prepared: orderId=TOUR-638054bd-1776014537381 amount=45.00 gate=korti_milli
+0|nexttour | 5:22:17 PM [express] POST /api/payments/initiate 200 in 11ms :: {"success":true,"data":{"method":"POST","action":"https://web.alif.tj/","formData":{"key":"602005","token":"bc70feafc3f58b3a8fe694dddebd20114aa3de898e968c75811e884af4da501f","orderId":"TOUR-638054bd-1776014537381","amount":"45.00","callbackUrl":"https://nexttour.tj/api/payments/callback","returnUrl":"https://nexttour.tj/payment/result?orderId=TOUR-638054bd-1776014537381","gate":"korti_milli","info":"Тур: Жемчужина Таджикистана – Гиссарская крепость","email":"admin@travelpro.ru"}},"orderId":"TOUR-638054bd-1776014537381"}
