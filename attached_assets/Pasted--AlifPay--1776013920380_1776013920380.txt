@@ -1,0 +1,159 @@
+Теперь у меня всё. Вот полная информация по AlifPay — можешь скопировать и передать нейросети в другом проекте:
+
+AlifPay — Полная интеграция
+Как это работает (архитектура)
+AlifPay использует redirect через POST форму. В отличие от Payler (где редирект по GET ссылке), AlifPay требует отправить HTML форму на https://web.alif.tj/ с подписанными параметрами.
+
+Флоу:
+
+Фронтенд вызывает POST /api/payments/alif/create с orderNumber
+Бэкенд генерирует подпись (HMAC-SHA256) и возвращает данные формы
+Фронтенд создаёт скрытую форму и сабмитит её на https://web.alif.tj/
+Пользователь оплачивает на сайте Alif
+Alif отправляет callback на POST /api/payments/alif/callback
+Пользователь редиректится на returnUrl (страница успеха)
+Переменные окружения (.env)
+ALIF_MERCHANT_KEY=ваш_ключ_от_alif
+ALIF_MERCHANT_PASSWORD=ваш_пароль_от_alif
+FRONTEND_URL=https://ваш-сайт.com
+BASE_URL=https://ваш-сайт.com
+
+Бэкенд — генерация платежа (Node.js / TypeScript)
+src/controllers/alifController.ts — метод createPayment:
+
+import crypto from 'crypto';
+async createPayment(req, res) {
+  const { orderNumber } = req.body;
+  // ... получить заказ из БД ...
+  const key      = process.env.ALIF_MERCHANT_KEY;
+  const password = process.env.ALIF_MERCHANT_PASSWORD;
+  const baseUrl  = process.env.BASE_URL || 'https://ваш-сайт.com';
+  const frontendUrl = process.env.FRONTEND_URL || 'https://ваш-сайт.com';
+  const orderId        = order.id.toString();
+  const amount         = order.totalAmount;
+  const amountFormatted = amount.toFixed(2);
+  const callbackUrl    = `${baseUrl}/api/payments/alif/callback`;
+  const returnUrl      = `${frontendUrl}/payment-success?orderNumber=${order.orderNumber}`;
+  const info           = `Тур №${orderId}`;
+  const email          = order.customer.email;
+  const phone          = order.customer.phone || '';
+  const gate           = 'vsa'; // Visa/MasterCard
+  // ⚠️ КРИТИЧНО: Именно такая двухшаговая подпись
+  const secretkey = crypto.createHmac('sha256', key).update(password).digest('hex');
+  const token     = crypto.createHmac('sha256', secretkey)
+    .update(key + orderId + amountFormatted + callbackUrl)
+    .digest('hex');
+  // Обновляем статус заказа в БД
+  await db.order.update({
+    where: { id: order.id },
+    data: { paymentMethod: 'alif', paymentStatus: 'processing' }
+  });
+  // Возвращаем данные формы на фронтенд
+  return res.json({
+    success: true,
+    data: {
+      method: 'POST',
+      action: 'https://web.alif.tj/',
+      formData: {
+        key,
+        token,
+        orderId,
+        amount: amountFormatted,
+        callbackUrl,
+        returnUrl,
+        info,
+        email,
+        phone,
+        gate
+      }
+    }
+  });
+}
+
+Бэкенд — обработка callback
+async callback(req, res) {
+  const body  = req.body || {};
+  const query = req.query || {};
+  // AlifPay может прислать поля в разных форматах — проверяем все варианты
+  const orderId = body.orderId || body.order_id || body.orderid
+    || query.orderId || query.order_id;
+  const status  = body.status || body.Status || body.STATUS
+    || query.status || query.Status;
+  const transactionId = body.transactionId || body.transaction_id;
+  // Нормализуем статус
+  const normalizedStatus = status ? String(status).toLowerCase().trim() : '';
+  const successStatuses  = ['ok', 'success', 'paid', 'charged', 'complete', 'completed', '1', 'true'];
+  const failStatuses     = ['fail', 'failed', 'error', 'declined', 'rejected', 'cancel', 'cancelled', '0', 'false'];
+  const isSuccess = successStatuses.includes(normalizedStatus);
+  const isFail    = failStatuses.includes(normalizedStatus);
+  // ⚠️ ВАЖНО: Если статус неизвестен — считаем успехом!
+  // AlifPay присылает callback ТОЛЬКО при успешной оплате.
+  // Если status пустой или неизвестный — это тоже успех.
+  const treatAsSuccess = isSuccess || (!isSuccess && !isFail);
+  if (treatAsSuccess) {
+    // Обновляем заказ в БД
+    await db.order.update({
+      where: { id: Number(orderId) },
+      data: {
+        paymentStatus: 'paid',
+        status: 'confirmed',
+        paymentIntentId: transactionId || null
+      }
+    });
+    // ... отправить email клиенту ...
+  } else {
+    await db.order.update({
+      where: { id: Number(orderId) },
+      data: { paymentStatus: 'failed' }
+    });
+  }
+  return res.json({ success: true }); // AlifPay ожидает 200 OK
+}
+
+Роуты
+// src/routes/paymentRoutes.ts
+router.post('/alif/create',    alifController.createPayment);
+router.post('/alif/callback',  alifController.callback);
+
+Фронтенд — запуск оплаты
+// 1. Запрашиваем данные у бэкенда
+const response = await fetch('/api/payments/alif/create', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ orderNumber: 'BT-12345' })
+});
+const result = await response.json();
+if (result.success) {
+  // 2. Создаём и сабмитим POST форму на AlifPay
+  const form = document.createElement('form');
+  form.method = result.data.method;   // 'POST'
+  form.action = result.data.action;   // 'https://web.alif.tj/'
+  Object.entries(result.data.formData).forEach(([key, value]) => {
+    const input = document.createElement('input');
+    input.type  = 'hidden';
+    input.name  = key;
+    input.value = value;
+    form.appendChild(input);
+  });
+  document.body.appendChild(form);
+  form.submit(); // пользователя уносит на страницу AlifPay
+}
+
+Параметры формы (что уходит на https://web.alif.tj/)
+Поле	Значение
+key	Ваш ALIF_MERCHANT_KEY
+token	HMAC-SHA256 подпись (двухшаговая, см. выше)
+orderId	ID заказа из вашей БД (числовой)
+amount	Сумма с двумя знаками (1250.50)
+callbackUrl	URL куда Alif пришлёт POST после оплаты
+returnUrl	URL куда редиректить клиента после оплаты
+info	Описание заказа (строка)
+email	Email клиента
+phone	Телефон клиента
+gate	vsa (Visa/MasterCard)
+Ключевые моменты которые важно знать
+Подпись двухшаговая — сначала HMAC(key, password) → secretkey, потом HMAC(secretkey, key+orderId+amount+callbackUrl) → token
+amount строго с 2 знаками — toFixed(2), иначе подпись не совпадёт
+callback только POST — Alif присылает POST, не GET
+Если status пустой в callback — это успех — Alif шлёт callback только при успешной оплате
+orderId — это числовой ID из вашей БД, не строковый номер заказа
