@@ -1008,7 +1008,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     const amount = paymentType === "prepay" ? totalPrice * 0.3 : totalPrice;
 
     const appUrl = process.env.APP_URL || getAppBaseUrl(req);
-    const orderId = `TOUR-${bookingId.slice(0, 8)}-${Date.now()}`;
+    const orderId = String(Date.now());
     const callbackUrl = `${appUrl}/api/payments/callback`;
     const returnUrl = `${appUrl}/payment/result?orderId=${orderId}`;
 

@@ -1,0 +1,72 @@
+[root@archlinux bunyod-tour]# cat .env
+# ===========================================
+# CORE CONFIGURATION
+# ===========================================
+NODE_ENV=production
+PORT=5000
+PRODUCTION_DOMAIN=bunyodtour.tj
+ALLOWED_ORIGINS=http://bunyodtour.tj,http://www.bunyodtour.tj,https://bunyodtour.tj,https://www.bunyodtour.tj
+BASE_URL=https://bunyodtour.tj
+FRONTEND_URL=https://bunyodtour.tj
+
+# ===========================================
+# SECURITY (REQUIRED - CHANGE THESE!)
+# ===========================================
+JWT_SECRET=bunyod-tour-production-secret-key-2025-very-secure-random-string-min-32-chars!
+ADMIN_DEFAULT_USER=admin
+ADMIN_DEFAULT_PASSWORD=StrongPassword123!Change
+
+# ===========================================
+# DATABASE (REQUIRED)
+# ===========================================
+DATABASE_URL=postgresql://postgres:P0stgres_2025_Safe+Change@localhost:5432/bunyod_tour?schema=public
+
+# ===========================================
+# EMAIL SYSTEM - SendGrid API (PRIMARY) + SMTP (FALLBACK)
+# ===========================================
+SENDGRID_API_KEY=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
+SENDGRID_FROM_EMAIL=booking@bunyodtour.tj
+SMTP_HOST=mail.timeweb.com
+SMTP_PORT=465
+SMTP_USER=booking@bunyodtour.tj
+SMTP_PASS=Book2025
+SMTP_FROM=booking@bunyodtour.tj
+ADMIN_EMAIL=booking@bunyodtour.tj
+
+# ===========================================
+# PAYMENT GATEWAYS
+# ===========================================
+# AlifPay (Tajikistan)
+ALIF_MERCHANT_KEY=152065
+ALIF_MERCHANT_PASSWORD=aIttCuLj96G4QAFCKzbA
+
+# Payler (Tajikistan)
+PAYLER_KEY=1a92a7df-45d3-4fe7-8149-2fd0c7e8d366
+PAYLER_PASSWORD=GkmPvgYxs7
+
+# Stripe (optional - if needed)
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+
+# Other Payment Systems (optional)
+PAYME_MERCHANT_ID=
+CLICK_MERCHANT_ID=
+
+# ===========================================
+# FEATURES & FLAGS
+# ===========================================
+INIT_DATABASE=true
+ENABLE_DYNAMIC_PRICING=true
+LOG_LEVEL=info
+RUN_MIGRATIONS_ON_BOOT=false
+RUN_SEED_ON_BOOT=false
+
+# ===========================================
+# DEPLOYMENT & UPTIME
+# ===========================================
+APP_NAME=bunyod-tour
+OPENAI_API_KEY=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
+OPENAI_BASE_URL=https://openrouter.ai/api/v1
+OPENAI_MODEL=google/gemini-2.0-flash-exp:free
+AI_PROVIDER=openai
+[root@archlinux bunyod-tour]#

@@ -1,0 +1,56 @@
+root@6899447-yr427605:/var/www/nexttour# cat .env
+DATABASE_URL=postgresql://nexttour:StrongPass123@localhost:5432/nexttour
+SESSION_SECRET=super-secret-random-string-12345
+NODE_ENV=production
+PORT=3000
+
+ALIF_TERMINAL_ID=602005
+ALIF_TERMINAL_PASSWORD=CSzgVpxdzR1GELYrhL50
+ALIF_TEST_MODE=false
+
+GOOGLE_CLIENT_ID=741274345588-sqd1o968aavf0fv5i9g514a9ut3qrbie.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=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
+APP_URL=https://nexttour.tj
+root@6899447-yr427605:/var/www/nexttour# pm2 logs
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-04-12T16:34:35: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T16:34:36: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T16:34:36: PM2 log: pid=32017 msg=process killed
+PM2        | 2026-04-12T16:34:36: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T16:34:36: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-12T17:19:58: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T17:19:58: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T17:19:58: PM2 log: pid=33917 msg=process killed
+PM2        | 2026-04-12T17:19:59: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T17:19:59: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-12T17:39:34: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T17:39:34: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T17:39:34: PM2 log: pid=34492 msg=process killed
+PM2        | 2026-04-12T17:39:34: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T17:39:34: PM2 log: App [nexttour:0] online
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour |   table: 'tours',
+0|nexttour |   column: undefined,
+0|nexttour |   dataType: undefined,
+0|nexttour |   constraint: 'tours_city_id_cities_id_fk',
+0|nexttour |   file: 'ri_triggers.c',
+0|nexttour |   line: '2621',
+0|nexttour |   routine: 'ri_ReportViolation'
+0|nexttour | }
+0|nexttour | [alif] initiateAlifPayment error: Alif API returned non-JSON (HTTP 403): <html>
+0|nexttour | <head><title>403 Forbidden</title></head>
+0|nexttour | <body>
+0|nexttour | <center><h1>403 Forbidden</h1></center>
+0|nexttour | </body>
+0|nexttour | </html>
+0|nexttour |
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | �ь в гиссар составить 40 минут в одну сторону по пути вы увидите красоту ","descriptionEn":"The way to Gissar takes 40 minutes one side ","durationMinutes":40}]},{"id":"e5ba3044-332a-4c2a-865d-a38ed3f8a548","tourId":"22eac233-f2ee-402b-87b8-33b2bb3f0a53","dayNumber":2,"titleRu":"Душанбе Искандаркуль ","titleEn":"Dushabe Iskandarkul","descriptionRu":"Этот день будет четким ","descriptionEn":"This day gonna be perfect","durationHours":12,"stops":[{"id":"d436305d-a380-432f-badc-3640a16c5810","itineraryDayId":"e5ba3044-332a-4c2a-865d-a38ed3f8a548","stopOrder":1,"titleRu":"Путь в исаандаркулт","titleEn":"Way to iskandarkul","descriptionRu":"Кайфш мени сагерача","descriptionEn":" Enjoy bitch ","durationMinutes":3}]}],"reviews":[],"priceTiers":[],"isFavorite":false,"country":{"id":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Таджикистан","nameEn":"Tajikistan","imageUrl":"/uploads/1774859735714-9th3i2z9di.mp4","countryCode":"TJ","tagsRu":["Природа","Культура","История"],"tagsEn":["Nature","Culture","History"],"cardSize":"normal","showOnHome":true},"city":{"id":"573f6d64-c5e1-4b78-8cba-fdd603766e19","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Душанбе","nameEn":"Dushanbe","imageUrl":null},"category":{"id":"47fc6f1d-09c3-401c-8685-d44e7301388b","nameRu":"однодневный тур","nameEn":"one day tour"},"categories":[{"id":"47fc6f1d-09c3-401c-8685-d44e7301388b","nameRu":"однодневный тур","nameEn":"one day tour"}],"categoryIds":["47fc6f1d-09c3-401c-8685-d44e7301388b"]}
+0|nexttour | 5:41:24 PM [express] GET /api/auth/providers 200 in 5ms :: {"google":true,"facebook":false,"mailru":false}
+0|nexttour | [email] Resend API key not configured.
+0|nexttour | 5:41:39 PM [express] POST /api/bookings 200 in 29ms :: {"id":"9df34c22-3d34-4ced-9966-0e5ce2ce7eff","userId":"ad568552-531b-46d6-9caf-f45774eef09d","guestName":null,"guestEmail":null,"guestPhone":null,"tourId":"22eac233-f2ee-402b-87b8-33b2bb3f0a53","tourDateId":null,"adults":1,"children":0,"selectedOptions":[],"totalPrice":"150.00","paidAmount":"0.00","paymentType":"full","bookingStatus":"new","notes":null,"createdAt":"2026-04-12T17:41:39.959Z"}
+0|nexttour | [alif] Form data prepared: orderId=TOUR-9df34c22-1776015700118 amount=150.00 gate=vsa
+0|nexttour | 5:41:40 PM [express] POST /api/payments/initiate 200 in 15ms :: {"success":true,"data":{"method":"POST","action":"https://web.alif.tj/","formData":{"key":"602005","token":"fed73bd34dd99b2f2785e10200441669f0943e56a66dfdc18c601084afcbf7fe","orderId":"TOUR-9df34c22-1776015700118","amount":"150.00","callbackUrl":"https://nexttour.tj/api/payments/callback","returnUrl":"https://nexttour.tj/payment/result?orderId=TOUR-9df34c22-1776015700118","gate":"vsa","info":"Тур: Жемчужина Таджикистана – Гиссарская крепость","email":"admin@travelpro.ru"}},"orderId":"TOUR-9df34c22-1776015700118"}
