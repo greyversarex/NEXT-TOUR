@@ -26,6 +26,8 @@ export const users = pgTable("users", {
   loyaltyLevel: loyaltyLevelEnum("loyalty_level").notNull().default("beginner"),
   bookingsCount: integer("bookings_count").notNull().default(0),
   discountsLeft: integer("discounts_left").notNull().default(0),
+  emailVerified: boolean("email_verified").notNull().default(false),
+  emailVerificationToken: text("email_verification_token"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

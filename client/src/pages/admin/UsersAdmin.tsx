@@ -71,6 +71,7 @@ export default function UsersAdmin() {
                         </span>
                         <span className="text-xs text-muted-foreground">{user.bookingsCount} {t("туров", "tours")}</span>
                         {user.role === "admin" && <Badge className="text-xs py-0">Admin</Badge>}
+                        {!user.emailVerified && <Badge variant="outline" className="text-xs py-0 text-orange-600 border-orange-300">{t("Email не подтверждён", "Email not verified")}</Badge>}
                       </div>
                     </div>
                   </div>

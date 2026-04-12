@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Eye, EyeOff, Plane, Mail, Lock, User } from "lucide-react";
+import { Loader2, Eye, EyeOff, Plane, Mail, Lock, User, CheckCircle2 } from "lucide-react";
 import { SiGoogle, SiFacebook, SiMaildotru } from "react-icons/si";
 
 interface AuthModalProps {
@@ -26,11 +26,12 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
   const { login, register } = useAuth();
   const { toast } = useToast();
   const [tab, setTab] = useState("login");
-  const [mode, setMode] = useState<"auth" | "forgotPassword">("auth");
+  const [mode, setMode] = useState<"auth" | "forgotPassword" | "verificationSent" | "verificationNeeded">("auth");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [resetInfo, setResetInfo] = useState<{ resetUrl: string; emailSent: boolean } | null>(null);
   const [providers, setProviders] = useState<OAuthProviders>({ google: false, facebook: false, mailru: false });
+  const [verificationEmail, setVerificationEmail] = useState("");
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [registerData, setRegisterData] = useState({ name: "", email: "", password: "" });
@@ -40,7 +41,6 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
     fetch("/api/auth/providers").then(r => r.json()).then(setProviders).catch(() => {});
   }, []);
 
-  // Check URL for OAuth success/error on mount
   useEffect(() => {
     if (!open) return;
     const params = new URLSearchParams(window.location.search);
@@ -64,7 +64,12 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
       toast({ title: t("Добро пожаловать!", "Welcome back!") });
       onClose();
     } catch (err: any) {
-      toast({ title: t("Ошибка входа", "Login failed"), description: err?.message || t("Неверный email или пароль", "Invalid email or password"), variant: "destructive" });
+      if (err?.needsVerification) {
+        setVerificationEmail(err.email || loginData.email);
+        setMode("verificationNeeded");
+      } else {
+        toast({ title: t("Ошибка входа", "Login failed"), description: err?.message || t("Неверный email или пароль", "Invalid email or password"), variant: "destructive" });
+      }
     } finally {
       setLoading(false);
     }
@@ -74,9 +79,11 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
     e.preventDefault();
     setLoading(true);
     try {
-      await register(registerData);
-      toast({ title: t("Регистрация успешна!", "Registration successful!"), description: t("Добро пожаловать в NEXT TOUR!", "Welcome to NEXT TOUR!") });
-      onClose();
+      const result = await register(registerData);
+      if (result.needsVerification) {
+        setVerificationEmail(registerData.email);
+        setMode("verificationSent");
+      }
     } catch (err: any) {
       const msg = err?.message || "";
       const isEmailTaken = msg.toLowerCase().includes("email already") || msg.toLowerCase().includes("already registered");
@@ -88,6 +95,24 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
         variant: "destructive",
       });
       if (isEmailTaken) setTab("login");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: verificationEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      toast({ title: t("Письмо отправлено!", "Email sent!"), description: t("Проверьте вашу почту", "Check your inbox") });
+    } catch (err: any) {
+      toast({ title: t("Ошибка", "Error"), description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -121,6 +146,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
     setTab("login");
     setResetInfo(null);
     setForgotEmail("");
+    setVerificationEmail("");
   };
 
   const hasOAuth = providers.google || providers.facebook || providers.mailru;
@@ -177,6 +203,50 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
     </div>
   );
 
+  const VerificationScreen = ({ isResend }: { isResend?: boolean }) => (
+    <div className="space-y-4 text-center">
+      <div className="flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mx-auto">
+        <Mail className="h-8 w-8 text-green-600" />
+      </div>
+      <h3 className="text-lg font-semibold text-foreground">
+        {isResend
+          ? t("Подтвердите ваш email", "Verify your email")
+          : t("Проверьте вашу почту!", "Check your email!")}
+      </h3>
+      <p className="text-sm text-muted-foreground">
+        {t(
+          `Мы отправили письмо с ссылкой для подтверждения на`,
+          `We sent a verification link to`
+        )}
+      </p>
+      <p className="font-medium text-foreground">{verificationEmail}</p>
+      <p className="text-sm text-muted-foreground">
+        {t(
+          "Перейдите по ссылке в письме, чтобы активировать аккаунт и войти.",
+          "Click the link in the email to activate your account and sign in."
+        )}
+      </p>
+      <div className="pt-2 space-y-2">
+        <Button
+          variant="outline"
+          className="w-full"
+          disabled={loading}
+          onClick={handleResendVerification}
+          data-testid="button-resend-verification"
+        >
+          {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+          {t("Отправить письмо повторно", "Resend verification email")}
+        </Button>
+        <Button variant="ghost" className="w-full" onClick={resetForm}>
+          {t("← Назад ко входу", "← Back to login")}
+        </Button>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        {t("Письмо не пришло? Проверьте папку «Спам»", "Didn't receive it? Check your spam folder")}
+      </p>
+    </div>
+  );
+
   return (
     <Dialog open={open} onOpenChange={() => { onClose(); resetForm(); }}>
       <DialogContent className="sm:max-w-md p-0 overflow-hidden">
@@ -187,19 +257,29 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
           <h2 className="text-xl font-bold">
             {mode === "forgotPassword"
               ? t("Восстановление пароля", "Password Recovery")
-              : tab === "login" ? t("Вход в аккаунт", "Sign In") : t("Создать аккаунт", "Create Account")}
+              : mode === "verificationSent" || mode === "verificationNeeded"
+                ? t("Подтверждение email", "Email Verification")
+                : tab === "login" ? t("Вход в аккаунт", "Sign In") : t("Создать аккаунт", "Create Account")}
           </h2>
           <p className="text-sm text-white/75 mt-1">
             {mode === "forgotPassword"
               ? t("Введите ваш email для сброса пароля", "Enter your email to reset password")
-              : tab === "login"
-                ? t("Войдите чтобы бронировать туры", "Sign in to book your dream trips")
-                : t("Присоединяйтесь к NEXT TOUR", "Join NEXT TOUR today")}
+              : mode === "verificationSent"
+                ? t("Осталось подтвердить вашу почту", "Just one more step")
+                : mode === "verificationNeeded"
+                  ? t("Ваш email не подтверждён", "Your email is not verified")
+                  : tab === "login"
+                    ? t("Войдите чтобы бронировать туры", "Sign in to book your dream trips")
+                    : t("Присоединяйтесь к NEXT TOUR", "Join NEXT TOUR today")}
           </p>
         </div>
 
         <div className="px-6 pb-6 pt-4">
-          {mode === "auth" ? (
+          {mode === "verificationSent" ? (
+            <VerificationScreen />
+          ) : mode === "verificationNeeded" ? (
+            <VerificationScreen isResend />
+          ) : mode === "auth" ? (
             <Tabs value={tab} onValueChange={setTab}>
               <TabsList className="grid w-full grid-cols-2 mb-5">
                 <TabsTrigger value="login" data-testid="tab-login">{t("Войти", "Sign In")}</TabsTrigger>

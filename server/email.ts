@@ -59,6 +59,27 @@ function wrap(body: string) {
   return `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;">${body}</div>`;
 }
 
+export async function sendVerificationEmail(toEmail: string, name: string, verifyUrl: string): Promise<boolean> {
+  const html = wrap(`
+    ${header("Подтверждение email")}
+    <div style="background:#fff;padding:32px;border-radius:0 0 8px 8px;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+      <h2 style="color:${brandColor};margin:0 0 16px;">Подтвердите ваш email, ${name}!</h2>
+      <p style="color:#475569;line-height:1.6;margin:0 0 24px;">
+        Спасибо за регистрацию в NEXT TOUR! Нажмите кнопку ниже, чтобы подтвердить ваш email и активировать аккаунт.
+      </p>
+      <a href="${verifyUrl}"
+         style="display:inline-block;background:${accentColor};color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">
+        Подтвердить email →
+      </a>
+      <p style="color:#94a3b8;font-size:12px;margin:24px 0 0;">
+        Если вы не регистрировались в NEXT TOUR — просто проигнорируйте это письмо.
+      </p>
+      ${footer()}
+    </div>
+  `);
+  return send(toEmail, "NEXT TOUR — Подтвердите ваш email ✉️", html);
+}
+
 export async function sendWelcomeEmail(toEmail: string, name: string): Promise<boolean> {
   const html = wrap(`
     ${header("Откройте мир путешествий")}

@@ -10,7 +10,7 @@ import { Pool } from "pg";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import path from "path";
-import { sendPasswordResetEmail, sendWelcomeEmail, sendBookingConfirmationEmail, sendBulkEmail } from "./email";
+import { sendPasswordResetEmail, sendWelcomeEmail, sendBookingConfirmationEmail, sendBulkEmail, sendVerificationEmail } from "./email";
 import { initiateAlifPayment, checkAlifTransaction } from "./payment";
 import multer from "multer";
 import { storage } from "./storage";
@@ -118,7 +118,6 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Auth
   app.post("/api/auth/register", async (req, res) => {
     try {
-      // Auto-generate username from email if not provided
       const body = { ...req.body };
       if (!body.username) {
         const base = (body.email || "").split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g, "_");
@@ -134,16 +133,47 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       const data = insertUserSchema.parse(body);
       const existing = await storage.getUserByEmail(data.email);
       if (existing) return res.status(400).json({ message: "Email already registered" });
-      const user = await storage.createUser(data);
-      const { password: _, ...safeUser } = user;
-      req.login(user, (err) => {
-        if (err) return res.status(500).json({ message: "Login failed" });
-        res.json(safeUser);
-        // Send welcome email after successful registration (non-blocking)
-        sendWelcomeEmail(data.email, data.name || data.username).catch(() => {});
-      });
+      const verificationToken = crypto.randomBytes(32).toString("hex");
+      const user = await storage.createUser({ ...data, emailVerificationToken: verificationToken } as any);
+      const appUrl = process.env.APP_URL || `https://${process.env.REPLIT_DEV_DOMAIN || "localhost:5000"}`;
+      const verifyUrl = `${appUrl}/verify-email?token=${verificationToken}`;
+      sendVerificationEmail(data.email, data.name || data.username, verifyUrl).catch(() => {});
+      res.json({ needsVerification: true, message: "Verification email sent" });
     } catch (e: any) {
       res.status(400).json({ message: e.message || "Registration failed" });
+    }
+  });
+
+  app.get("/api/auth/verify-email", async (req, res) => {
+    try {
+      const { token } = req.query;
+      if (!token || typeof token !== "string") return res.status(400).json({ message: "Invalid token" });
+      const user = await storage.getUserByVerificationToken(token);
+      if (!user) return res.status(400).json({ message: "Invalid or expired verification link" });
+      if (user.emailVerified) return res.json({ success: true, alreadyVerified: true });
+      await storage.updateUser(user.id, { emailVerified: true, emailVerificationToken: null });
+      sendWelcomeEmail(user.email, user.name).catch(() => {});
+      res.json({ success: true });
+    } catch (e: any) {
+      res.status(500).json({ message: "Verification failed" });
+    }
+  });
+
+  app.post("/api/auth/resend-verification", async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) return res.status(400).json({ message: "Email required" });
+      const user = await storage.getUserByEmail(email);
+      if (!user) return res.status(404).json({ message: "User not found" });
+      if (user.emailVerified) return res.json({ success: true, alreadyVerified: true });
+      const newToken = crypto.randomBytes(32).toString("hex");
+      await storage.updateUser(user.id, { emailVerificationToken: newToken });
+      const appUrl = process.env.APP_URL || `https://${process.env.REPLIT_DEV_DOMAIN || "localhost:5000"}`;
+      const verifyUrl = `${appUrl}/verify-email?token=${newToken}`;
+      await sendVerificationEmail(email, user.name, verifyUrl);
+      res.json({ success: true });
+    } catch (e: any) {
+      res.status(500).json({ message: "Failed to resend" });
     }
   });
 
@@ -151,9 +181,12 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     passport.authenticate("local", (err: any, user: any, info: any) => {
       if (err) return res.status(500).json({ message: "Authentication error" });
       if (!user) return res.status(401).json({ message: info?.message || "Invalid credentials" });
+      if (user.provider === "local" && !user.emailVerified) {
+        return res.status(403).json({ message: "Email not verified", needsVerification: true, email: user.email });
+      }
       req.login(user, (loginErr) => {
         if (loginErr) return res.status(500).json({ message: "Login failed" });
-        const { password: _, ...safeUser } = user;
+        const { password: _, emailVerificationToken: _t, ...safeUser } = user;
         res.json(safeUser);
       });
     })(req, res, next);
@@ -165,7 +198,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   app.get("/api/auth/me", (req, res) => {
     if (!req.user) return res.status(401).json({ message: "Not authenticated" });
-    const { password: _, ...safeUser } = req.user as any;
+    const { password: _, emailVerificationToken: _t, ...safeUser } = req.user as any;
     res.json(safeUser);
   });
 
@@ -795,7 +828,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   // Admin Users
   app.get("/api/admin/users", requireAdmin, async (req, res) => {
     const allUsers = await storage.getAllUsers();
-    res.json(allUsers.map(({ password: _, ...u }) => u));
+    res.json(allUsers.map(({ password: _, emailVerificationToken: _t, ...u }) => u));
   });
   app.put("/api/admin/users/:id", requireAdmin, async (req, res) => {
     const user = await storage.updateUser(req.params.id, req.body);

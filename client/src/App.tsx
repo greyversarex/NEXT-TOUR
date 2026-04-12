@@ -21,6 +21,7 @@ import NewsPage, { NewsDetail } from "@/pages/NewsPage";
 import Promotions from "@/pages/Promotions";
 import About from "@/pages/About";
 import ResetPassword from "@/pages/ResetPassword";
+import VerifyEmail from "@/pages/VerifyEmail";
 import PaymentResult from "@/pages/PaymentResult";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
@@ -67,6 +68,7 @@ function Router() {
       <Route path="/promotions" component={Promotions} />
       <Route path="/about" component={About} />
       <Route path="/reset-password" component={ResetPassword} />
+      <Route path="/verify-email" component={VerifyEmail} />
       <Route path="/payment/result" component={PaymentResult} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />

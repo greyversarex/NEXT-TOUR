@@ -31,6 +31,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   upsertOAuthUser(profile: { provider: string; providerId: string; email: string; name: string; avatar?: string }): Promise<User>;
   updateUser(id: string, data: Partial<User>): Promise<User | undefined>;
+  getUserByVerificationToken(token: string): Promise<User | undefined>;
   deleteUser(id: string): Promise<void>;
   getAllUsers(): Promise<User[]>;
 
@@ -261,6 +262,7 @@ export class DatabaseStorage implements IStorage {
       avatar: profile.avatar || null,
       provider: profile.provider,
       providerId: profile.providerId,
+      emailVerified: true,
     }).returning();
     return created;
   }
@@ -271,6 +273,11 @@ export class DatabaseStorage implements IStorage {
     }
     const [user] = await db.update(users).set(data).where(eq(users.id, id)).returning();
     return user;
+  }
+
+  async getUserByVerificationToken(token: string) {
+    const [u] = await db.select().from(users).where(eq(users.emailVerificationToken, token));
+    return u;
   }
 
   async deleteUser(id: string) {

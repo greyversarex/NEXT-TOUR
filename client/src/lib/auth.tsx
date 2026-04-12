@@ -6,8 +6,8 @@ import type { User } from "@shared/schema";
 interface AuthContextType {
   user: Omit<User, "password"> | null | undefined;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: { email: string; name: string; password: string }) => Promise<void>;
+  login: (email: string, password: string) => Promise<any>;
+  register: (data: { email: string; name: string; password: string }) => Promise<any>;
   logout: () => Promise<void>;
 }
 
@@ -33,22 +33,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  const loginMutation = useMutation({
-    mutationFn: (data: { email: string; password: string }) =>
-      apiRequest("POST", "/api/auth/login", data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-    },
-  });
-
-  const registerMutation = useMutation({
-    mutationFn: (data: { email: string; name: string; password: string }) =>
-      apiRequest("POST", "/api/auth/register", data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-    },
-  });
-
   const logoutMutation = useMutation({
     mutationFn: () => apiRequest("POST", "/api/auth/logout", {}),
     onSuccess: () => {
@@ -58,11 +42,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const login = async (email: string, password: string) => {
-    await loginMutation.mutateAsync({ email, password });
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      const err: any = new Error(data.message || "Login failed");
+      err.needsVerification = data.needsVerification;
+      err.email = data.email;
+      throw err;
+    }
+    queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    return data;
   };
 
   const register = async (data: { email: string; name: string; password: string }) => {
-    await registerMutation.mutateAsync(data);
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
+    if (!res.ok) {
+      throw new Error(result.message || "Registration failed");
+    }
+    return result;
   };
 
   const logout = async () => {
