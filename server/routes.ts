@@ -43,6 +43,8 @@ const ah = (fn: (req: Request, res: Response, next: any) => Promise<any>) =>
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
+  app.set("trust proxy", 1);
+
   app.use(session({
     store: new PgSession({ pool, createTableIfMissing: true }),
     secret: process.env.SESSION_SECRET || "travel-platform-secret-key-2024",
