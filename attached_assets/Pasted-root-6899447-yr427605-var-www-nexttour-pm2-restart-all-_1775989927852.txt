@@ -1,0 +1,90 @@
+root@6899447-yr427605:/var/www/nexttour# pm2 restart all
+pm2 logs --lines 30
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [all](ids: [ 0 ])
+[PM2] [nexttour](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ nexttour           │ fork     │ 1    │ online    │ 0%       │ 27.0mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[TAILING] Tailing last 30 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 30 lines:
+PM2        | 2026-04-10T11:37:25: PM2 log: Node.js version      : 20.20.1
+PM2        | 2026-04-10T11:37:25: PM2 log: Current arch         : x64
+PM2        | 2026-04-10T11:37:25: PM2 log: PM2 home             : /root/.pm2
+PM2        | 2026-04-10T11:37:25: PM2 log: PM2 PID file         : /root/.pm2/pm2.pid
+PM2        | 2026-04-10T11:37:25: PM2 log: RPC socket file      : /root/.pm2/rpc.sock
+PM2        | 2026-04-10T11:37:25: PM2 log: BUS socket file      : /root/.pm2/pub.sock
+PM2        | 2026-04-10T11:37:25: PM2 log: Application log path : /root/.pm2/logs
+PM2        | 2026-04-10T11:37:25: PM2 log: Worker Interval      : 30000
+PM2        | 2026-04-10T11:37:25: PM2 log: Process dump file    : /root/.pm2/dump.pm2
+PM2        | 2026-04-10T11:37:25: PM2 log: Concurrent actions   : 2
+PM2        | 2026-04-10T11:37:25: PM2 log: SIGTERM timeout      : 1600
+PM2        | 2026-04-10T11:37:25: PM2 log: Runtime Binary       : /usr/bin/node
+PM2        | 2026-04-10T11:37:25: PM2 log: ===============================================================================
+PM2        | 2026-04-10T11:37:25: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-10T11:37:25: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-12T10:29:43: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T10:29:43: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T10:29:43: PM2 log: pid=806 msg=process killed
+PM2        | 2026-04-12T10:29:43: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T10:29:44: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-12T10:30:39: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T10:30:39: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T10:30:39: PM2 log: pid=27268 msg=process killed
+PM2        | 2026-04-12T10:30:40: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T10:30:40: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-12T10:31:50: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T10:31:50: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T10:31:50: PM2 log: pid=27456 msg=process killed
+PM2        | 2026-04-12T10:31:50: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T10:31:50: PM2 log: App [nexttour:0] online
+
+/root/.pm2/logs/nexttour-error.log last 30 lines:
+0|nexttour |   column: undefined,
+0|nexttour |   dataType: undefined,
+0|nexttour |   constraint: 'tours_city_id_cities_id_fk',
+0|nexttour |   file: 'ri_triggers.c',
+0|nexttour |   line: '2621',
+0|nexttour |   routine: 'ri_ReportViolation'
+0|nexttour | }
+0|nexttour | Internal Server Error: error: update or delete on table "cities" violates foreign key constraint "tours_city_id_cities_id_fk" on table "tours"
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:83:15227
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|nexttour |     at async Yy.deleteCity (/var/www/nexttour/dist/index.cjs:304:4208)
+0|nexttour |     at async /var/www/nexttour/dist/index.cjs:304:24871 {
+0|nexttour |   length: 313,
+0|nexttour |   severity: 'ERROR',
+0|nexttour |   code: '23503',
+0|nexttour |   detail: 'Key (id)=(2b105fd6-576a-4f64-a5dd-3ac9023b803f) is still referenced from table "tours".',
+0|nexttour |   hint: undefined,
+0|nexttour |   position: undefined,
+0|nexttour |   internalPosition: undefined,
+0|nexttour |   internalQuery: undefined,
+0|nexttour |   where: undefined,
+0|nexttour |   schema: 'public',
+0|nexttour |   table: 'tours',
+0|nexttour |   column: undefined,
+0|nexttour |   dataType: undefined,
+0|nexttour |   constraint: 'tours_city_id_cities_id_fk',
+0|nexttour |   file: 'ri_triggers.c',
+0|nexttour |   line: '2621',
+0|nexttour |   routine: 'ri_ReportViolation'
+0|nexttour | }
+
+/root/.pm2/logs/nexttour-out.log last 30 lines:
+0|nexttour | ni","imageUrl":null},{"id":"b40fe296-12f3-4a81-9533-9d4881fffa5c","countryId":"2fa4b10f-04b7-4605-bcaa-54c46bfad7b1","nameRu":"Токио","nameEn":"Tokyo","imageUrl":null}]
+0|nexttour | 9:58:26 AM [express] GET /api/auth/me 304 in 9ms :: {"id":"ad568552-531b-46d6-9caf-f45774eef09d","email":"admin@travelpro.ru","username":"admin","name":"Администратор","avatar":null,"provider":"local","providerId":null,"role":"admin","loyaltyLevel":"beginner","bookingsCount":0,"discountsLeft":0,"createdAt":"2026-03-06T18:01:35.085Z"}
+0|nexttour | 9:58:26 AM [express] GET /api/currencies 304 in 9ms :: [{"id":"03c627ae-de20-4d62-a9c3-03152c51894a","code":"TJS","symbol":"TJS","nameRu":"Сомони","nameEn":"Somoni","rateToBase":"1.0000","isBase":true,"isActive":true,"sortOrder":0},{"id":"02afba4a-4387-4b21-8545-d8933f80d1ac","code":"USD","symbol":"$","nameRu":"Доллар США","nameEn":"US Dollar","rateToBase":"10.8900","isBase":false,"isActive":true,"sortOrder":1},{"id":"8930e3ff-cedf-434e-bcea-44f60e9c9b2e","code":"EUR","symbol":"€","nameRu":"Евро","nameEn":"Euro","rateToBase":"11.8500","isBase":false,"isActive":true,"sortOrder":2},{"id":"bab68ec7-0c5f-47cf-a62f-d64c5e912ec9","code":"RUB","symbol":"₽","nameRu":"Рубль","nameEn":"Ruble","rateToBase":"0.1300","isBase":false,"isActive":true,"sortOrder":3}]
+0|nexttour | 9:58:26 AM [express] GET /api/tours 304 in 7ms :: []
+0|nexttour | 9:58:26 AM [express] GET /api/countries 304 in 11ms :: [{"id":"b238150d-1115-4f25-bb69-fea81b4979f8","nameRu":"Франция","nameEn":"France","imageUrl":"/uploads/1773066390754-axewpiqzlje.mp4","countryCode":"FR","tagsRu":["Романтика","Искусство","Кухня"],"tagsEn":["Romance","Art","Cuisine"],"cardSize":"wide","showOnHome":false},{"id":"2a1ef1f5-cbb1-4efe-ae64-3f07d2d0e940","nameRu":"Греция","nameEn":"Greece","imageUrl":"/uploads/1773063641217-5qsyanwh7av.mp4","countryCode":"GR","tagsRu":["Острова","Архитектура","Закаты"],"tagsEn":["Islands","Architecture","Sunsets"],"cardSize":"normal","showOnHome":false},{"id":"65b36981-4d71-41d5-b601-402d67816fa6","nameRu":"Индонезия","nameEn":"Indonesia","imageUrl":"/images/tour-bali.png","countryCode":"ID","tagsRu":["Тропики","Культура","Сёрфинг"],"tagsEn":["Tropics","Culture","Surfing"],"cardSize":"normal","showOnHome":false},{"id":"2fa4b10f-04b7-4605-bcaa-54c46bfad7b1","nameRu":"Япония","nameEn":"Japan","imageUrl":"/images/tour-tokyo.png","countryCode":"JP","tagsRu":["Культура","Сакура","Кухня"],"tagsEn":["Culture","Cherry Blossoms","Cuisine"],"cardSize":"normal","showOnHome":false},{"id":"7d72c8e9-6115-44db-922f-adf3264f69d7","nameRu":"Мальдивы","nameEn":"Maldives","imageUrl":"/images/tour-maldives.png","countryCode":"MV","tagsRu":["Пляжи","Острова","Кораллы"],"tagsEn":["Beaches","Islands","Corals"],"cardSize":"normal","showOnHome":false},{"id":"12a16b6b-e8c5-4a1f-b1b3-6e63fd5711d5","nameRu":"Перу","nameEn":"Peru","imageUrl":"/images/tour-peru.png","countryCode":null,"tagsRu":null,"tagsEn":null,"cardSize":"normal","showOnHome":false},{"id":"26591d55-4360-41a0-bfd7-50f291bb6e0f","nameRu":"Швейцария","nameEn":"Switzerland","imageUrl":"/uploads/1773063804194-72m6vfxly5u.mp4","countryCode":"CH","tagsRu":["Горы","Природа","Люкс"],"tagsEn":["Mountains","Nature","Luxury"],"cardSize":"full","showOnHome":false},{"id":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Таджикистан","nameEn":"Tajikistan","imageUrl":"/uploads/1774859735714-9th3i2z9di.mp4","countryCode":"TJ","tagsRu":["Природа","Культура","История"],"tagsEn":["Nature","Culture","History"],"cardSize":"normal","showOnHome":true}]
+0|nexttour | 9:58:26 AM [express] GET /api/categories 304 in 11ms :: [{"id":"98a58cc1-e353-469d-a292-f122a582212f","nameRu":"Приключения","nameEn":"Adventures"},{"id":"4bfc4c72-2f87-4d49-961d-3914101052d7","nameRu":"Пляжный отдых","nameEn":"Beach"},{"id":"cfb172d7-6613-4076-82ea-7e8556f455f3","nameRu":"Культура и история","nameEn":"Culture & History"},{"id":"9674b9b3-66e9-49d9-8134-06458353248e","nameRu":"Горы","nameEn":"Mountains"},{"id":"908cd3c8-ac00-4241-a91f-a01ed817953a","nameRu":"Романтика","nameEn":"Romance"},{"id":"47fc6f1d-09c3-401c-8685-d44e7301388b","nameRu":"однодневный тур","nameEn":"one day tour"}]
+0|nexttour | 9:58:26 AM [express] GET /api/cities 304 in 5ms :: [{"id":"2b105fd6-576a-4f64-a5dd-3ac9023b803f","countryId":"65b36981-4d71-41d5-b601-402d67816fa6","nameRu":"Бали","nameEn":"Bali","imageUrl":null},{"id":"573f6d64-c5e1-4b78-8cba-fdd603766e19","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Душанбе","nameEn":"Dushanbe","imageUrl":null},{"id":"a3e0fb0f-ca95-42e6-b745-90c495134b74","countryId":"26591d55-4360-41a0-bfd7-50f291bb6e0f","nameRu":"Женева","nameEn":"Geneva","imageUrl":null},{"id":"ead7ec54-b088-467b-9d25-a17ece1224d8","countryId":"2fa4b10f-04b7-4605-bcaa-54c46bfad7b1","nameRu":"Киото","nameEn":"Kyoto","imageUrl":null},{"id":"f206213c-6797-4aa3-8cb8-f5dc4fcc3737","countryId":"12a16b6b-e8c5-4a1f-b1b3-6e63fd5711d5","nameRu":"Лима","nameEn":"Lima","imageUrl":null},{"id":"46a21180-30b2-45e6-a5fa-44845225c20c","countryId":"7d72c8e9-6115-44db-922f-adf3264f69d7","nameRu":"Мале","nameEn":"Male","imageUrl":null},{"id":"1295200c-bd7b-4c9e-bb81-7f9b4e7979ec","countryId":"b238150d-1115-4f25-bb69-fea81b4979f8","nameRu":"Париж","nameEn":"Paris","imageUrl":null},{"id":"27948356-9ad8-469a-b380-36b567b1690e","countryId":"2a1ef1f5-cbb1-4efe-ae64-3f07d2d0e940","nameRu":"Санторини","nameEn":"Santorini","imageUrl":null},{"id":"b40fe296-12f3-4a81-9533-9d4881fffa5c","countryId":"2fa4b10f-04b7-4605-bcaa-54c46bfad7b1","nameRu":"Токио","nameEn":"Tokyo","imageUrl":null}]
+0|nexttour | [seed] Database already seeded, skipping.
+0|nexttour | 10:29:45 AM [express] serving on port 3000
+0|nexttour | [seed] Database already seeded, skipping.
+0|nexttour | 10:30:41 AM [express] serving on port 3000
+
+0|nexttour  | [seed] Database already seeded, skipping.
+0|nexttour  | 10:31:51 AM [express] serving on port 3000
