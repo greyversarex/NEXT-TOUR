@@ -3,9 +3,9 @@ import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  LayoutDashboard, Map, Building2, Tag, Image, Layers,
+  LayoutDashboard, Map, Tag, Image, Layers,
   Users, BookOpen, MessageSquare, Newspaper,
-  PlusCircle, ChevronRight, Settings, Globe, BarChart3,
+  ChevronRight, Globe, BarChart3,
   Award, Monitor, Coins, Mail
 } from "lucide-react";
 
@@ -14,8 +14,7 @@ const navItems = [
   { href: "/admin/statistics", label: "Statistics", labelRu: "Статистика", icon: BarChart3 },
   { href: "/admin/loyalty", label: "Loyalty Program", labelRu: "Программа лояльности", icon: Award },
   { href: "/admin/tours", label: "Tours", labelRu: "Туры", icon: Globe },
-  { href: "/admin/countries", label: "Countries", labelRu: "Страны", icon: Map },
-  { href: "/admin/cities", label: "Cities", labelRu: "Города", icon: Building2 },
+  { href: "/admin/countries", label: "Countries & Cities", labelRu: "Страны и города", icon: Map },
   { href: "/admin/categories", label: "Categories", labelRu: "Категории", icon: Tag },
   { href: "/admin/banners", label: "Banners", labelRu: "Баннеры", icon: Image },
   { href: "/admin/feeds", label: "Tour Feeds", labelRu: "Ленты", icon: Layers },

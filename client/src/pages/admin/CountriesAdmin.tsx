@@ -57,7 +57,17 @@ export default function CountriesAdmin() {
 
   const deleteCountryMutation = useMutation({
     mutationFn: (id: string) => apiRequest("DELETE", `/api/countries/${id}`, {}),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/countries"] }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/countries"] }); toast({ title: t("Страна удалена", "Country deleted") }); },
+    onError: (err: any) => {
+      const msg = err?.message || "";
+      toast({
+        title: t("Нельзя удалить", "Cannot delete"),
+        description: msg.includes("foreign key") || msg.includes("referenced")
+          ? t("Сначала удалите или переназначьте все города и туры этой страны.", "First delete or reassign all cities and tours in this country.")
+          : msg,
+        variant: "destructive",
+      });
+    },
   });
 
   const cityMutation = useMutation({
@@ -67,7 +77,17 @@ export default function CountriesAdmin() {
 
   const deleteCityMutation = useMutation({
     mutationFn: (id: string) => apiRequest("DELETE", `/api/cities/${id}`, {}),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/cities"] }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/cities"] }); toast({ title: t("Город удалён", "City deleted") }); },
+    onError: (err: any) => {
+      const msg = err?.message || "";
+      toast({
+        title: t("Нельзя удалить", "Cannot delete"),
+        description: msg.includes("foreign key") || msg.includes("referenced")
+          ? t("Этот город используется в турах. Сначала переназначьте туры на другой город.", "This city is used in tours. First reassign the tours to another city.")
+          : msg,
+        variant: "destructive",
+      });
+    },
   });
 
   return (

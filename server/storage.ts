@@ -341,9 +341,9 @@ export class DatabaseStorage implements IStorage {
     await db.delete(categories).where(eq(categories.id, id));
   }
 
-  async getTours(filters?: { countryId?: string; cityId?: string; categoryId?: string; search?: string; minPrice?: number; maxPrice?: number; duration?: number; isHot?: boolean }) {
-    let q = db.select().from(tours).where(eq(tours.isActive, true));
-    const conditions = [eq(tours.isActive, true)];
+  async getTours(filters?: { countryId?: string; cityId?: string; categoryId?: string; search?: string; minPrice?: number; maxPrice?: number; duration?: number; isHot?: boolean; includeInactive?: boolean }) {
+    const conditions = [];
+    if (!filters?.includeInactive) conditions.push(eq(tours.isActive, true));
     if (filters?.countryId) conditions.push(eq(tours.countryId, filters.countryId));
     if (filters?.cityId) conditions.push(eq(tours.cityId, filters.cityId));
     if (filters?.categoryId) conditions.push(eq(tours.categoryId, filters.categoryId));
@@ -355,7 +355,8 @@ export class DatabaseStorage implements IStorage {
         ilike(tours.titleEn, `%${filters.search}%`),
       )!);
     }
-    return db.select().from(tours).where(and(...conditions)).orderBy(desc(tours.createdAt));
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+    return db.select().from(tours).where(whereClause).orderBy(desc(tours.createdAt));
   }
 
   async getTour(id: string) {

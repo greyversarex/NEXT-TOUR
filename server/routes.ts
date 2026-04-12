@@ -336,6 +336,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       maxPrice: req.query.maxPrice ? Number(req.query.maxPrice) : undefined,
       duration: req.query.duration ? Number(req.query.duration) : undefined,
       isHot: req.query.isHot === "true",
+      includeInactive: req.query.includeInactive === "true" && req.isAuthenticated() && (req.user as any)?.role === "admin",
     };
     res.json(await storage.getTours(filters));
   });
