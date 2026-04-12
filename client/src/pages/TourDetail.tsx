@@ -675,7 +675,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
   const toPay = paymentType === "prepay" ? totalPrice * 0.3 : totalPrice;
 
   const mutation = useMutation({
-    mutationFn: (data: any) => apiRequest("POST", "/api/bookings", data),
+    mutationFn: (data: any) => apiRequest("POST", "/api/bookings", data).then(res => res.json()),
     onSuccess: (booking: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
       payMutation.mutate({ bookingId: booking.id, gate: payGate });
@@ -687,7 +687,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
 
   const payMutation = useMutation({
     mutationFn: ({ bookingId, gate }: { bookingId: string; gate: string }) =>
-      apiRequest("POST", "/api/payments/initiate", { bookingId, gate }),
+      apiRequest("POST", "/api/payments/initiate", { bookingId, gate }).then(res => res.json()),
     onSuccess: (data: any) => {
       if (data.url) {
         window.location.href = data.url;
