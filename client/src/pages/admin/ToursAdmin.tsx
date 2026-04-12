@@ -29,9 +29,8 @@ export default function ToursAdmin() {
   const [editTour, setEditTour] = useState<Partial<Tour> | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  const { data: tours = [] } = useQuery<Tour[]>({
-    queryKey: ["/api/tours", "admin"],
-    queryFn: () => fetch("/api/tours?includeInactive=true", { credentials: "include" }).then(r => r.json()),
+  const { data: tours = [] } = useQuery<Tour[]>({ queryKey: ["/api/tours", "admin"],
+    queryFn: () => fetch("/api/tours", { credentials: "include" }).then(r => r.json()),
   });
   const { data: countries = [] } = useQuery<Country[]>({ queryKey: ["/api/countries"] });
   const { data: categories = [] } = useQuery<any[]>({ queryKey: ["/api/categories"] });
@@ -41,31 +40,18 @@ export default function ToursAdmin() {
     mutationFn: (id: string) => apiRequest("DELETE", `/api/tours/${id}`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tours", "admin"] });
-      toast({ title: t("Тур скрыт", "Tour hidden") });
-    },
-  });
-
-  const restoreMutation = useMutation({
-    mutationFn: (id: string) => apiRequest("PUT", `/api/tours/${id}`, { isActive: true }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/tours", "admin"] });
-      toast({ title: t("Тур восстановлен", "Tour restored") });
+      queryClient.invalidateQueries({ queryKey: ["/api/tours", "trash"] });
+      toast({ title: t("Тур перемещён в корзину", "Tour moved to trash") });
     },
   });
 
   const openNew = () => { setEditTour({}); setShowForm(true); };
   const openEdit = (tour: Tour) => { setEditTour(tour); setShowForm(true); };
 
-  const activeTours = tours.filter(t => t.isActive);
-  const inactiveTours = tours.filter(t => !t.isActive);
-
   return (
     <AdminLayout title={t("Управление турами", "Tours Management")}>
       <div className="flex justify-between items-center mb-6">
-        <p className="text-sm text-muted-foreground">
-          {t("Активных:", "Active:")} {activeTours.length}
-          {inactiveTours.length > 0 && <span className="ml-2 text-muted-foreground/60">{t("· Скрытых:", "· Hidden:")} {inactiveTours.length}</span>}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("Всего туров:", "Total tours:")} {tours.length}</p>
         <Button onClick={openNew} className="gap-2" data-testid="button-new-tour">
           <Plus className="h-4 w-4" /> {t("Добавить тур", "Add Tour")}
         </Button>
@@ -73,7 +59,7 @@ export default function ToursAdmin() {
 
       <div className="space-y-3">
         {tours.map(tour => (
-          <Card key={tour.id} data-testid={`card-admin-tour-${tour.id}`} className={!tour.isActive ? "opacity-50 border-dashed" : ""}>
+          <Card key={tour.id} data-testid={`card-admin-tour-${tour.id}`}>
             <CardContent className="pt-4">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -91,7 +77,6 @@ export default function ToursAdmin() {
                     <p className="font-medium text-sm truncate">{lang === "ru" ? tour.titleRu : tour.titleEn}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-xs text-muted-foreground">{tour.duration} {t("дн.", "days")} · {Number(tour.basePrice).toFixed(0)} TJS</span>
-                      {!tour.isActive && <Badge variant="outline" className="text-xs py-0 text-muted-foreground">{t("Скрыт", "Hidden")}</Badge>}
                       {tour.isHot && <Badge className="text-xs py-0 bg-orange-100 text-orange-700">{t("Горящий", "Hot")}</Badge>}
                       {tour.discountPercent > 0 && <Badge variant="secondary" className="text-xs py-0">-{tour.discountPercent}%</Badge>}
                     </div>
@@ -104,15 +89,9 @@ export default function ToursAdmin() {
                   <Button variant="ghost" size="icon" onClick={() => openEdit(tour)} data-testid={`button-edit-tour-${tour.id}`}>
                     <Edit className="h-4 w-4" />
                   </Button>
-                  {tour.isActive ? (
-                    <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(tour.id)} className="text-destructive" data-testid={`button-delete-tour-${tour.id}`}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  ) : (
-                    <Button variant="ghost" size="icon" onClick={() => restoreMutation.mutate(tour.id)} className="text-green-600" title={t("Восстановить", "Restore")} data-testid={`button-restore-tour-${tour.id}`}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(tour.id)} className="text-destructive" data-testid={`button-delete-tour-${tour.id}`}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </CardContent>

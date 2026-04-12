@@ -378,6 +378,15 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json({ success: true });
   });
 
+  app.delete("/api/tours/:id/permanent", requireAdmin, async (req, res) => {
+    try {
+      await storage.permanentDeleteTour(req.params.id);
+      res.json({ success: true });
+    } catch (e: any) {
+      res.status(400).json({ message: e.message || "Cannot delete tour" });
+    }
+  });
+
   app.get("/api/tours/:id/categories", async (req, res) => {
     const categoryIds = await storage.getTourCategoryIds(req.params.id);
     res.json({ categoryIds });

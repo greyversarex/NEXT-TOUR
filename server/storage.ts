@@ -391,6 +391,21 @@ export class DatabaseStorage implements IStorage {
     await db.update(tours).set({ isActive: false }).where(eq(tours.id, id));
   }
 
+  async permanentDeleteTour(id: string) {
+    const existingBookings = await db.select({ id: bookings.id }).from(bookings).where(eq(bookings.tourId, id)).limit(1);
+    if (existingBookings.length > 0) {
+      throw new Error("Cannot permanently delete a tour that has bookings. Remove or reassign bookings first.");
+    }
+    await db.delete(favorites).where(eq(favorites.tourId, id));
+    await db.delete(tourFeedItems).where(eq(tourFeedItems.tourId, id));
+    await db.delete(reviews).where(eq(reviews.tourId, id));
+    await db.delete(tourOptions).where(eq(tourOptions.tourId, id));
+    await db.delete(tourPriceComponents).where(eq(tourPriceComponents.tourId, id));
+    await db.delete(tourItinerary).where(eq(tourItinerary.tourId, id));
+    await db.delete(tourDates).where(eq(tourDates.tourId, id));
+    await db.delete(tours).where(eq(tours.id, id));
+  }
+
   async getTourPriceTiers(tourId: string) {
     return db.select().from(tourPriceTiers).where(eq(tourPriceTiers.tourId, tourId)).orderBy(asc(tourPriceTiers.minPeople));
   }
