@@ -90,13 +90,14 @@ export default function UsersAdmin() {
                     </Select>
                     {user.role !== "admin" && (
                       <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        variant="destructive"
+                        size="sm"
+                        className="h-8 text-xs"
                         onClick={() => setDeleteTarget(user)}
                         data-testid={`button-delete-user-${user.id}`}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3.5 w-3.5 mr-1" />
+                        {t("Удалить", "Delete")}
                       </Button>
                     )}
                   </div>
