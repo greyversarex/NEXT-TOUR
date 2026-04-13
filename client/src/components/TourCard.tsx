@@ -185,7 +185,6 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
           <button
             onClick={handleShare}
             className="w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center
-              opacity-0 group-hover/card:opacity-100
               hover:bg-black/60 hover:scale-110 active:scale-95 transition-all duration-200"
             data-testid={`button-share-${tour.id}`}
             title={t("Поделиться", "Share")}
