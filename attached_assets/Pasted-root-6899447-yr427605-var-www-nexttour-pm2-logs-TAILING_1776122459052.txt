@@ -1,0 +1,64 @@
+root@6899447-yr427605:/var/www/nexttour# pm2 logs
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-04-13T23:05:53: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-13T23:05:53: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-13T23:05:53: PM2 log: pid=57417 msg=process killed
+PM2        | 2026-04-13T23:05:53: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-13T23:05:53: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-13T23:09:34: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-13T23:09:34: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-13T23:09:35: PM2 log: pid=57609 msg=process killed
+PM2        | 2026-04-13T23:09:35: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-13T23:09:35: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-13T23:19:31: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-13T23:19:32: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-13T23:19:32: PM2 log: pid=57820 msg=process killed
+PM2        | 2026-04-13T23:19:32: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-13T23:19:32: PM2 log: App [nexttour:0] online
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour | [google oauth] passport error: TokenError: Bad Request
+0|nexttour |     at OAuth2Strategy.parseErrorResponse (/var/www/nexttour/node_modules/passport-oauth2/lib/strategy.js:373:12)
+0|nexttour |     at OAuth2Strategy._createOAuthError (/var/www/nexttour/node_modules/passport-oauth2/lib/strategy.js:420:16)
+0|nexttour |     at /var/www/nexttour/node_modules/passport-oauth2/lib/strategy.js:177:45
+0|nexttour |     at /var/www/nexttour/node_modules/oauth/lib/oauth2.js:196:18
+0|nexttour |     at passBackControl (/var/www/nexttour/node_modules/oauth/lib/oauth2.js:132:9)
+0|nexttour |     at IncomingMessage.<anonymous> (/var/www/nexttour/node_modules/oauth/lib/oauth2.js:157:7)
+0|nexttour |     at IncomingMessage.emit (node:events:536:35)
+0|nexttour |     at endReadableNT (node:internal/streams/readable:1698:12)
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+0|nexttour |   code: 'invalid_grant',
+0|nexttour |   uri: undefined,
+0|nexttour |   status: 500
+0|nexttour | }
+0|nexttour | Error: ENOENT: no such file or directory, stat '/var/www/nexttour/dist/public/index.html'
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | rs. You will stroll through the ancient fortress, where bustling bazaars once thrived and торговые караваны used to stop. You’ll learn how the citadel served as the residence of Bukhara’s governors and a military stronghold. And you’ll imagine what life was like here many centuries ago.","cityId":"573f6d64-c5e1-4b78-8cba-fdd603766e19","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","categoryId":"47fc6f1d-09c3-401c-8685-d44e7301388b","duration":1,"basePrice":"150.00","discountPercent":0,"mainImage":"https://www.advantour.com/img/tajikistan/hissar/hissar-fortress.jpg","mainImagePosition":"50% 50%","images":["/uploads/1774205121447-364dhz2mzmf.jpg"],"imagesMeta":[],"isHot":false,"isFeatured":false,"isActive":true,"includedRu":"Транспорт\nГид \nОбед\nВходные билеты","includedEn":"Transportation\nGuide\nLunch\nEntrance fees","notIncludedRu":"Страховка \nЛичные расходы ","notIncludedEn":"Insurance\nPersonal expenses","mapUrl":"","customDatesTextRu":"Даты по желанию","customDatesTextEn":"Flexible dates","createdAt":"2026-04-12T22:14:52.874Z"}]
+0|nexttour | 11:19:48 PM [express] GET /api/currencies 200 in 36ms :: [{"id":"03c627ae-de20-4d62-a9c3-03152c51894a","code":"TJS","symbol":"TJS","nameRu":"Сомони","nameEn":"Somoni","rateToBase":"1.0000","isBase":true,"isActive":true,"sortOrder":0},{"id":"02afba4a-4387-4b21-8545-d8933f80d1ac","code":"USD","symbol":"$","nameRu":"Доллар США","nameEn":"US Dollar","rateToBase":"10.8900","isBase":false,"isActive":true,"sortOrder":1},{"id":"8930e3ff-cedf-434e-bcea-44f60e9c9b2e","code":"EUR","symbol":"€","nameRu":"Евро","nameEn":"Euro","rateToBase":"11.8500","isBase":false,"isActive":true,"sortOrder":2},{"id":"bab68ec7-0c5f-47cf-a62f-d64c5e912ec9","code":"RUB","symbol":"₽","nameRu":"Рубль","nameEn":"Ruble","rateToBase":"0.1300","isBase":false,"isActive":true,"sortOrder":3}]
+0|nexttour | 11:19:48 PM [express] GET /api/auth/providers 200 in 5ms :: {"google":true,"facebook":false,"mailru":false}
+0|nexttour | 11:20:02 PM [express] POST /api/bookings 200 in 99ms :: {"id":"2c16427b-179b-4d0e-8f26-a445581399f8","userId":"ad568552-531b-46d6-9caf-f45774eef09d","guestName":null,"guestEmail":null,"guestPhone":null,"tourId":"c737b66e-cf3e-41c7-928b-ba275765ed77","tourDateId":null,"adults":1,"children":0,"selectedOptions":[],"totalPrice":"1400.00","paidAmount":"0.00","paymentType":"full","bookingStatus":"new","notes":null,"createdAt":"2026-04-13T23:20:02.226Z"}
+0|nexttour | [alif] Initiating: orderId=1776122402435 amount=1400.00 gate=korti_milli
+0|nexttour | [alif] API HTTP 403: <html>
+0|nexttour | <head><title>403 Forbidden</title></head>
+0|nexttour | <body>
+0|nexttour | <center><h1>403 Forbidden</h1></center>
+0|nexttour | </body>
+0|nexttour | </html>
+0|nexttour |
+0|nexttour | [alif] API failed (403), falling back to form
+0|nexttour | 11:20:02 PM [express] POST /api/payments/initiate 200 in 217ms
+0|nexttour | [email] Sent "NEXT TOUR — Бронирование тура: Жемчужина Таджикистана – Гиссарская крепость (копия)" to admin@travelpro.ru
+
+^C
+root@6899447-yr427605:/var/www/nexttour# grep -E "ALIF" /var/www/nexttour/.env
+ALIF_TERMINAL_ID=602005
+ALIF_TERMINAL_PASSWORD=CSzgVpxdzR1GELYrhL50
+ALIF_TEST_MODE=false
+root@6899447-yr427605:/var/www/nexttour# pm2 logs nexttour --lines 50 | grep -E "\[alif\]|payments"
+0|nexttour | [alif] initiateAlifPayment error: Alif API returned non-JSON (HTTP 403): <html>
+0|nexttour | [alif] Initiating: orderId=1776122402435 amount=1400.00 gate=korti_milli
+0|nexttour | [alif] API HTTP 403: <html>
+0|nexttour | [alif] API failed (403), falling back to form
+0|nexttour | 11:20:02 PM [express] POST /api/payments/initiate 200 in 217ms
