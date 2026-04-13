@@ -27,11 +27,14 @@ export function ImageUpload({ value, onChange, placeholder = "https://...", clas
       const fd = new FormData();
       fd.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: fd, credentials: "include" });
-      if (!res.ok) throw new Error("Upload failed");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || "Не удалось загрузить файл");
+      }
       const { url } = await res.json();
       onChange(url);
-    } catch {
-      toast({ title: "Ошибка загрузки", description: "Не удалось загрузить файл", variant: "destructive" });
+    } catch (err: any) {
+      toast({ title: "Ошибка загрузки", description: err.message || "Не удалось загрузить файл", variant: "destructive" });
     } finally {
       setUploading(false);
     }

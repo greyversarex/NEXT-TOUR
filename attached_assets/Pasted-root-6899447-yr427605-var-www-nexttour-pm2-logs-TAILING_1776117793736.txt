@@ -1,0 +1,41 @@
+root@6899447-yr427605:/var/www/nexttour# pm2 logs
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-04-12T22:48:44: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-12T22:48:45: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-12T22:48:45: PM2 log: pid=40583 msg=process killed
+PM2        | 2026-04-12T22:48:45: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-12T22:48:45: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-13T21:50:35: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-13T21:50:36: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-13T21:50:36: PM2 log: pid=41307 msg=process killed
+PM2        | 2026-04-13T21:50:36: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-13T21:50:36: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-13T21:58:52: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-13T21:58:52: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-13T21:58:52: PM2 log: pid=56006 msg=process killed
+PM2        | 2026-04-13T21:58:52: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-13T21:58:52: PM2 log: App [nexttour:0] online
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour | [google oauth] passport error: TokenError: Bad Request
+0|nexttour |     at OAuth2Strategy.parseErrorResponse (/var/www/nexttour/node_modules/passport-oauth2/lib/strategy.js:373:12)
+0|nexttour |     at OAuth2Strategy._createOAuthError (/var/www/nexttour/node_modules/passport-oauth2/lib/strategy.js:420:16)
+0|nexttour |     at /var/www/nexttour/node_modules/passport-oauth2/lib/strategy.js:177:45
+0|nexttour |     at /var/www/nexttour/node_modules/oauth/lib/oauth2.js:196:18
+0|nexttour |     at passBackControl (/var/www/nexttour/node_modules/oauth/lib/oauth2.js:132:9)
+0|nexttour |     at IncomingMessage.<anonymous> (/var/www/nexttour/node_modules/oauth/lib/oauth2.js:157:7)
+0|nexttour |     at IncomingMessage.emit (node:events:536:35)
+0|nexttour |     at endReadableNT (node:internal/streams/readable:1698:12)
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+0|nexttour |   code: 'invalid_grant',
+0|nexttour |   uri: undefined,
+0|nexttour |   status: 500
+0|nexttour | }
+0|nexttour | Error: ENOENT: no such file or directory, stat '/var/www/nexttour/dist/public/index.html'
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | iss.png"],"imagesMeta":null,"isHot":false,"isFeatured":false,"isActive":false,"includedRu":"Авиаперелёт Москва-Осака-Москва\nПроживание в рёкане 8 ночей\nЗавтраки ежедневно\nЧайная церемония","includedEn":"Round trip flights\n8 nights in ryokan\nDaily breakfasts\nTea ceremony","notIncludedRu":"Страховка\nОбеды и ужины\nЛичные расходы","notIncludedEn":"Insurance\nLunches and dinners\nPersonal expenses","mapUrl":null,"customDatesTextRu":null,"customDatesTextEn":null,"createdAt":"2026-03-06T18:01:35.299Z"},{"id":"0af41af7-b393-40f3-89f8-fda40717aa84","titleRu":"Экзотический Бали","titleEn":"Exotic Bali","descriptionRu":"Бали — остров богов, где уникальная культура встречается с тропической природой. Рисовые террасы, храмы, сёрфинг, спа-процедуры и великолепная кухня ждут вас на этом волшебном острове.","descriptionEn":"Bali — the island of gods, where unique culture meets tropical nature. Rice terraces, temples, surfing, spa treatments and superb cuisine await you on this magical island.","cityId":null,"countryId":"65b36981-4d71-41d5-b601-402d67816fa6","categoryId":"4bfc4c72-2f87-4d49-961d-3914101052d7","duration":10,"basePrice":"1490.00","discountPercent":15,"mainImage":"/images/tour-bali.png","mainImagePosition":"50% 50%","images":["/images/tour-bali.png","/images/tour-maldives.png","/images/hero-banner.png"],"imagesMeta":null,"isHot":true,"isFeatured":true,"isActive":false,"includedRu":"Авиаперелёт Москва-Денпасар-Москва\nПроживание на вилле 10 ночей\nЗавтраки и ужины\nТрансфер\nЭкскурсия на Убуд","includedEn":"Round trip flights\n10 nights villa stay\nBreakfasts and dinners\nTransfers\nUbud tour","notIncludedRu":"Виза по прилёту ($35)\nСтраховка\nЛичные расходы","notIncludedEn":"Visa on arrival ($35)\nInsurance\nPersonal expenses","mapUrl":"","customDatesTextRu":null,"customDatesTextEn":null,"createdAt":"2026-03-06T18:01:35.299Z"}]
+0|nexttour | 10:00:42 PM [express] GET /api/tours/c737b66e-cf3e-41c7-928b-ba275765ed77/categories 200 in 32ms :: {"categoryIds":["47fc6f1d-09c3-401c-8685-d44e7301388b"]}
+0|nexttour | 10:00:43 PM [express] GET /api/tours/c737b66e-cf3e-41c7-928b-ba275765ed77/price-tiers 200 in 19ms :: [{"id":"31e808b0-e5d8-4bd3-a75d-89d4fd8aec1f","tourId":"c737b66e-cf3e-41c7-928b-ba275765ed77","minPeople":1,"maxPeople":null,"pricePerPerson":"1400.00","labelRu":null,"labelEn":null},{"id":"ec6f37f5-e8f1-493d-8a55-89d442f576b1","tourId":"c737b66e-cf3e-41c7-928b-ba275765ed77","minPeople":2,"maxPeople":3,"pricePerPerson":"700.00","labelRu":null,"labelEn":null}]
+0|nexttour | 10:02:28 PM [express] POST /api/upload 200 in 38ms :: {"url":"/uploads/1776117748644-96q8pmry8qw.png"}

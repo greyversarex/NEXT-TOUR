@@ -215,6 +215,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
     setUploadingGallery(true);
     try {
       const uploaded: string[] = [];
+      const failed: string[] = [];
       for (const file of Array.from(files)) {
         const fd = new FormData();
         fd.append("file", file);
@@ -222,13 +223,19 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
         if (res.ok) {
           const { url } = await res.json();
           uploaded.push(url);
+        } else {
+          const data = await res.json().catch(() => ({}));
+          failed.push(`${file.name}: ${data.message || "ошибка"}`);
         }
       }
       if (uploaded.length) {
         setForm(p => ({ ...p, images: [...p.images, ...uploaded] }));
       }
-    } catch {
-      toast({ title: "Ошибка загрузки", variant: "destructive" });
+      if (failed.length) {
+        toast({ title: `Не удалось загрузить ${failed.length} файл(ов)`, description: failed.join("\n"), variant: "destructive" });
+      }
+    } catch (err: any) {
+      toast({ title: "Ошибка загрузки", description: err.message, variant: "destructive" });
     } finally {
       setUploadingGallery(false);
     }

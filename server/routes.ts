@@ -905,15 +905,21 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       },
     }),
     fileFilter: (_req, file, cb) => {
-      const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif", "video/mp4", "video/quicktime", "video/webm"];
-      cb(null, allowed.includes(file.mimetype));
+      if (file.mimetype.startsWith("image/") || ["video/mp4", "video/quicktime", "video/webm"].includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error(`Неподдерживаемый тип файла: ${file.mimetype}`));
+      }
     },
     limits: { fileSize: 200 * 1024 * 1024 },
   });
 
-  app.post("/api/upload", requireAuth, upload.single("file"), (req, res) => {
-    if (!req.file) return res.status(400).json({ message: "No file uploaded or invalid type" });
-    res.json({ url: `/uploads/${req.file.filename}` });
+  app.post("/api/upload", requireAuth, (req, res, next) => {
+    upload.single("file")(req, res, (err) => {
+      if (err) return res.status(400).json({ message: err.message || "Upload error" });
+      if (!req.file) return res.status(400).json({ message: "Файл не загружен или неподдерживаемый тип" });
+      res.json({ url: `/uploads/${req.file.filename}` });
+    });
   });
 
   // Analytics
