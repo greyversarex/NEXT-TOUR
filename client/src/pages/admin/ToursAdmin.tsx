@@ -443,7 +443,6 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
                   </div>
                 </div>
 
-                <div><Label>{t("Ссылка на карту (iframe URL)", "Map URL (iframe)")}</Label><Input value={form.mapUrl} onChange={e => set("mapUrl", e.target.value)} className="mt-1" placeholder="https://www.google.com/maps/embed?..." /></div>
                 <div className="grid grid-cols-2 gap-4">
                   <div><Label>{t("Включено (RU)", "Included (RU)")}</Label><Textarea value={form.includedRu} onChange={e => set("includedRu", e.target.value)} className="mt-1" placeholder={t("Каждый пункт на новой строке", "One item per line")} /></div>
                   <div><Label>{t("Включено (EN)", "Included (EN)")}</Label><Textarea value={form.includedEn} onChange={e => set("includedEn", e.target.value)} className="mt-1" placeholder="One item per line" /></div>
