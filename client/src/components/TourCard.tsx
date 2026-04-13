@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Clock, Heart, ArrowRight, MapPin, Settings2, Check } from "lucide-react";
+import { Clock, Heart, ArrowRight, MapPin, Settings2, Check, Share2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
 import { useAuth } from "@/lib/auth";
@@ -78,6 +78,8 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
   const cityName = city ? (lang === "ru" ? city.nameRu : city.nameEn) : null;
   const locationLabel = [cityName, countryName].filter(Boolean).join(", ");
 
+  const [copied, setCopied] = useState(false);
+
   const favMutation = useMutation({
     mutationFn: () => apiRequest("POST", `/api/favorites/${tour.id}`, {}),
     onSuccess: (data: any) => {
@@ -92,6 +94,21 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
     e.stopPropagation();
     if (!user) return;
     favMutation.mutate();
+  };
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = `${window.location.origin}/tours/${tour.id}`;
+    const shareTitle = lang === "ru" ? tour.titleRu : tour.titleEn;
+    if (navigator.share) {
+      navigator.share({ title: shareTitle, url }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+    }
   };
 
   return (
@@ -165,6 +182,19 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
               <Settings2 className="w-3.5 h-3.5" />
             </button>
           )}
+          <button
+            onClick={handleShare}
+            className="w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center
+              opacity-0 group-hover/card:opacity-100
+              hover:bg-black/60 hover:scale-110 active:scale-95 transition-all duration-200"
+            data-testid={`button-share-${tour.id}`}
+            title={t("Поделиться", "Share")}
+          >
+            {copied
+              ? <Check className="h-3.5 w-3.5 text-green-400" />
+              : <Share2 className="h-3.5 w-3.5 text-white" />
+            }
+          </button>
           {user && (
             <button
               onClick={handleFavorite}
