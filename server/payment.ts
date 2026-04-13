@@ -138,10 +138,10 @@ export async function initiateAlifPayment(params: PaymentParams): Promise<AlifPa
   const formData: Record<string, string> = {
     key: TERMINAL_ID,
     token,
-    orderId,
+    order_id: orderId,
     amount: amountStr,
-    callbackUrl,
-    returnUrl,
+    callback_url: callbackUrl,
+    return_url: returnUrl,
     gate,
   };
   if (info) formData.info = info;
