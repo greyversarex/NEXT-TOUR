@@ -2,8 +2,11 @@ import crypto from "crypto";
 
 const TERMINAL_ID = process.env.ALIF_TERMINAL_ID || "";
 const TERMINAL_PASSWORD = process.env.ALIF_TERMINAL_PASSWORD || "";
+const TEST_MODE = process.env.ALIF_TEST_MODE === "true";
 
-const ALIF_API_URL = "https://acquiring.alif.tj";
+const ALIF_API_URL = TEST_MODE
+  ? "https://test.acquiring.alif.tj"
+  : "https://acquiring.alif.tj";
 
 function hmacSha256(secret: string, data: string): string {
   return crypto.createHmac("sha256", secret).update(data).digest("hex");
@@ -102,7 +105,7 @@ export async function initiateAlifPayment(params: PaymentParams): Promise<AlifPa
   if (email) apiBody.email = email;
   if (phone) apiBody.phone = phone;
 
-  console.log(`[alif] Initiating: orderId=${orderId} amount=${amountStr} gate=${gate}`);
+  console.log(`[alif] Initiating: orderId=${orderId} amount=${amountStr} gate=${gate} mode=${TEST_MODE ? "TEST" : "PROD"}`);
 
   try {
     const response = await fetch(`${ALIF_API_URL}/v2/`, {
