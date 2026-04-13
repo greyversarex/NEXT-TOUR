@@ -1,0 +1,41 @@
+[TAILING] Tailing last 15 lines for [all] processes (change the value with --lines option)
+/root/.pm2/pm2.log last 15 lines:
+PM2        | 2026-04-13T22:11:58: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-13T22:11:58: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-13T22:11:58: PM2 log: pid=56535 msg=process killed
+PM2        | 2026-04-13T22:11:58: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-13T22:11:58: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-13T22:37:37: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-13T22:37:37: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-13T22:37:37: PM2 log: pid=56609 msg=process killed
+PM2        | 2026-04-13T22:37:37: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-13T22:37:37: PM2 log: App [nexttour:0] online
+PM2        | 2026-04-13T22:58:33: PM2 log: Stopping app:nexttour id:0
+PM2        | 2026-04-13T22:58:33: PM2 log: App [nexttour:0] exited with code [0] via signal [SIGINT]
+PM2        | 2026-04-13T22:58:33: PM2 log: pid=56950 msg=process killed
+PM2        | 2026-04-13T22:58:34: PM2 log: App [nexttour:0] starting in -fork mode-
+PM2        | 2026-04-13T22:58:34: PM2 log: App [nexttour:0] online
+
+/root/.pm2/logs/nexttour-error.log last 15 lines:
+0|nexttour | [google oauth] passport error: TokenError: Bad Request
+0|nexttour |     at OAuth2Strategy.parseErrorResponse (/var/www/nexttour/node_modules/passport-oauth2/lib/strategy.js:373:12)
+0|nexttour |     at OAuth2Strategy._createOAuthError (/var/www/nexttour/node_modules/passport-oauth2/lib/strategy.js:420:16)
+0|nexttour |     at /var/www/nexttour/node_modules/passport-oauth2/lib/strategy.js:177:45
+0|nexttour |     at /var/www/nexttour/node_modules/oauth/lib/oauth2.js:196:18
+0|nexttour |     at passBackControl (/var/www/nexttour/node_modules/oauth/lib/oauth2.js:132:9)
+0|nexttour |     at IncomingMessage.<anonymous> (/var/www/nexttour/node_modules/oauth/lib/oauth2.js:157:7)
+0|nexttour |     at IncomingMessage.emit (node:events:536:35)
+0|nexttour |     at endReadableNT (node:internal/streams/readable:1698:12)
+0|nexttour |     at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+0|nexttour |   code: 'invalid_grant',
+0|nexttour |   uri: undefined,
+0|nexttour |   status: 500
+0|nexttour | }
+0|nexttour | Error: ENOENT: no such file or directory, stat '/var/www/nexttour/dist/public/index.html'
+
+/root/.pm2/logs/nexttour-out.log last 15 lines:
+0|nexttour | ameRu":"Индонезия","nameEn":"Indonesia","imageUrl":"/images/tour-bali.png","countryCode":"ID","tagsRu":["Тропики","Культура","Сёрфинг"],"tagsEn":["Tropics","Culture","Surfing"],"cardSize":"normal","showOnHome":false},{"id":"2fa4b10f-04b7-4605-bcaa-54c46bfad7b1","nameRu":"Япония","nameEn":"Japan","imageUrl":"/images/tour-tokyo.png","countryCode":"JP","tagsRu":["Культура","Сакура","Кухня"],"tagsEn":["Culture","Cherry Blossoms","Cuisine"],"cardSize":"normal","showOnHome":false},{"id":"7d72c8e9-6115-44db-922f-adf3264f69d7","nameRu":"Мальдивы","nameEn":"Maldives","imageUrl":"/images/tour-maldives.png","countryCode":"MV","tagsRu":["Пляжи","Острова","Кораллы"],"tagsEn":["Beaches","Islands","Corals"],"cardSize":"normal","showOnHome":false},{"id":"12a16b6b-e8c5-4a1f-b1b3-6e63fd5711d5","nameRu":"Перу","nameEn":"Peru","imageUrl":"/images/tour-peru.png","countryCode":null,"tagsRu":null,"tagsEn":null,"cardSize":"normal","showOnHome":false},{"id":"26591d55-4360-41a0-bfd7-50f291bb6e0f","nameRu":"Швейцария","nameEn":"Switzerland","imageUrl":"/uploads/1773063804194-72m6vfxly5u.mp4","countryCode":"CH","tagsRu":["Горы","Природа","Люкс"],"tagsEn":["Mountains","Nature","Luxury"],"cardSize":"full","showOnHome":false},{"id":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Таджикистан","nameEn":"Tajikistan","imageUrl":"/uploads/1774859735714-9th3i2z9di.mp4","countryCode":"TJ","tagsRu":["Природа","Культура","История"],"tagsEn":["Nature","Culture","History"],"cardSize":"normal","showOnHome":true}]
+0|nexttour | 11:00:30 PM [express] GET /api/intro-screen 200 in 3ms :: {"id":"f322a793-1396-4bbb-9d1c-4c2a5626f816","titleRu":"NEXT TOUR","titleEn":"NEXT TOUR","sloganRu":"Открой мир востока","sloganEn":"Discover the World","videoUrl":"https://www.orexca.com/img/tajikistan/dushanbe.jpg","isActive":true}
+0|nexttour | 11:00:30 PM [express] GET /api/settings/home-layout 200 in 3ms :: ["popular","feed:5bf920af-a56e-40de-aacd-bd0e886bb764","reviews","hot","destinations"]
+0|nexttour | 11:00:31 PM [express] GET /api/currencies 200 in 3ms :: [{"id":"03c627ae-de20-4d62-a9c3-03152c51894a","code":"TJS","symbol":"TJS","nameRu":"Сомони","nameEn":"Somoni","rateToBase":"1.0000","isBase":true,"isActive":true,"sortOrder":0},{"id":"02afba4a-4387-4b21-8545-d8933f80d1ac","code":"USD","symbol":"$","nameRu":"Доллар США","nameEn":"US Dollar","rateToBase":"10.8900","isBase":false,"isActive":true,"sortOrder":1},{"id":"8930e3ff-cedf-434e-bcea-44f60e9c9b2e","code":"EUR","symbol":"€","nameRu":"Евро","nameEn":"Euro","rateToBase":"11.8500","isBase":false,"isActive":true,"sortOrder":2},{"id":"bab68ec7-0c5f-47cf-a62f-d64c5e912ec9","code":"RUB","symbol":"₽","nameRu":"Рубль","nameEn":"Ruble","rateToBase":"0.1300","isBase":false,"isActive":true,"sortOrder":3}]
+0|nexttour | 11:00:31 PM [express] GET /api/auth/providers 200 in 1ms :: {"google":true,"facebook":false,"mailru":false}
