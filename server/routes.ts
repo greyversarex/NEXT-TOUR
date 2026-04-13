@@ -11,7 +11,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import path from "path";
 import { sendPasswordResetEmail, sendWelcomeEmail, sendBookingConfirmationEmail, sendBulkEmail, sendVerificationEmail } from "./email";
-import { initiateAlifPayment, checkAlifTransaction } from "./payment";
+import { initiateAlifPayment, checkAlifTransaction, verifyCallbackToken, normalizeAlifStatus } from "./payment";
 import multer from "multer";
 import { storage } from "./storage";
 import {
@@ -1140,53 +1140,72 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   app.post("/api/payments/callback", async (req, res) => {
     try {
       const body = req.body || {};
-      const query = req.query || {};
 
-      const orderId = body.orderId || body.order_id || body.orderid
-        || query.orderId || query.order_id;
-      const status = body.status || body.Status || body.STATUS
-        || query.status || query.Status;
+      const orderId = String(body.orderId || body.order_id || "");
+      const rawStatus = body.status || body.Status || body.STATUS;
       const transactionId = body.transactionId || body.transaction_id;
-      const amount = body.amount || body.Amount;
+      const callbackToken = body.token || body.Token;
+      const rawAmount = body.amount || body.Amount;
 
-      console.log(`[alif] Callback received: orderId=${orderId} status=${status} txn=${transactionId} body=${JSON.stringify(body)}`);
+      console.log(`[alif] Callback: orderId=${orderId} status=${rawStatus} txn=${transactionId} body=${JSON.stringify(body)}`);
 
-      if (!orderId) return res.status(200).send("OK");
+      if (!orderId) {
+        console.warn("[alif] Callback missing orderId, ignoring");
+        return res.status(200).send("OK");
+      }
 
-      const payment = await storage.getAlifPaymentByOrderId(String(orderId));
+      const payment = await storage.getAlifPaymentByOrderId(orderId);
       if (!payment) {
         console.warn(`[alif] Payment not found for orderId=${orderId}`);
         return res.status(200).send("OK");
       }
 
-      const normalizedStatus = status ? String(status).toLowerCase().trim() : "";
-      const successStatuses = ["ok", "success", "paid", "charged", "complete", "completed", "1", "true"];
-      const failStatuses = ["fail", "failed", "error", "declined", "rejected", "cancel", "cancelled", "canceled", "0", "false"];
+      const appUrl = process.env.APP_URL || getAppBaseUrl(req);
+      const callbackUrl = `${appUrl}/api/payments/callback`;
 
-      const isSuccess = successStatuses.includes(normalizedStatus);
-      const isFail = failStatuses.includes(normalizedStatus);
-      const treatAsSuccess = isSuccess || (!isSuccess && !isFail);
+      if (callbackToken) {
+        const amountStr = rawAmount != null
+          ? Number(rawAmount).toFixed(2)
+          : Number(payment.amount).toFixed(2);
+        const isValid = verifyCallbackToken(orderId, amountStr, callbackUrl, String(callbackToken));
+        if (!isValid) {
+          console.error(`[alif] Callback token verification FAILED for orderId=${orderId}`);
+          return res.status(200).send("OK");
+        }
+        console.log(`[alif] Callback token verified OK`);
+      } else {
+        console.warn(`[alif] Callback has no token — skipping verification for orderId=${orderId}`);
+      }
 
-      const finalStatus = treatAsSuccess ? "ok" : "failed";
+      const alifStatus = normalizeAlifStatus(rawStatus);
+      console.log(`[alif] Status: raw="${rawStatus}" → normalized="${alifStatus}"`);
+
+      if (alifStatus === null || alifStatus === "pending") {
+        console.log(`[alif] Ignoring transient status="${rawStatus}" for orderId=${orderId}`);
+        return res.status(200).send("OK");
+      }
 
       await storage.updateAlifPayment(payment.id, {
-        status: finalStatus as any,
+        status: (alifStatus === "ok" ? "ok" : "failed") as any,
         transactionId: transactionId?.toString(),
         alifResponse: body,
       });
 
-      if (treatAsSuccess) {
+      if (alifStatus === "ok") {
         const booking = await storage.getBooking(payment.bookingId);
         if (booking) {
           const newBookingStatus = booking.paymentType === "prepay" ? "prepaid" : "paid";
+          const paidAmount = rawAmount != null
+            ? Number(rawAmount).toFixed(2)
+            : payment.amount;
           await storage.updateBooking(payment.bookingId, {
             bookingStatus: newBookingStatus as any,
-            paidAmount: amount?.toString() || payment.amount,
+            paidAmount,
           });
+          console.log(`[alif] Payment ${orderId} SUCCESS → booking ${payment.bookingId} → ${newBookingStatus}`);
         }
-        console.log(`[alif] Payment ${orderId} marked as OK`);
       } else {
-        console.log(`[alif] Payment ${orderId} marked as FAILED (status=${status})`);
+        console.log(`[alif] Payment ${orderId} status=${alifStatus} — booking NOT updated`);
       }
 
       res.status(200).send("OK");
@@ -1208,14 +1227,14 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json(payment || null);
   }));
 
-  // Get payment status by orderId (for result page)
-  app.get("/api/payments/order/:orderId", requireAuth, ah(async (req, res) => {
+  // Get payment status by orderId (for result page — guests allowed via orderId)
+  app.get("/api/payments/order/:orderId", ah(async (req, res) => {
     const user = req.user as any;
     const payment = await storage.getAlifPaymentByOrderId(req.params.orderId);
     if (!payment) return res.status(404).json({ message: "Payment not found" });
     const booking = await storage.getBooking(payment.bookingId);
     if (!booking) return res.status(404).json({ message: "Booking not found" });
-    if (user.role !== "admin" && booking.userId !== user.id) {
+    if (user && user.role !== "admin" && booking.userId && booking.userId !== user.id) {
       return res.status(403).json({ message: "Forbidden" });
     }
     res.json({ payment, booking });
