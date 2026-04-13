@@ -28,6 +28,8 @@ export function ImageUpload({ value, onChange, placeholder = "https://...", clas
       fd.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: fd, credentials: "include" });
       if (!res.ok) {
+        if (res.status === 413) throw new Error("Файл слишком большой. Уменьшите размер или сожмите изображение.");
+        if (res.status === 401) throw new Error("Необходимо войти в систему.");
         const data = await res.json().catch(() => ({}));
         throw new Error(data.message || "Не удалось загрузить файл");
       }

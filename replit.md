@@ -93,6 +93,21 @@ Preferred communication style: Simple, everyday language.
 
 ---
 
+## Настройка Nginx на продакшене (Timeweb)
+
+Для корректной работы загрузки файлов в Nginx-конфиге сервера **обязательно** должны быть прописаны эти параметры:
+
+```nginx
+client_max_body_size 200M;
+proxy_read_timeout 300s;
+proxy_connect_timeout 300s;
+proxy_send_timeout 300s;
+```
+
+Без `client_max_body_size 200M` Nginx будет отклонять файлы больше 1MB с ошибкой 413, не доводя запрос до Node.js.
+
+---
+
 ## External Dependencies
 
 | Dependency | Purpose |

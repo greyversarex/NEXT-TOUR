@@ -224,8 +224,12 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
           const { url } = await res.json();
           uploaded.push(url);
         } else {
-          const data = await res.json().catch(() => ({}));
-          failed.push(`${file.name}: ${data.message || "ошибка"}`);
+          if (res.status === 413) {
+            failed.push(`${file.name}: файл слишком большой`);
+          } else {
+            const data = await res.json().catch(() => ({}));
+            failed.push(`${file.name}: ${data.message || "ошибка"}`);
+          }
         }
       }
       if (uploaded.length) {
