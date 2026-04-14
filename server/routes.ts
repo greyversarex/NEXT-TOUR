@@ -1160,14 +1160,10 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         return res.status(200).send("OK");
       }
 
-      const appUrl = process.env.APP_URL || getAppBaseUrl(req);
-      const callbackUrl = `${appUrl}/api/payments/callback`;
-
       if (callbackToken) {
-        const amountStr = rawAmount != null
-          ? Number(rawAmount).toFixed(2)
-          : Number(payment.amount).toFixed(2);
-        const isValid = verifyCallbackToken(orderId, amountStr, callbackUrl, String(callbackToken));
+        const txnId = String(transactionId || "");
+        const status = String(rawStatus || "");
+        const isValid = verifyCallbackToken(orderId, status, txnId, String(callbackToken));
         if (!isValid) {
           console.error(`[alif] Callback token verification FAILED for orderId=${orderId}`);
           return res.status(200).send("OK");
@@ -1250,9 +1246,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     if (user.role !== "admin" && booking.userId !== user.id) {
       return res.status(403).json({ message: "Forbidden" });
     }
-    const baseUrl = getAppBaseUrl(req);
-    const callbackUrl = `${baseUrl}/api/payments/callback`;
-    const result = await checkAlifTransaction({ orderId: payment.orderId, amount: Number(payment.amount), callbackUrl });
+    const result = await checkAlifTransaction({ orderId: payment.orderId });
     res.json(result);
   }));
 

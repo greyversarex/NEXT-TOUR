@@ -8,6 +8,10 @@ const ALIF_API_URL = TEST_MODE
   ? "https://test.acquiring.alif.tj"
   : "https://acquiring.alif.tj";
 
+const ALIF_WEB_URL = TEST_MODE
+  ? "https://test-web.alif.tj"
+  : "https://web.alif.tj";
+
 function hmacSha256(secret: string, data: string): string {
   return crypto.createHmac("sha256", secret).update(data).digest("hex");
 }
@@ -24,13 +28,19 @@ function generateToken(orderId: string, amount: string, callbackUrl: string): st
 
 export function verifyCallbackToken(
   orderId: string,
-  amount: string,
-  callbackUrl: string,
+  status: string,
+  transactionId: string,
   receivedToken: string,
 ): boolean {
   if (!TERMINAL_ID || !TERMINAL_PASSWORD) return false;
-  const expected = generateToken(orderId, amount, callbackUrl);
-  return crypto.timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(receivedToken, "hex"));
+  const hashedPassword = buildHashedPassword();
+  const dataToSign = orderId + status + transactionId;
+  const expected = hmacSha256(hashedPassword, dataToSign);
+  try {
+    return crypto.timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(receivedToken, "hex"));
+  } catch {
+    return false;
+  }
 }
 
 export type AlifStatus =
@@ -156,7 +166,7 @@ export async function initiateAlifPayment(params: PaymentParams): Promise<AlifPa
     .join("\n");
 
   const formHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Переход к оплате...</title></head><body>
-    <form id="alifForm" method="POST" action="https://web.alif.tj/">${fields}</form>
+    <form id="alifForm" method="POST" action="${ALIF_WEB_URL}/">${fields}</form>
     <p style="text-align:center;margin-top:50px;font-family:sans-serif;">Переход к оплате...</p>
     <script>document.getElementById("alifForm").submit();</script>
   </body></html>`;
@@ -166,24 +176,20 @@ export async function initiateAlifPayment(params: PaymentParams): Promise<AlifPa
 
 export interface CheckTxnParams {
   orderId: string;
-  amount: number;
-  callbackUrl: string;
 }
 
 export async function checkAlifTransaction(params: CheckTxnParams): Promise<any> {
-  const { orderId, amount, callbackUrl } = params;
-  const amountStr = amount.toFixed(2);
-  const token = generateToken(orderId, amountStr, callbackUrl);
+  const { orderId } = params;
+  const hashedPassword = buildHashedPassword();
+  const token = hmacSha256(hashedPassword, TERMINAL_ID + orderId);
 
   const body = {
-    order_id: orderId,
-    token,
+    orderId,
     key: TERMINAL_ID,
-    amount: amountStr,
-    callback_url: callbackUrl,
+    token,
   };
 
-  const response = await fetch(`${ALIF_API_URL}/checktxn`, {
+  const response = await fetch(`${ALIF_WEB_URL}/checktxn`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
