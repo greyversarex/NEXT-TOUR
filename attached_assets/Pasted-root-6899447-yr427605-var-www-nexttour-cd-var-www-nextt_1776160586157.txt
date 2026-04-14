@@ -1,0 +1,82 @@
+root@6899447-yr427605:/var/www/nexttour# cd /var/www/nexttour && git pull && npm run build && pm2 restart nexttour --update-env
+remote: Enumerating objects: 22, done.
+remote: Counting objects: 100% (22/22), done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 20 (delta 14), reused 20 (delta 14), pack-reused 0 (from 0)
+Unpacking objects: 100% (20/20), 302.51 KiB | 1.10 MiB/s, done.
+From https://github.com/greyversarex/NEXT-TOUR
+   fce117b..c8a4e3b  main       -> origin/main
+Updating fce117b..c8a4e3b
+Fast-forward
+ attached_assets/image_1776158898906.png | Bin 0 -> 5779 bytes
+ attached_assets/image_1776159016698.png | Bin 0 -> 97866 bytes
+ attached_assets/image_1776159143766.png | Bin 0 -> 64502 bytes
+ attached_assets/image_1776159218854.png | Bin 0 -> 65310 bytes
+ attached_assets/image_1776159893923.png | Bin 0 -> 103348 bytes
+ 5 files changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 attached_assets/image_1776158898906.png
+ create mode 100644 attached_assets/image_1776159016698.png
+ create mode 100644 attached_assets/image_1776159143766.png
+ create mode 100644 attached_assets/image_1776159218854.png
+ create mode 100644 attached_assets/image_1776159893923.png
+
+> rest-express@1.0.0 build
+> tsx script/build.ts
+
+building client...
+vite v7.3.1 building client environment for production...
+transforming (49) ../node_modules/wouter/src/use-browser-location.js
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3225 modules transformed.
+../dist/public/index.html                                                                     3.99 kB │ gzip:   1.50 kB
+../dist/public/assets/Generated_Image_March_13__2026_-_2_17AM_1773350294824-BrSSivC6.png  2,287.01 kB
+../dist/public/assets/index-BUbGt4Pb.css                                                    144.59 kB │ gzip:  21.76 kB
+../dist/public/assets/save-2CgD22e3.js                                                        0.32 kB │ gzip:   0.23 kB
+../dist/public/assets/square-pen-DUwKaP0Q.js                                                  0.42 kB │ gzip:   0.28 kB
+../dist/public/assets/textarea-mjXLavKA.js                                                    0.50 kB │ gzip:   0.32 kB
+../dist/public/assets/switch-UyYiR6zm.js                                                      2.34 kB │ gzip:   1.19 kB
+../dist/public/assets/CategoriesAdmin-Cl8iJBG5.js                                             2.48 kB │ gzip:   1.10 kB
+../dist/public/assets/image-upload-CaXiXQy0.js                                                2.77 kB │ gzip:   1.43 kB
+../dist/public/assets/Dashboard-alIYFdOD.js                                                   2.97 kB │ gzip:   1.32 kB
+../dist/public/assets/ReviewsAdmin-DjuYxjMc.js                                                3.68 kB │ gzip:   1.57 kB
+../dist/public/assets/BannersAdmin-D7emahb1.js                                                3.86 kB │ gzip:   1.55 kB
+../dist/public/assets/NewsAdmin-DA_eb1rG.js                                                   4.00 kB │ gzip:   1.58 kB
+../dist/public/assets/CitiesAdmin-C6fKy117.js                                                 4.06 kB │ gzip:   1.64 kB
+../dist/public/assets/IntroScreenAdmin-I9Gj-OlF.js                                            4.19 kB │ gzip:   1.72 kB
+../dist/public/assets/InquiriesAdmin-DU0vrkN1.js                                              4.31 kB │ gzip:   1.76 kB
+../dist/public/assets/UsersAdmin-BwJE8gUT.js                                                  4.39 kB │ gzip:   1.91 kB
+../dist/public/assets/TrashAdmin-BPkgFSuy.js                                                  4.53 kB │ gzip:   1.96 kB
+../dist/public/assets/HeroSlidesAdmin-_VtfRkh1.js                                             5.37 kB │ gzip:   1.82 kB
+../dist/public/assets/CurrenciesAdmin-4TdxtpVI.js                                             5.71 kB │ gzip:   1.99 kB
+../dist/public/assets/AdminLayout-CeQaSLFV.js                                                 6.08 kB │ gzip:   2.41 kB
+../dist/public/assets/FeedsAdmin-BWe0z4EV.js                                                  6.65 kB │ gzip:   2.43 kB
+../dist/public/assets/BookingsAdmin-BTn9i1kW.js                                               8.44 kB │ gzip:   3.19 kB
+../dist/public/assets/CountriesAdmin-Bkku4mZi.js                                             10.33 kB │ gzip:   3.08 kB
+../dist/public/assets/EmailAdmin-DCR0zvGi.js                                                 11.41 kB │ gzip:   4.11 kB
+../dist/public/assets/ru-DHJduXxY.js                                                         12.63 kB │ gzip:   3.16 kB
+../dist/public/assets/LoyaltyAdmin-CodgxiBu.js                                               33.78 kB │ gzip:  11.98 kB
+../dist/public/assets/ToursAdmin-B3ZbUepA.js                                                 53.69 kB │ gzip:  11.36 kB
+../dist/public/assets/StatisticsAdmin-o_4Pj2rk.js                                           399.49 kB │ gzip: 110.06 kB
+../dist/public/assets/index-DRrqNdof.js                                                     619.76 kB │ gzip: 188.61 kB
+
+(!) Some chunks are larger than 600 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 23.89s
+building server...
+
+  dist/index.cjs  1.4mb ⚠️
+
+⚡ Done in 1258ms
+[PM2] Applying action restartProcessId on app [nexttour](ids: [ 0 ])
+[PM2] [nexttour](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ nexttour           │ fork     │ 4    │ online    │ 0%       │ 55.9mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+root@6899447-yr427605:/var/www/nexttour# pm2 logs nexttour --lines 5 | grep alif
+0|nexttour | [alif] Callback token verification FAILED for orderId=1776122990839
+0|nexttour | [alif] API HTTP 200: {"url":"https://test-web.alif.tj?payment=3CLLz7O3zXzBHUn6UxwJLbdLVI2","code":200,"message":"Успешно"}
+0|nexttour | [alif] API success, redirect to: https://test-web.alif.tj?payment=3CLLz7O3zXzBHUn6UxwJLbdLVI2
