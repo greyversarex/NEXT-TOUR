@@ -103,12 +103,12 @@ export async function initiateAlifPayment(params: PaymentParams): Promise<AlifPa
   const token = generateToken(orderId, amountStr, callbackUrl);
 
   const apiBody: Record<string, any> = {
-    order_id: orderId,
-    token,
     key: TERMINAL_ID,
-    callback_url: callbackUrl,
-    return_url: returnUrl,
+    token,
+    orderId,
     amount: amountStr,
+    callbackUrl,
+    returnUrl,
     gate,
   };
   if (info) apiBody.info = info;
@@ -151,10 +151,10 @@ export async function initiateAlifPayment(params: PaymentParams): Promise<AlifPa
   const formData: Record<string, string> = {
     key: TERMINAL_ID,
     token,
-    order_id: orderId,
+    orderId,
     amount: amountStr,
-    callback_url: callbackUrl,
-    return_url: returnUrl,
+    callbackUrl,
+    returnUrl,
     gate,
   };
   if (info) formData.info = info;
