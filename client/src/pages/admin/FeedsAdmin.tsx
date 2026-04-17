@@ -22,9 +22,13 @@ export default function FeedsAdmin() {
   const [addTourId, setAddTourId] = useState("");
 
   const { data: feeds = [] } = useQuery<any[]>({ queryKey: ["/api/tour-feeds"] });
-  const { data: allTours = [] } = useQuery<Tour[]>({ queryKey: ["/api/tours"] });
+  const { data: allTours = [] } = useQuery<Tour[]>({
+    queryKey: ["/api/tours", "admin-feeds"],
+    queryFn: () => fetch("/api/tours?includeInactive=true", { credentials: "include" }).then(r => r.json()),
+  });
   const { data: feedTours = [] } = useQuery<any[]>({
-    queryKey: [`/api/tour-feeds/${manageFeed?.id}/tours`],
+    queryKey: [`/api/tour-feeds/${manageFeed?.id}/tours`, "admin"],
+    queryFn: () => fetch(`/api/tour-feeds/${manageFeed?.id}/tours?includeInactive=true`, { credentials: "include" }).then(r => r.json()),
     enabled: !!manageFeed?.id,
   });
 

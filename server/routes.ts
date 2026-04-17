@@ -398,12 +398,15 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   app.post("/api/tours", requireAdmin, async (req, res) => {
     try {
-      const { categoryIds, ...tourData } = req.body;
+      const { categoryIds, feedIds, ...tourData } = req.body;
       const tour = await storage.createTour(tourData);
       if (Array.isArray(categoryIds) && categoryIds.length > 0) {
         await storage.setTourCategories(tour.id, categoryIds);
       } else if (tour.categoryId) {
         await storage.setTourCategories(tour.id, [tour.categoryId]);
+      }
+      if (Array.isArray(feedIds)) {
+        await storage.setTourFeeds(tour.id, feedIds);
       }
       res.json(tour);
     } catch (e: any) {
@@ -412,14 +415,28 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   app.put("/api/tours/:id", requireAdmin, async (req, res) => {
-    const { categoryIds, ...tourData } = req.body;
+    const { categoryIds, feedIds, ...tourData } = req.body;
     const tour = await storage.updateTour(req.params.id, tourData);
     if (tour) {
       if (Array.isArray(categoryIds)) {
         await storage.setTourCategories(tour.id, categoryIds);
       }
+      if (Array.isArray(feedIds)) {
+        await storage.setTourFeeds(tour.id, feedIds);
+      }
     }
     res.json(tour);
+  });
+
+  app.get("/api/tours/:id/feeds", async (req, res) => {
+    const feedIds = await storage.getFeedIdsForTour(req.params.id);
+    res.json({ feedIds });
+  });
+
+  app.put("/api/tours/:id/feeds", requireAdmin, async (req, res) => {
+    const feedIds = Array.isArray(req.body?.feedIds) ? req.body.feedIds : [];
+    await storage.setTourFeeds(req.params.id, feedIds);
+    res.json({ success: true, feedIds });
   });
 
   app.delete("/api/tours/:id", requireAdmin, async (req, res) => {
@@ -637,7 +654,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json({ success: true });
   });
   app.get("/api/tour-feeds/:id/tours", async (req, res) => {
-    res.json(await storage.getTourFeedItems(req.params.id));
+    const includeInactive = req.query.includeInactive === "true" && req.isAuthenticated() && (req.user as any)?.role === "admin";
+    res.json(await storage.getTourFeedItems(req.params.id, includeInactive));
   });
   app.post("/api/tour-feeds/:id/tours", requireAdmin, async (req, res) => {
     res.json(await storage.addTourToFeed(req.params.id, req.body.tourId));

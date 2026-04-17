@@ -156,11 +156,19 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
   const [categoryIds, setCategoryIds] = useState<string[]>(
     tour.categoryId ? [tour.categoryId] : []
   );
+  const [feedIds, setFeedIds] = useState<string[]>([]);
 
   const { data: existingCats } = useQuery<{ categoryIds: string[] }>({
     queryKey: ["/api/tours", tour.id, "categories"],
     enabled: !!tour.id,
   });
+
+  const { data: existingFeeds } = useQuery<{ feedIds: string[] }>({
+    queryKey: ["/api/tours", tour.id, "feeds"],
+    enabled: !!tour.id,
+  });
+
+  const { data: feedsList = [] } = useQuery<any[]>({ queryKey: ["/api/tour-feeds"] });
 
   useEffect(() => {
     if (existingCats) {
@@ -172,9 +180,21 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
     }
   }, [existingCats]);
 
+  useEffect(() => {
+    if (existingFeeds) {
+      setFeedIds(existingFeeds.feedIds);
+    }
+  }, [existingFeeds]);
+
   const toggleCategory = (id: string) => {
     setCategoryIds(prev =>
       prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]
+    );
+  };
+
+  const toggleFeed = (id: string) => {
+    setFeedIds(prev =>
+      prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
     );
   };
 
@@ -274,7 +294,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
       const res = await apiRequest(
         isEdit ? "PUT" : "POST",
         isEdit ? `/api/tours/${tour.id}` : "/api/tours",
-        { ...form, categoryId: categoryIds[0] || null, categoryIds }
+        { ...form, categoryId: categoryIds[0] || null, categoryIds, feedIds }
       );
       const saved = await res.json();
       const tourId = saved.id;
@@ -373,6 +393,26 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
                       )}
                     </div>
                   </div>
+                </div>
+                <div>
+                  <Label>{t("Ленты туров", "Tour Feeds")}</Label>
+                  <div className="mt-1 border rounded-md p-2 grid grid-cols-2 md:grid-cols-3 gap-x-3 gap-y-1 max-h-36 overflow-y-auto">
+                    {feedsList.map((f: any) => (
+                      <label key={f.id} className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 rounded px-1 py-0.5">
+                        <input
+                          type="checkbox"
+                          checked={feedIds.includes(f.id)}
+                          onChange={() => toggleFeed(f.id)}
+                          className="accent-primary"
+                        />
+                        <span className="text-sm truncate">{lang === "ru" ? f.nameRu : f.nameEn}</span>
+                      </label>
+                    ))}
+                    {feedsList.length === 0 && (
+                      <p className="text-xs text-muted-foreground px-1 col-span-full">{t("Нет лент", "No feeds")}</p>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">{t("Выберите, в каких лентах будет показан тур", "Choose which feeds this tour appears in")}</p>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div><Label>{t("Длительность (дней)", "Duration (days)")}</Label><Input type="number" value={form.duration} onChange={e => set("duration", Number(e.target.value))} className="mt-1" min={1} /></div>

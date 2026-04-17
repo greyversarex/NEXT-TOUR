@@ -119,9 +119,11 @@ export interface IStorage {
   createTourFeed(data: any): Promise<TourFeed>;
   updateTourFeed(id: string, data: Partial<TourFeed>): Promise<TourFeed | undefined>;
   deleteTourFeed(id: string): Promise<void>;
-  getTourFeedItems(feedId: string): Promise<(TourFeedItem & { tour: Tour })[]>;
+  getTourFeedItems(feedId: string, includeInactive?: boolean): Promise<(TourFeedItem & { tour: Tour })[]>;
   addTourToFeed(feedId: string, tourId: string): Promise<TourFeedItem>;
   removeTourFromFeed(feedId: string, tourId: string): Promise<void>;
+  getFeedIdsForTour(tourId: string): Promise<string[]>;
+  setTourFeeds(tourId: string, feedIds: string[]): Promise<void>;
 
   // Reviews
   getReviews(tourId?: string, status?: string): Promise<(Review & { user: Pick<User, "id" | "name" | "avatar"> })[]>;
@@ -687,21 +689,41 @@ export class DatabaseStorage implements IStorage {
     await db.delete(tourFeeds).where(eq(tourFeeds.id, id));
   }
 
-  async getTourFeedItems(feedId: string) {
+  async getTourFeedItems(feedId: string, includeInactive = false) {
+    const conditions = [eq(tourFeedItems.feedId, feedId)];
+    if (!includeInactive) conditions.push(eq(tours.isActive, true));
     const items = await db.select().from(tourFeedItems)
       .leftJoin(tours, eq(tourFeedItems.tourId, tours.id))
-      .where(and(eq(tourFeedItems.feedId, feedId), eq(tours.isActive, true)))
+      .where(and(...conditions))
       .orderBy(asc(tourFeedItems.order));
-    return items.map(i => ({ ...i.tour_feed_items, tour: i.tours! }));
+    return items
+      .filter(i => i.tours)
+      .map(i => ({ ...i.tour_feed_items, tour: i.tours! }));
   }
 
   async addTourToFeed(feedId: string, tourId: string) {
+    const existing = await db.select().from(tourFeedItems)
+      .where(and(eq(tourFeedItems.feedId, feedId), eq(tourFeedItems.tourId, tourId)));
+    if (existing.length > 0) return existing[0];
     const [item] = await db.insert(tourFeedItems).values({ feedId, tourId, order: 0 }).returning();
     return item;
   }
 
   async removeTourFromFeed(feedId: string, tourId: string) {
     await db.delete(tourFeedItems).where(and(eq(tourFeedItems.feedId, feedId), eq(tourFeedItems.tourId, tourId)));
+  }
+
+  async getFeedIdsForTour(tourId: string): Promise<string[]> {
+    const rows = await db.select({ feedId: tourFeedItems.feedId })
+      .from(tourFeedItems).where(eq(tourFeedItems.tourId, tourId));
+    return rows.map(r => r.feedId);
+  }
+
+  async setTourFeeds(tourId: string, feedIds: string[]): Promise<void> {
+    await db.delete(tourFeedItems).where(eq(tourFeedItems.tourId, tourId));
+    if (feedIds.length > 0) {
+      await db.insert(tourFeedItems).values(feedIds.map(feedId => ({ feedId, tourId, order: 0 })));
+    }
   }
 
   async getReviews(tourId?: string, status?: string) {
