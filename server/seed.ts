@@ -32,9 +32,9 @@ export async function seedDatabase() {
   const userPass = await bcrypt.hash("user123", 10);
 
   const [admin] = await db.insert(users).values([
-    { email: "admin@travelpro.ru", username: "admin", name: "Администратор", password: adminPass, role: "admin" },
-    { email: "user@travelpro.ru", username: "user", name: "Иван Петров", password: userPass, role: "user" },
-    { email: "premium@travelpro.ru", username: "premium_user", name: "Анна Иванова", password: userPass, role: "user", loyaltyLevel: "premium", bookingsCount: 8 },
+    { email: "admin@travelpro.ru", username: "admin", name: "Администратор", password: adminPass, role: "admin", emailVerified: true },
+    { email: "user@travelpro.ru", username: "user", name: "Иван Петров", password: userPass, role: "user", emailVerified: true },
+    { email: "premium@travelpro.ru", username: "premium_user", name: "Анна Иванова", password: userPass, role: "user", loyaltyLevel: "premium", bookingsCount: 8, emailVerified: true },
   ]).returning();
 
   const countryRows = await db.insert(countries).values([
