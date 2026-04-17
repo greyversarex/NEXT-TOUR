@@ -1,0 +1,32 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "FGzpxCEfLhh7Y_Cjd6bNR"
+uri = "file://client/public/images/tour-athens.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "E3j1ZaRZUq20uRrdhr2jM"
+uri = "file://client/public/images/tour-loire.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Wsp_8YdT-gq5EtB_jlD2b"
+uri = "file://client/public/images/tour-alps.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "Tauy65oJ2e62OSF6_-nxA"
+uri = "file://client/public/images/tour-bali-villa.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "N6ShMd35I_wSLLgTHDtv0"
+uri = "file://client/public/images/tour-maldives-bungalow.png"
+type = "image"
+title = "generated_image"
