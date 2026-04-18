@@ -992,6 +992,7 @@ function ItineraryManager({ tourId }: { tourId: string }) {
   const [editing, setEditing] = useState<any>(null);
   const [expandedDay, setExpandedDay] = useState<string | null>(null);
   const [stopForm, setStopForm] = useState({ titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationMinutes: "" as any });
+  const [editingStop, setEditingStop] = useState<any>(null);
 
   const addMutation = useMutation({
     mutationFn: (d: any) => apiRequest("POST", `/api/tours/${tourId}/itinerary`, d),
@@ -1008,6 +1009,10 @@ function ItineraryManager({ tourId }: { tourId: string }) {
   const addStopMutation = useMutation({
     mutationFn: (d: any) => apiRequest("POST", `/api/itinerary/${d.dayId}/stops`, d),
     onSuccess: () => { qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/itinerary`] }); setStopForm({ titleRu: "", titleEn: "", descriptionRu: "", descriptionEn: "", durationMinutes: "" }); toast({ title: t("Остановка добавлена", "Stop added") }); },
+  });
+  const editStopMutation = useMutation({
+    mutationFn: (d: any) => apiRequest("PUT", `/api/itinerary-stops/${d.id}`, d),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: [`/api/tours/${tourId}/itinerary`] }); setEditingStop(null); toast({ title: t("Остановка обновлена", "Stop updated") }); },
   });
   const delStopMutation = useMutation({
     mutationFn: (id: string) => apiRequest("DELETE", `/api/itinerary-stops/${id}`, {}),
@@ -1083,15 +1088,37 @@ function ItineraryManager({ tourId }: { tourId: string }) {
               {expandedDay === item.id && (
                 <div className="border-t px-3 pb-3 pt-2 space-y-3 bg-muted/20">
                   {(item.stops || []).map((stop: any, idx: number) => (
-                    <div key={stop.id} className="flex items-start gap-2 p-2 border rounded bg-background">
-                      <MapPin className="h-3.5 w-3.5 mt-0.5 text-primary shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium">{idx + 1}. {lang === "ru" ? stop.titleRu : stop.titleEn}</p>
-                        {(lang === "ru" ? stop.descriptionRu : stop.descriptionEn) && <p className="text-xs text-muted-foreground mt-0.5">{lang === "ru" ? stop.descriptionRu : stop.descriptionEn}</p>}
-                        {stop.durationMinutes && <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><Clock className="h-3 w-3" />{stop.durationMinutes} {t("мин.", "min.")}</p>}
+                    editingStop?.id === stop.id ? (
+                      <div key={stop.id} className="border rounded p-3 space-y-2 bg-background">
+                        <p className="text-xs font-semibold">{t("Редактировать остановку", "Edit Stop")} {idx + 1}</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input placeholder={t("Название (RU)", "Title (RU)")} value={editingStop.titleRu || ""} onChange={e => setEditingStop((p: any) => ({ ...p, titleRu: e.target.value }))} className="h-8 text-xs" />
+                          <Input placeholder={t("Название (EN)", "Title (EN)")} value={editingStop.titleEn || ""} onChange={e => setEditingStop((p: any) => ({ ...p, titleEn: e.target.value }))} className="h-8 text-xs" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Textarea placeholder={t("Описание (RU)", "Desc (RU)")} value={editingStop.descriptionRu || ""} onChange={e => setEditingStop((p: any) => ({ ...p, descriptionRu: e.target.value }))} className="text-xs min-h-[60px]" />
+                          <Textarea placeholder={t("Описание (EN)", "Desc (EN)")} value={editingStop.descriptionEn || ""} onChange={e => setEditingStop((p: any) => ({ ...p, descriptionEn: e.target.value }))} className="text-xs min-h-[60px]" />
+                        </div>
+                        <div className="flex gap-2 items-end">
+                          <Input type="number" placeholder={t("Минут", "Minutes")} value={editingStop.durationMinutes ?? ""} onChange={e => setEditingStop((p: any) => ({ ...p, durationMinutes: e.target.value ? Number(e.target.value) : null }))} className="h-8 text-xs w-24" min={1} />
+                          <Button type="button" size="sm" className="h-8 text-xs" disabled={editStopMutation.isPending} onClick={() => editStopMutation.mutate(editingStop)}>
+                            {editStopMutation.isPending ? "..." : t("Сохранить", "Save")}
+                          </Button>
+                          <Button type="button" size="sm" variant="outline" className="h-8 text-xs" onClick={() => setEditingStop(null)}>{t("Отмена", "Cancel")}</Button>
+                        </div>
                       </div>
-                      <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => delStopMutation.mutate(stop.id)}><Trash2 className="h-3 w-3" /></Button>
-                    </div>
+                    ) : (
+                      <div key={stop.id} className="flex items-start gap-2 p-2 border rounded bg-background">
+                        <MapPin className="h-3.5 w-3.5 mt-0.5 text-primary shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium">{idx + 1}. {lang === "ru" ? stop.titleRu : stop.titleEn}</p>
+                          {(lang === "ru" ? stop.descriptionRu : stop.descriptionEn) && <p className="text-xs text-muted-foreground mt-0.5">{lang === "ru" ? stop.descriptionRu : stop.descriptionEn}</p>}
+                          {stop.durationMinutes && <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><Clock className="h-3 w-3" />{stop.durationMinutes} {t("мин.", "min.")}</p>}
+                        </div>
+                        <Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={() => setEditingStop({ ...stop })}><Edit className="h-3 w-3" /></Button>
+                        <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => delStopMutation.mutate(stop.id)}><Trash2 className="h-3 w-3" /></Button>
+                      </div>
+                    )
                   ))}
                   <div className="border rounded p-3 space-y-2 bg-muted/30">
                     <p className="text-xs font-semibold">{t("Добавить остановку", "Add Stop")}</p>
