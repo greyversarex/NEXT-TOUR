@@ -1,7 +1,7 @@
 import { Switch, Route, useLocation } from "wouter";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/lib/i18n";
@@ -11,6 +11,29 @@ import NotFound from "@/pages/not-found";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import IntroScreen from "@/components/IntroScreen";
+
+function SiteBackgroundApplier() {
+  const { data } = useQuery<{ imageUrl: string; overlay: number }>({
+    queryKey: ["/api/settings/site-background"],
+    staleTime: 1000 * 60 * 5,
+  });
+  useEffect(() => {
+    if (!data?.imageUrl) return;
+    const ov = (data.overlay ?? 25) / 100;
+    document.body.style.backgroundImage = [
+      `linear-gradient(rgba(0,0,0,${ov}),rgba(0,0,0,${ov}))`,
+      `url(${data.imageUrl})`,
+    ].join(",");
+    document.body.setAttribute("data-custom-bg", "true");
+    return () => {
+      if (document.body.getAttribute("data-custom-bg")) {
+        document.body.style.backgroundImage = "";
+        document.body.removeAttribute("data-custom-bg");
+      }
+    };
+  }, [data]);
+  return null;
+}
 
 // User-facing pages — eager (критичны для первой загрузки)
 import Home from "@/pages/Home";
@@ -46,6 +69,7 @@ const CurrenciesAdmin    = lazy(() => import("@/pages/admin/CurrenciesAdmin"));
 const EmailAdmin         = lazy(() => import("@/pages/admin/EmailAdmin"));
 const InquiriesAdmin     = lazy(() => import("@/pages/admin/InquiriesAdmin"));
 const TrashAdmin         = lazy(() => import("@/pages/admin/TrashAdmin"));
+const SiteSettingsAdmin  = lazy(() => import("@/pages/admin/SiteSettingsAdmin"));
 
 function AdminFallback() {
   return (
@@ -129,6 +153,9 @@ function Router() {
       <Route path="/admin/trash">
         {() => <Suspense fallback={<AdminFallback />}><TrashAdmin /></Suspense>}
       </Route>
+      <Route path="/admin/site-settings">
+        {() => <Suspense fallback={<AdminFallback />}><SiteSettingsAdmin /></Suspense>}
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
@@ -166,6 +193,7 @@ function App() {
           <AuthProvider>
             <TooltipProvider>
               <Toaster />
+              <SiteBackgroundApplier />
               <AppShell />
             </TooltipProvider>
           </AuthProvider>

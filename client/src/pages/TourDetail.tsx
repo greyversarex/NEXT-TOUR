@@ -268,7 +268,10 @@ export default function TourDetail() {
             </TabsList>
 
             <TabsContent value="description">
-              <p className="text-foreground/80 leading-relaxed whitespace-pre-line">{description}</p>
+              {description && (/<[a-z][\s\S]*>/i.test(description)
+                ? <div className="text-foreground/80 leading-relaxed prose prose-sm max-w-none dark:prose-invert [&_h1]:text-2xl [&_h1]:font-bold [&_h2]:text-xl [&_h2]:font-semibold [&_h3]:text-lg [&_h3]:font-semibold [&_p]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1" dangerouslySetInnerHTML={{ __html: description }} />
+                : <p className="text-foreground/80 leading-relaxed whitespace-pre-line">{description}</p>
+              )}
             </TabsContent>
 
             <TabsContent value="program">
@@ -284,9 +287,12 @@ export default function TourDetail() {
                         </div>
                         <div className="flex-1">
                           <h4 className="font-semibold">{lang === "ru" ? item.titleRu : item.titleEn}</h4>
-                          {(lang === "ru" ? item.descriptionRu : item.descriptionEn) && (
-                            <p className="text-sm text-muted-foreground mt-1">{lang === "ru" ? item.descriptionRu : item.descriptionEn}</p>
-                          )}
+                          {(lang === "ru" ? item.descriptionRu : item.descriptionEn) && (() => {
+                            const desc = lang === "ru" ? item.descriptionRu : item.descriptionEn;
+                            return /<[a-z][\s\S]*>/i.test(desc)
+                              ? <div className="text-sm text-muted-foreground mt-1 prose prose-sm max-w-none [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_p]:mb-1 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4" dangerouslySetInnerHTML={{ __html: desc }} />
+                              : <p className="text-sm text-muted-foreground mt-1">{desc}</p>;
+                          })()}
                           {item.durationHours && (
                             <span className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                               <Clock className="h-3 w-3" /> {item.durationHours} {t("ч.", "hrs.")}

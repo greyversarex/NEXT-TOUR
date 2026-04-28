@@ -176,6 +176,8 @@ export interface IStorage {
   updateLoyaltySettings(data: LoyaltySettings): Promise<LoyaltySettings>;
   getHomeLayout(): Promise<string[]>;
   setHomeLayout(order: string[]): Promise<void>;
+  getSiteBackground(): Promise<{ imageUrl: string; overlay: number } | null>;
+  setSiteBackground(data: { imageUrl: string; overlay: number }): Promise<void>;
 
   // Alif Payments
   createAlifPayment(data: { bookingId: string; orderId: string; amount: string; gate: string }): Promise<AlifPayment>;
@@ -1064,6 +1066,20 @@ export class DatabaseStorage implements IStorage {
       await db.update(settings).set({ value: order as any }).where(eq(settings.key, "home-layout"));
     } else {
       await db.insert(settings).values({ key: "home-layout", value: order as any });
+    }
+  }
+
+  async getSiteBackground(): Promise<{ imageUrl: string; overlay: number } | null> {
+    const [row] = await db.select().from(settings).where(eq(settings.key, "site-background"));
+    return row ? (row.value as { imageUrl: string; overlay: number }) : null;
+  }
+
+  async setSiteBackground(data: { imageUrl: string; overlay: number }): Promise<void> {
+    const [existing] = await db.select().from(settings).where(eq(settings.key, "site-background"));
+    if (existing) {
+      await db.update(settings).set({ value: data as any }).where(eq(settings.key, "site-background"));
+    } else {
+      await db.insert(settings).values({ key: "site-background", value: data as any });
     }
   }
 

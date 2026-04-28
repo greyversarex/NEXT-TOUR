@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -59,16 +59,30 @@ export default function NewsAdmin() {
 
       {editing !== null && (
         <Dialog open onOpenChange={() => setEditing(null)}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle>{editing.id ? t("Редактировать новость", "Edit News") : t("Новая новость", "New Article")}</DialogTitle></DialogHeader>
             <form onSubmit={e => { e.preventDefault(); saveMutation.mutate(editing); }} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div><Label>{t("Заголовок (RU)", "Title (RU)")}</Label><Input value={editing.titleRu || ""} onChange={e => setEditing((p: any) => ({ ...p, titleRu: e.target.value }))} className="mt-1" required /></div>
                 <div><Label>{t("Заголовок (EN)", "Title (EN)")}</Label><Input value={editing.titleEn || ""} onChange={e => setEditing((p: any) => ({ ...p, titleEn: e.target.value }))} className="mt-1" required /></div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div><Label>{t("Текст (RU)", "Content (RU)")}</Label><Textarea value={editing.contentRu || ""} onChange={e => setEditing((p: any) => ({ ...p, contentRu: e.target.value }))} className="mt-1 min-h-[120px]" required /></div>
-                <div><Label>{t("Текст (EN)", "Content (EN)")}</Label><Textarea value={editing.contentEn || ""} onChange={e => setEditing((p: any) => ({ ...p, contentEn: e.target.value }))} className="mt-1 min-h-[120px]" required /></div>
+              <div>
+                <Label className="mb-1.5 block">{t("Текст (RU)", "Content (RU)")}</Label>
+                <RichTextEditor
+                  value={editing.contentRu || ""}
+                  onChange={v => setEditing((p: any) => ({ ...p, contentRu: v }))}
+                  placeholder={t("Введите текст статьи...", "Enter article content...")}
+                  minHeight="160px"
+                />
+              </div>
+              <div>
+                <Label className="mb-1.5 block">{t("Текст (EN)", "Content (EN)")}</Label>
+                <RichTextEditor
+                  value={editing.contentEn || ""}
+                  onChange={v => setEditing((p: any) => ({ ...p, contentEn: v }))}
+                  placeholder="Enter article content..."
+                  minHeight="160px"
+                />
               </div>
               <div><Label>{t("Изображение", "Image")}</Label><div className="mt-1"><ImageUpload value={editing.imageUrl || ""} onChange={v => setEditing((p: any) => ({ ...p, imageUrl: v }))} /></div></div>
               <div className="flex items-center gap-2">

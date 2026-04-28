@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useI18n } from "@/lib/i18n";
@@ -355,9 +356,13 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
                   <div><Label>{t("Название (RU)", "Title (RU)")}</Label><Input value={form.titleRu} onChange={e => set("titleRu", e.target.value)} required className="mt-1" /></div>
                   <div><Label>{t("Название (EN)", "Title (EN)")}</Label><Input value={form.titleEn} onChange={e => set("titleEn", e.target.value)} required className="mt-1" /></div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div><Label>{t("Описание (RU)", "Description (RU)")}</Label><Textarea value={form.descriptionRu} onChange={e => set("descriptionRu", e.target.value)} className="mt-1 min-h-[80px]" required /></div>
-                  <div><Label>{t("Описание (EN)", "Description (EN)")}</Label><Textarea value={form.descriptionEn} onChange={e => set("descriptionEn", e.target.value)} className="mt-1 min-h-[80px]" required /></div>
+                <div>
+                  <Label className="mb-1.5 block">{t("Описание (RU)", "Description (RU)")}</Label>
+                  <RichTextEditor value={form.descriptionRu} onChange={v => set("descriptionRu", v)} placeholder={t("Описание тура...", "Tour description...")} minHeight="100px" />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block">{t("Описание (EN)", "Description (EN)")}</Label>
+                  <RichTextEditor value={form.descriptionEn} onChange={v => set("descriptionEn", v)} placeholder="Tour description..." minHeight="100px" />
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>

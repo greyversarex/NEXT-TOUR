@@ -2,11 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { useRoute } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/lib/i18n";
 import { Calendar } from "lucide-react";
 import { format } from "date-fns";
 import type { News } from "@shared/schema";
+import { stripHtml } from "@/components/ui/rich-text-editor";
 
 export default function NewsPage() {
   const { t, lang } = useI18n();
@@ -49,7 +49,7 @@ export default function NewsPage() {
                 <div className="p-4 flex-1">
                   <h3 className="font-semibold mb-2 line-clamp-2">{lang === "ru" ? item.titleRu : item.titleEn}</h3>
                   <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
-                    {(lang === "ru" ? item.contentRu : item.contentEn).slice(0, 120)}...
+                    {stripHtml(lang === "ru" ? item.contentRu : item.contentEn).slice(0, 150)}...
                   </p>
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <Calendar className="h-3.5 w-3.5" />
@@ -94,9 +94,12 @@ export function NewsDetail() {
             {format(new Date(item.publishedAt), "dd MMMM yyyy")}
           </div>
           <h1 className="text-3xl font-bold mb-6">{lang === "ru" ? item.titleRu : item.titleEn}</h1>
-          <div className="text-foreground/80 leading-relaxed whitespace-pre-line">
-            {lang === "ru" ? item.contentRu : item.contentEn}
-          </div>
+          {(() => {
+            const content = lang === "ru" ? item.contentRu : item.contentEn;
+            return /<[a-z][\s\S]*>/i.test(content)
+              ? <div className="text-foreground/80 leading-relaxed prose prose-sm max-w-none dark:prose-invert [&_h1]:text-2xl [&_h1]:font-bold [&_h2]:text-xl [&_h2]:font-semibold [&_h3]:text-lg [&_h3]:font-semibold [&_p]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1" dangerouslySetInnerHTML={{ __html: content }} />
+              : <div className="text-foreground/80 leading-relaxed whitespace-pre-line">{content}</div>;
+          })()}
         </div>
       </div>
     </div>

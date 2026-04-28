@@ -966,6 +966,16 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json({ success: true });
   });
 
+  app.get("/api/settings/site-background", async (req, res) => {
+    const bg = await storage.getSiteBackground();
+    res.json(bg ?? { imageUrl: "", overlay: 25 });
+  });
+  app.post("/api/settings/site-background", requireAdmin, async (req, res) => {
+    const { imageUrl, overlay } = req.body as { imageUrl: string; overlay: number };
+    await storage.setSiteBackground({ imageUrl: imageUrl || "", overlay: Number(overlay) || 25 });
+    res.json({ success: true });
+  });
+
   app.get("/api/admin/loyalty-settings", requireAdmin, async (req, res) => {
     res.json(await storage.getLoyaltySettings());
   });
