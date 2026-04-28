@@ -6,65 +6,94 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { ImagePositionPicker } from "@/components/ui/image-position-picker";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Image } from "lucide-react";
+import { ImageIcon } from "lucide-react";
+
+interface SiteBg {
+  imageUrl: string;
+  overlay: number;
+  position: string;
+}
 
 export default function SiteSettingsAdmin() {
   const { t } = useI18n();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: bg, isLoading } = useQuery<{ imageUrl: string; overlay: number }>({
+  const { data: bg, isLoading } = useQuery<SiteBg>({
     queryKey: ["/api/settings/site-background"],
   });
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [overlay, setOverlay] = useState<number | null>(null);
+  const [position, setPosition] = useState<string | null>(null);
 
   const currentImage = imageUrl ?? bg?.imageUrl ?? "";
   const currentOverlay = overlay ?? bg?.overlay ?? 25;
+  const currentPosition = position ?? bg?.position ?? "50% 50%";
 
   const saveMutation = useMutation({
     mutationFn: () =>
       apiRequest("POST", "/api/settings/site-background", {
         imageUrl: currentImage,
         overlay: currentOverlay,
+        position: currentPosition,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/settings/site-background"] });
       toast({ title: t("Сохранено", "Saved") });
+      setImageUrl(null);
+      setOverlay(null);
+      setPosition(null);
     },
     onError: () => {
       toast({ title: t("Ошибка", "Error"), variant: "destructive" });
     },
   });
 
+  const isDirty = imageUrl !== null || overlay !== null || position !== null;
+
   return (
     <AdminLayout title={t("Фон сайта", "Site Background")}>
-      <div className="max-w-xl space-y-6">
+      <div className="max-w-2xl space-y-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Image className="h-4 w-4" />
+              <ImageIcon className="h-4 w-4" />
               {t("Фоновое изображение", "Background Image")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="space-y-6">
             {!isLoading && (
               <>
+                {/* Image upload */}
                 <div>
                   <Label className="mb-2 block">{t("Изображение", "Image")}</Label>
                   <ImageUpload
                     value={currentImage}
-                    onChange={v => setImageUrl(v)}
+                    onChange={v => { setImageUrl(v); setPosition(null); }}
                   />
-                  {currentImage && (
-                    <p className="text-xs text-muted-foreground mt-2 break-all">{currentImage}</p>
-                  )}
                 </div>
 
+                {/* Position picker — shown only when there's an image */}
+                {currentImage && (
+                  <ImagePositionPicker
+                    src={currentImage}
+                    value={currentPosition}
+                    onChange={v => setPosition(v)}
+                    label={t("Фокусная точка", "Focal point")}
+                    hint={t(
+                      "Перетащите изображение, чтобы выбрать, какая часть будет в центре фона",
+                      "Drag the image to choose which part stays centered as a background",
+                    )}
+                    height={220}
+                  />
+                )}
+
+                {/* Overlay slider */}
                 <div>
                   <div className="flex justify-between mb-2">
                     <Label>{t("Затемнение", "Overlay darkness")}</Label>
@@ -83,16 +112,16 @@ export default function SiteSettingsAdmin() {
                   </p>
                 </div>
 
-                {/* Live preview */}
+                {/* Live mini-preview with overlay applied */}
                 {currentImage && (
                   <div>
-                    <Label className="mb-2 block">{t("Предпросмотр", "Preview")}</Label>
+                    <Label className="mb-2 block">{t("Предпросмотр с затемнением", "Preview with overlay")}</Label>
                     <div
-                      className="w-full h-32 rounded-lg overflow-hidden relative"
+                      className="w-full h-28 rounded-lg overflow-hidden relative"
                       style={{
                         backgroundImage: `linear-gradient(rgba(0,0,0,${currentOverlay / 100}),rgba(0,0,0,${currentOverlay / 100})),url(${currentImage})`,
                         backgroundSize: "cover",
-                        backgroundPosition: "center",
+                        backgroundPosition: currentPosition,
                       }}
                     >
                       <div className="absolute inset-0 flex items-center justify-center">
@@ -111,10 +140,10 @@ export default function SiteSettingsAdmin() {
                   >
                     {t("Сохранить", "Save")}
                   </Button>
-                  {(imageUrl !== null || overlay !== null) && (
+                  {isDirty && (
                     <Button
                       variant="outline"
-                      onClick={() => { setImageUrl(null); setOverlay(null); }}
+                      onClick={() => { setImageUrl(null); setOverlay(null); setPosition(null); }}
                     >
                       {t("Отмена", "Cancel")}
                     </Button>

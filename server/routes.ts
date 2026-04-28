@@ -968,11 +968,15 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   app.get("/api/settings/site-background", async (req, res) => {
     const bg = await storage.getSiteBackground();
-    res.json(bg ?? { imageUrl: "", overlay: 25 });
+    res.json(bg ?? { imageUrl: "", overlay: 25, position: "50% 50%" });
   });
   app.post("/api/settings/site-background", requireAdmin, async (req, res) => {
-    const { imageUrl, overlay } = req.body as { imageUrl: string; overlay: number };
-    await storage.setSiteBackground({ imageUrl: imageUrl || "", overlay: Number(overlay) || 25 });
+    const { imageUrl, overlay, position } = req.body as { imageUrl: string; overlay: number; position: string };
+    await storage.setSiteBackground({
+      imageUrl: imageUrl || "",
+      overlay: Number(overlay) || 25,
+      position: position || "50% 50%",
+    });
     res.json({ success: true });
   });
 

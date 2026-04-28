@@ -13,21 +13,24 @@ import Footer from "@/components/Footer";
 import IntroScreen from "@/components/IntroScreen";
 
 function SiteBackgroundApplier() {
-  const { data } = useQuery<{ imageUrl: string; overlay: number }>({
+  const { data } = useQuery<{ imageUrl: string; overlay: number; position: string }>({
     queryKey: ["/api/settings/site-background"],
     staleTime: 1000 * 60 * 5,
   });
   useEffect(() => {
     if (!data?.imageUrl) return;
     const ov = (data.overlay ?? 25) / 100;
+    const pos = data.position || "50% 50%";
     document.body.style.backgroundImage = [
       `linear-gradient(rgba(0,0,0,${ov}),rgba(0,0,0,${ov}))`,
       `url(${data.imageUrl})`,
     ].join(",");
+    document.body.style.backgroundPosition = pos;
     document.body.setAttribute("data-custom-bg", "true");
     return () => {
       if (document.body.getAttribute("data-custom-bg")) {
         document.body.style.backgroundImage = "";
+        document.body.style.backgroundPosition = "";
         document.body.removeAttribute("data-custom-bg");
       }
     };

@@ -73,6 +73,19 @@ export function RichTextEditor({ value, onChange, placeholder, className, minHei
         class: "outline-none min-h-[inherit] prose prose-sm max-w-none dark:prose-invert",
         "data-placeholder": placeholder || "",
       },
+      handleKeyDown(view, event) {
+        if (event.key === " ") {
+          const { state } = view;
+          const { $from } = state.selection;
+          const textBefore = $from.nodeBefore?.text ?? "";
+          const charBefore = textBefore.slice(-1);
+          if (charBefore === " " || charBefore === "\u00a0") {
+            view.dispatch(state.tr.insertText("\u00a0"));
+            return true;
+          }
+        }
+        return false;
+      },
     },
   });
 
@@ -89,9 +102,9 @@ export function RichTextEditor({ value, onChange, placeholder, className, minHei
     <div className={cn("border rounded-md overflow-hidden", className)}>
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b bg-muted/30">
-        {/* Headings */}
+        {/* Headings — native select without preventDefault so the dropdown opens */}
         <select
-          className="text-xs border rounded px-1.5 py-1 bg-background text-foreground h-7 mr-1"
+          className="text-xs border rounded px-1.5 py-1 bg-background text-foreground h-7 mr-1 cursor-pointer"
           value={
             editor.isActive("heading", { level: 1 }) ? "1" :
             editor.isActive("heading", { level: 2 }) ? "2" :
@@ -102,7 +115,6 @@ export function RichTextEditor({ value, onChange, placeholder, className, minHei
             if (v === 0) editor.chain().focus().setParagraph().run();
             else editor.chain().focus().toggleHeading({ level: v as 1|2|3 }).run();
           }}
-          onMouseDown={e => e.preventDefault()}
         >
           <option value="0">Обычный</option>
           <option value="1">Заголовок 1</option>
@@ -153,6 +165,7 @@ export function RichTextEditor({ value, onChange, placeholder, className, minHei
           <button
             type="button"
             title="Цвет текста"
+            onMouseDown={e => e.preventDefault()}
             className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             <Palette className="h-3.5 w-3.5" />
@@ -199,7 +212,7 @@ export function RichTextEditor({ value, onChange, placeholder, className, minHei
         .ProseMirror h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
         .ProseMirror h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.4rem; }
         .ProseMirror h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.35rem; }
-        .ProseMirror p { margin-bottom: 0.5rem; }
+        .ProseMirror p { margin-bottom: 0.5rem; white-space: pre-wrap; }
         .ProseMirror ul { list-style-type: disc; padding-left: 1.25rem; margin-bottom: 0.5rem; }
         .ProseMirror ol { list-style-type: decimal; padding-left: 1.25rem; margin-bottom: 0.5rem; }
         .ProseMirror li { margin-bottom: 0.15rem; }
@@ -223,7 +236,7 @@ export function renderRichText(html: string, className?: string) {
         "[&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-3",
         "[&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mb-2",
         "[&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2",
-        "[&_p]:mb-2 [&_p]:leading-relaxed",
+        "[&_p]:mb-2 [&_p]:leading-relaxed [&_p]:whitespace-pre-wrap",
         "[&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-2",
         "[&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-2",
         "[&_li]:mb-1",
@@ -238,5 +251,5 @@ export function renderRichText(html: string, className?: string) {
 }
 
 export function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
+  return html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/\u00a0/g, " ").trim();
 }
