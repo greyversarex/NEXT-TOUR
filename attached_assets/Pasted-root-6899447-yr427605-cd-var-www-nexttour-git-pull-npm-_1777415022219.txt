@@ -1,0 +1,160 @@
+root@6899447-yr427605:~# cd /var/www/nexttour && git pull && npm run build && pm2 restart nexttour --update-env
+remote: Enumerating objects: 38, done.
+remote: Counting objects: 100% (38/38), done.
+remote: Compressing objects: 100% (5/5), done.
+remote: Total 38 (delta 33), reused 38 (delta 33), pack-reused 0 (from 0)
+Unpacking objects: 100% (38/38), 17.19 KiB | 93.00 KiB/s, done.
+From https://github.com/greyversarex/NEXT-TOUR
+   ec04650..a266bcf  main       -> origin/main
+Updating ec04650..a266bcf
+Fast-forward
+ .replit                                       |   7 +-
+ client/src/App.tsx                            |  35 +-
+ client/src/components/ui/rich-text-editor.tsx | 255 ++++++++++
+ client/src/pages/NewsPage.tsx                 |  13 +-
+ client/src/pages/TourDetail.tsx               |  14 +-
+ client/src/pages/admin/AdminLayout.tsx        |   3 +-
+ client/src/pages/admin/NewsAdmin.tsx          |  24 +-
+ client/src/pages/admin/SiteSettingsAdmin.tsx  | 170 +++++++
+ client/src/pages/admin/ToursAdmin.tsx         |  11 +-
+ package-lock.json                             | 650 +++++++++++++++++++++++++-
+ package.json                                  |   6 +
+ server/routes.ts                              |  14 +
+ server/storage.ts                             |  16 +
+ 13 files changed, 1185 insertions(+), 33 deletions(-)
+ create mode 100644 client/src/components/ui/rich-text-editor.tsx
+ create mode 100644 client/src/pages/admin/SiteSettingsAdmin.tsx
+
+> rest-express@1.0.0 build
+> tsx script/build.ts
+
+building client...
+vite v7.3.1 building client environment for production...
+transforming (4) src/App.tsx
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 137 modules transformed.
+✗ Build failed in 5.88s
+[vite]: Rollup failed to resolve import "@tiptap/react" from "/var/www/nexttour/client/src/components/ui/rich-text-editor.tsx".
+This is most likely unintended because it can break your application at runtime.
+If you do want to externalize this module explicitly add it to
+`build.rollupOptions.external`
+    at viteLog (/var/www/nexttour/node_modules/vite/dist/node/chunks/config.js:33635:57)
+    at <anonymous> (/var/www/nexttour/node_modules/vite/dist/node/chunks/config.js:33669:73)
+    at onwarn (/var/www/nexttour/node_modules/@vitejs/plugin-react/dist/index.js:90:7)
+    at <anonymous> (/var/www/nexttour/node_modules/vite/dist/node/chunks/config.js:33669:28)
+    at onRollupLog (/var/www/nexttour/node_modules/vite/dist/node/chunks/config.js:33664:63)
+    at onLog (/var/www/nexttour/node_modules/vite/dist/node/chunks/config.js:33467:4)
+    at <anonymous> (/var/www/nexttour/node_modules/rollup/dist/es/shared/node-entry.js:21004:32)
+    at Object.logger (/var/www/nexttour/node_modules/rollup/dist/es/shared/node-entry.js:22891:9)
+    at ModuleLoader.handleInvalidResolvedId (/var/www/nexttour/node_modules/rollup/dist/es/shared/node-entry.js:21635:26)
+    at <anonymous> (/var/www/nexttour/node_modules/rollup/dist/es/shared/node-entry.js:21593:26) {
+  watchFiles: [
+    '/var/www/nexttour/client/index.html',
+    '/var/www/nexttour/client/src/main.tsx',
+    '/var/www/nexttour/package.json',
+    '/var/www/nexttour/node_modules/react/jsx-runtime.js',
+    '/var/www/nexttour/node_modules/react-dom/client.js',
+    '/var/www/nexttour/client/src/App.tsx',
+    '/var/www/nexttour/client/src/index.css',
+    '/var/www/nexttour/node_modules/react/cjs/react-jsx-runtime.production.min.js',
+    '/var/www/nexttour/node_modules/react/index.js',
+    '/var/www/nexttour/node_modules/react-dom/index.js',
+    '/var/www/nexttour/client/src/hooks/use-toast.ts',
+    '/var/www/nexttour/client/src/lib/queryClient.ts',
+    '/var/www/nexttour/client/src/lib/utils.ts',
+    '/var/www/nexttour/client/src/components/AuthModal.tsx',
+    '/var/www/nexttour/client/src/components/Footer.tsx',
+    '/var/www/nexttour/client/src/components/Header.tsx',
+    '/var/www/nexttour/client/src/components/IntroScreen.tsx',
+    '/var/www/nexttour/client/src/components/TourCard.tsx',
+    '/var/www/nexttour/client/src/components/ui/accordion.tsx',
+    '/var/www/nexttour/client/src/components/ui/alert-dialog.tsx',
+    '/var/www/nexttour/client/src/components/ui/alert.tsx',
+    '/var/www/nexttour/client/src/components/ui/aspect-ratio.tsx',
+    '/var/www/nexttour/client/src/components/ui/avatar.tsx',
+    '/var/www/nexttour/client/src/components/ui/badge.tsx',
+    '/var/www/nexttour/client/src/components/ui/breadcrumb.tsx',
+    '/var/www/nexttour/client/src/components/ui/button.tsx',
+    '/var/www/nexttour/client/src/components/ui/calendar.tsx',
+    '/var/www/nexttour/client/src/components/ui/card.tsx',
+    '/var/www/nexttour/client/src/components/ui/carousel.tsx',
+    '/var/www/nexttour/client/src/components/ui/chart.tsx',
+    '/var/www/nexttour/client/src/components/ui/checkbox.tsx',
+    '/var/www/nexttour/client/src/components/ui/collapsible.tsx',
+    '/var/www/nexttour/client/src/components/ui/command.tsx',
+    '/var/www/nexttour/client/src/components/ui/context-menu.tsx',
+    '/var/www/nexttour/client/src/components/ui/dialog.tsx',
+    '/var/www/nexttour/client/src/components/ui/drawer.tsx',
+    '/var/www/nexttour/client/src/components/ui/dropdown-menu.tsx',
+    '/var/www/nexttour/client/src/components/ui/form.tsx',
+    '/var/www/nexttour/client/src/components/ui/hover-card.tsx',
+    '/var/www/nexttour/client/src/components/ui/image-position-picker.tsx',
+    '/var/www/nexttour/client/src/components/ui/image-upload.tsx',
+    '/var/www/nexttour/client/src/components/ui/input-otp.tsx',
+    '/var/www/nexttour/client/src/components/ui/input.tsx',
+    '/var/www/nexttour/client/src/components/ui/label.tsx',
+    '/var/www/nexttour/client/src/components/ui/menubar.tsx',
+    '/var/www/nexttour/client/src/components/ui/navigation-menu.tsx',
+    '/var/www/nexttour/client/src/components/ui/pagination.tsx',
+    '/var/www/nexttour/client/src/components/ui/popover.tsx',
+    '/var/www/nexttour/client/src/components/ui/progress.tsx',
+    '/var/www/nexttour/client/src/components/ui/radio-group.tsx',
+    '/var/www/nexttour/client/src/components/ui/resizable.tsx',
+    '/var/www/nexttour/client/src/components/ui/rich-text-editor.tsx',
+    '/var/www/nexttour/client/src/components/ui/scroll-area.tsx',
+    '/var/www/nexttour/client/src/components/ui/select.tsx',
+    '/var/www/nexttour/client/src/components/ui/separator.tsx',
+    '/var/www/nexttour/client/src/components/ui/sheet.tsx',
+    '/var/www/nexttour/client/src/components/ui/sidebar.tsx',
+    '/var/www/nexttour/client/src/components/ui/skeleton.tsx',
+    '/var/www/nexttour/client/src/components/ui/slider.tsx',
+    '/var/www/nexttour/client/src/components/ui/switch.tsx',
+    '/var/www/nexttour/client/src/components/ui/table.tsx',
+    '/var/www/nexttour/client/src/components/ui/tabs.tsx',
+    '/var/www/nexttour/client/src/components/ui/textarea.tsx',
+    '/var/www/nexttour/client/src/components/ui/toast.tsx',
+    '/var/www/nexttour/client/src/components/ui/toaster.tsx',
+    '/var/www/nexttour/client/src/components/ui/toggle-group.tsx',
+    '/var/www/nexttour/client/src/components/ui/toggle.tsx',
+    '/var/www/nexttour/client/src/components/ui/tooltip.tsx',
+    '/var/www/nexttour/client/src/hooks/use-mobile.tsx',
+    '/var/www/nexttour/client/src/lib/auth.tsx',
+    '/var/www/nexttour/client/src/lib/currency.tsx',
+    '/var/www/nexttour/client/src/lib/i18n.tsx',
+    '/var/www/nexttour/client/src/pages/About.tsx',
+    '/var/www/nexttour/client/src/pages/Home.tsx',
+    '/var/www/nexttour/client/src/pages/NewsPage.tsx',
+    '/var/www/nexttour/client/src/pages/PaymentResult.tsx',
+    '/var/www/nexttour/client/src/pages/Privacy.tsx',
+    '/var/www/nexttour/client/src/pages/Profile.tsx',
+    '/var/www/nexttour/client/src/pages/Promotions.tsx',
+    '/var/www/nexttour/client/src/pages/ResetPassword.tsx',
+    '/var/www/nexttour/client/src/pages/Terms.tsx',
+    '/var/www/nexttour/client/src/pages/TourDetail.tsx',
+    '/var/www/nexttour/client/src/pages/Tours.tsx',
+    '/var/www/nexttour/client/src/pages/VerifyEmail.tsx',
+    '/var/www/nexttour/client/src/pages/admin/AdminLayout.tsx',
+    '/var/www/nexttour/client/src/pages/admin/BannersAdmin.tsx',
+    '/var/www/nexttour/client/src/pages/admin/BookingsAdmin.tsx',
+    '/var/www/nexttour/client/src/pages/admin/CategoriesAdmin.tsx',
+    '/var/www/nexttour/client/src/pages/admin/CitiesAdmin.tsx',
+    '/var/www/nexttour/client/src/pages/admin/CountriesAdmin.tsx',
+    '/var/www/nexttour/client/src/pages/admin/CurrenciesAdmin.tsx',
+    '/var/www/nexttour/client/src/pages/admin/Dashboard.tsx',
+    '/var/www/nexttour/client/src/pages/admin/EmailAdmin.tsx',
+    '/var/www/nexttour/client/src/pages/admin/FeedsAdmin.tsx',
+    '/var/www/nexttour/client/src/pages/admin/HeroSlidesAdmin.tsx',
+    '/var/www/nexttour/client/src/pages/admin/InquiriesAdmin.tsx',
+    '/var/www/nexttour/client/src/pages/admin/IntroScreenAdmin.tsx',
+    '/var/www/nexttour/client/src/pages/admin/LoyaltyAdmin.tsx',
+    '/var/www/nexttour/client/src/pages/admin/NewsAdmin.tsx',
+    '/var/www/nexttour/client/src/pages/admin/PriceComponentsAdmin.tsx',
+    ... 63 more items
+  ]
+}
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.13.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.13.0
+npm notice To update run: npm install -g npm@11.13.0
+npm notice
+root@6899447-yr427605:/var/www/nexttour#
