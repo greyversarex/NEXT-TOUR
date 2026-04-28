@@ -1,0 +1,55 @@
+root@6899447-yr427605:/var/www/nexttour# cd /var/www/nexttour && git pull && npm install && npm run build && pm2 restart nexttour --update-env
+Already up to date.
+
+added 48 packages, changed 2 packages, and audited 576 packages in 7s
+
+114 packages are looking for funding
+  run `npm fund` for details
+
+17 vulnerabilities (1 low, 9 moderate, 7 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> rest-express@1.0.0 build
+> tsx script/build.ts
+
+building client...
+vite v7.3.1 building client environment for production...
+transforming (8) src/lib/queryClient.ts
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 3280 modules transformed.
+
+<--- Last few GCs --->
+
+[315899:0x159aa630]    34450 ms: Mark-Compact 468.2 (489.8) -> 464.2 (489.8) MB, 677.21 / 0.00 ms  (average mu = 0.207, current mu = 0.147) allocation failure; scavenge might not succeed
+[315899:0x159aa630]    35297 ms: Mark-Compact 468.2 (489.8) -> 464.2 (489.8) MB, 729.88 / 0.00 ms  (average mu = 0.173, current mu = 0.138) allocation failure; scavenge might not succeed
+
+
+<--- JS stacktrace --->
+
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0xb78db1 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [/usr/bin/node]
+ 2: 0xee82f0 v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/usr/bin/node]
+ 3: 0xee85d7 v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/usr/bin/node]
+ 4: 0x10fa275  [/usr/bin/node]
+ 5: 0x10fa804 v8::internal::Heap::RecomputeLimits(v8::internal::GarbageCollector) [/usr/bin/node]
+ 6: 0x11116f4 v8::internal::Heap::PerformGarbageCollection(v8::internal::GarbageCollector, v8::internal::GarbageCollectionReason, char const*) [/usr/bin/node]
+ 7: 0x1111f0c v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/usr/bin/node]
+ 8: 0x10e8211 v8::internal::HeapAllocator::AllocateRawWithLightRetrySlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/usr/bin/node]
+ 9: 0x10e93a5 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/usr/bin/node]
+10: 0x10c5ac6 v8::internal::Factory::AllocateRaw(int, v8::internal::AllocationType, v8::internal::AllocationAlignment) [/usr/bin/node]
+11: 0x10b723c v8::internal::FactoryBase<v8::internal::Factory>::AllocateRawArray(int, v8::internal::AllocationType) [/usr/bin/node]
+12: 0x10b73a4 v8::internal::FactoryBase<v8::internal::Factory>::NewFixedArrayWithFiller(v8::internal::Handle<v8::internal::Map>, int, v8::internal::Handle<v8::internal::Oddball>, v8::internal::AllocationType) [/usr/bin/node]
+13: 0x13e5dca v8::internal::OrderedHashTable<v8::internal::OrderedHashSet, 1>::Allocate(v8::internal::Isolate*, int, v8::internal::AllocationType) [/usr/bin/node]
+14: 0x13e5e70 v8::internal::OrderedHashTable<v8::internal::OrderedHashSet, 1>::Rehash(v8::internal::Isolate*, v8::internal::Handle<v8::internal::OrderedHashSet>, int) [/usr/bin/node]
+15: 0x15173c3 v8::internal::Runtime_SetGrow(int, unsigned long*, v8::internal::Isolate*) [/usr/bin/node]
+16: 0x195bef6  [/usr/bin/node]
+root@6899447-yr427605:/var/www/nexttour#
