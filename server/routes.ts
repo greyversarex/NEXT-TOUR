@@ -20,6 +20,7 @@ import {
   insertBannerSchema, insertTourFeedSchema,
   insertReviewSchema, insertBookingSchema,
   insertNewsSchema, insertCountrySchema, insertCitySchema, insertCategorySchema,
+  insertHotelSchema,
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -398,7 +399,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   app.post("/api/tours", requireAdmin, async (req, res) => {
     try {
-      const { categoryIds, feedIds, ...tourData } = req.body;
+      const { categoryIds, feedIds, hotelIds, ...tourData } = req.body;
       const tour = await storage.createTour(tourData);
       if (Array.isArray(categoryIds) && categoryIds.length > 0) {
         await storage.setTourCategories(tour.id, categoryIds);
@@ -408,6 +409,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       if (Array.isArray(feedIds)) {
         await storage.setTourFeeds(tour.id, feedIds);
       }
+      if (Array.isArray(hotelIds)) {
+        await storage.setTourHotels(tour.id, hotelIds);
+      }
       res.json(tour);
     } catch (e: any) {
       res.status(400).json({ message: e.message });
@@ -415,7 +419,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   app.put("/api/tours/:id", requireAdmin, async (req, res) => {
-    const { categoryIds, feedIds, ...tourData } = req.body;
+    const { categoryIds, feedIds, hotelIds, ...tourData } = req.body;
     const tour = await storage.updateTour(req.params.id, tourData);
     if (tour) {
       if (Array.isArray(categoryIds)) {
@@ -423,6 +427,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       }
       if (Array.isArray(feedIds)) {
         await storage.setTourFeeds(tour.id, feedIds);
+      }
+      if (Array.isArray(hotelIds)) {
+        await storage.setTourHotels(tour.id, hotelIds);
       }
     }
     res.json(tour);
@@ -471,7 +478,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   app.get("/api/tours/:id/full", async (req, res) => {
     const tour = await storage.getTour(req.params.id);
     if (!tour) return res.status(404).json({ message: "Tour not found" });
-    const [dates, priceComponents, options, days, allStops, reviews, priceTiers, country, city, category, categoryIds] = await Promise.all([
+    const [dates, priceComponents, options, days, allStops, reviews, priceTiers, country, city, category, categoryIds, hotels] = await Promise.all([
       storage.getTourDates(req.params.id),
       storage.getTourPriceComponents(req.params.id),
       storage.getTourOptions(req.params.id),
@@ -483,6 +490,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       tour.cityId ? storage.getCity(tour.cityId) : Promise.resolve(undefined),
       tour.categoryId ? storage.getCategory(tour.categoryId) : Promise.resolve(undefined),
       storage.getTourCategoryIds(req.params.id),
+      storage.getTourHotels(req.params.id),
     ]);
     const itinerary = days.map(day => ({
       ...day,
@@ -494,7 +502,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
     const allCategories = await storage.getCategories();
     const categories = allCategories.filter(c => categoryIds.includes(c.id));
-    res.json({ tour, dates, priceComponents, options, itinerary, reviews, priceTiers, isFavorite, country, city, category, categories, categoryIds });
+    res.json({ tour, dates, priceComponents, options, itinerary, reviews, priceTiers, isFavorite, country, city, category, categories, categoryIds, hotels });
   });
 
   // Tour Dates
@@ -765,6 +773,44 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     if (!booking) return res.status(404).json({ message: "Not found" });
     if (user.role !== "admin" && booking.userId !== user.id) return res.status(403).json({ message: "Forbidden" });
     res.json(await storage.updateBooking(req.params.id, req.body));
+  });
+
+  // Hotels
+  app.get("/api/hotels", async (req, res) => {
+    const filters: { countryId?: string; cityId?: string } = {};
+    if (req.query.countryId) filters.countryId = req.query.countryId as string;
+    if (req.query.cityId) filters.cityId = req.query.cityId as string;
+    res.json(await storage.getHotels(filters));
+  });
+  app.get("/api/hotels/:id", async (req, res) => {
+    const hotel = await storage.getHotel(req.params.id);
+    if (!hotel) return res.status(404).json({ message: "Hotel not found" });
+    res.json(hotel);
+  });
+  app.post("/api/hotels", requireAdmin, async (req, res) => {
+    try {
+      const data = insertHotelSchema.parse(req.body);
+      res.json(await storage.createHotel(data));
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
+  });
+  app.put("/api/hotels/:id", requireAdmin, async (req, res) => {
+    res.json(await storage.updateHotel(req.params.id, req.body));
+  });
+  app.delete("/api/hotels/:id", requireAdmin, async (req, res) => {
+    await storage.deleteHotel(req.params.id);
+    res.json({ success: true });
+  });
+
+  // Tour Hotels (selection per tour)
+  app.get("/api/tours/:id/hotels", async (req, res) => {
+    res.json(await storage.getTourHotels(req.params.id));
+  });
+  app.put("/api/tours/:id/hotels", requireAdmin, async (req, res) => {
+    const hotelIds = Array.isArray(req.body?.hotelIds) ? req.body.hotelIds : [];
+    await storage.setTourHotels(req.params.id, hotelIds);
+    res.json({ success: true, hotelIds });
   });
 
   // Inquiries

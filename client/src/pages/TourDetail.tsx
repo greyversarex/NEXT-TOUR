@@ -18,7 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Clock, MapPin, Star, Heart, Users, CheckCircle,
-  XCircle, ChevronLeft, ChevronRight, Calendar, Tag, Loader2, ChevronDown, Send
+  XCircle, ChevronLeft, ChevronRight, Calendar, Tag, Loader2, ChevronDown, Send, Hotel as HotelIcon
 } from "lucide-react";
 import AuthModal from "@/components/AuthModal";
 import TourCard from "@/components/TourCard";
@@ -70,7 +70,7 @@ export default function TourDetail() {
     );
   }
 
-  const { tour, dates, options, itinerary, reviews, priceTiers = [], isFavorite, country, city, category, categories: tourCategoriesList } = data;
+  const { tour, dates, options, itinerary, reviews, priceTiers = [], isFavorite, country, city, category, categories: tourCategoriesList, hotels = [] } = data;
   const title = lang === "ru" ? tour.titleRu : tour.titleEn;
   const description = lang === "ru" ? tour.descriptionRu : tour.descriptionEn;
   const included = lang === "ru" ? tour.includedRu : tour.includedEn;
@@ -263,6 +263,11 @@ export default function TourDetail() {
               <TabsTrigger value="description">{t("Описание", "Description")}</TabsTrigger>
               <TabsTrigger value="program">{t("Программа", "Itinerary")}</TabsTrigger>
               <TabsTrigger value="included">{t("Включено", "Included")}</TabsTrigger>
+              {hotels.length > 0 && (
+                <TabsTrigger value="accommodation" className="gap-1" data-testid="tab-accommodation">
+                  <HotelIcon className="h-3.5 w-3.5" />{t("Проживание", "Accommodation")}
+                </TabsTrigger>
+              )}
               {reviews.length > 0 && <TabsTrigger value="reviews">{t("Отзывы", "Reviews")} ({reviews.length})</TabsTrigger>}
               {tour.mapUrl && <TabsTrigger value="map">{t("На карте", "On the Map")}</TabsTrigger>}
             </TabsList>
@@ -360,6 +365,53 @@ export default function TourDetail() {
                 )}
               </div>
             </TabsContent>
+
+            {hotels.length > 0 && (
+              <TabsContent value="accommodation">
+                <div className="grid sm:grid-cols-2 gap-4" data-testid="list-hotels">
+                  {hotels.map((h: any) => {
+                    const hName = lang === "ru" ? h.nameRu : h.nameEn;
+                    const hDesc = lang === "ru" ? h.descriptionRu : h.descriptionEn;
+                    return (
+                      <div
+                        key={h.id}
+                        className="rounded-2xl overflow-hidden border border-card-border bg-card flex flex-col"
+                        data-testid={`card-hotel-${h.id}`}
+                      >
+                        {h.mainImage && (
+                          <div className="aspect-[16/10] overflow-hidden bg-muted">
+                            <img src={h.mainImage} alt={hName} className="w-full h-full object-cover" loading="lazy" />
+                          </div>
+                        )}
+                        <div className="p-4 flex-1 flex flex-col">
+                          <h4 className="font-semibold text-base mb-1 flex items-center gap-2">
+                            <HotelIcon className="h-4 w-4 text-primary" />
+                            {hName}
+                          </h4>
+                          {hDesc && (
+                            <p className="text-sm text-muted-foreground whitespace-pre-line">{hDesc}</p>
+                          )}
+                          {h.images && h.images.length > 0 && (
+                            <div className="mt-3 grid grid-cols-4 gap-1.5">
+                              {h.images.slice(0, 4).map((img: string, i: number) => (
+                                <a key={i} href={img} target="_blank" rel="noopener noreferrer">
+                                  <img
+                                    src={img}
+                                    alt=""
+                                    className="w-full aspect-square object-cover rounded"
+                                    loading="lazy"
+                                  />
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </TabsContent>
+            )}
 
             <TabsContent value="reviews">
               <div className="space-y-4">

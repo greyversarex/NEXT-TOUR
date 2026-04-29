@@ -304,6 +304,26 @@ export const currencies = pgTable("currencies", {
   sortOrder: integer("sort_order").notNull().default(0),
 });
 
+export const hotels = pgTable("hotels", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  nameRu: text("name_ru").notNull(),
+  nameEn: text("name_en").notNull(),
+  descriptionRu: text("description_ru"),
+  descriptionEn: text("description_en"),
+  countryId: varchar("country_id").references(() => countries.id),
+  cityId: varchar("city_id").references(() => cities.id),
+  mainImage: text("main_image"),
+  images: text("images").array().notNull().default(sql`'{}'`),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const tourHotels = pgTable("tour_hotels", {
+  tourId: varchar("tour_id").notNull().references(() => tours.id, { onDelete: "cascade" }),
+  hotelId: varchar("hotel_id").notNull().references(() => hotels.id, { onDelete: "cascade" }),
+}, (t) => ({
+  pk: primaryKey({ columns: [t.tourId, t.hotelId] }),
+}));
+
 export const settings = pgTable("settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   key: text("key").notNull().unique(),
@@ -343,6 +363,7 @@ export const insertInquirySchema = createInsertSchema(inquiries).omit({ id: true
 export const insertIntroScreenSchema = createInsertSchema(introScreen).omit({ id: true });
 export const insertHeroSlideSchema = createInsertSchema(heroSlides).omit({ id: true });
 export const insertTourCategorySchema = createInsertSchema(tourCategories);
+export const insertHotelSchema = createInsertSchema(hotels).omit({ id: true, createdAt: true });
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -387,6 +408,8 @@ export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type Currency = typeof currencies.$inferSelect;
 export type InsertCurrency = z.infer<typeof insertCurrencySchema>;
 export type Settings = typeof settings.$inferSelect;
+export type Hotel = typeof hotels.$inferSelect;
+export type InsertHotel = z.infer<typeof insertHotelSchema>;
 
 export interface AnalyticsData {
   totalBookings: number;

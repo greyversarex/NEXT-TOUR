@@ -18,7 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { ImagePositionPicker } from "@/components/ui/image-position-picker";
-import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route, ChevronDown, ChevronRight, MapPin, Clock, DollarSign, X, Upload, Loader2, Copy } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route, ChevronDown, ChevronRight, MapPin, Clock, DollarSign, X, Upload, Loader2, Copy, Hotel as HotelIcon } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Tour, Country, Category } from "@shared/schema";
@@ -158,6 +158,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
     tour.categoryId ? [tour.categoryId] : []
   );
   const [feedIds, setFeedIds] = useState<string[]>([]);
+  const [hotelIds, setHotelIds] = useState<string[]>([]);
 
   const { data: existingCats } = useQuery<{ categoryIds: string[] }>({
     queryKey: ["/api/tours", tour.id, "categories"],
@@ -169,7 +170,13 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
     enabled: !!tour.id,
   });
 
+  const { data: existingHotels } = useQuery<any[]>({
+    queryKey: ["/api/tours", tour.id, "hotels"],
+    enabled: !!tour.id,
+  });
+
   const { data: feedsList = [] } = useQuery<any[]>({ queryKey: ["/api/tour-feeds"] });
+  const { data: allHotels = [] } = useQuery<any[]>({ queryKey: ["/api/hotels"] });
 
   useEffect(() => {
     if (existingCats) {
@@ -186,6 +193,16 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
       setFeedIds(existingFeeds.feedIds);
     }
   }, [existingFeeds]);
+
+  useEffect(() => {
+    if (existingHotels) {
+      setHotelIds(existingHotels.map((h: any) => h.id));
+    }
+  }, [existingHotels]);
+
+  const toggleHotel = (id: string) => {
+    setHotelIds(prev => prev.includes(id) ? prev.filter(h => h !== id) : [...prev, id]);
+  };
 
   const toggleCategory = (id: string) => {
     setCategoryIds(prev =>
@@ -295,7 +312,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
       const res = await apiRequest(
         isEdit ? "PUT" : "POST",
         isEdit ? `/api/tours/${tour.id}` : "/api/tours",
-        { ...form, categoryId: categoryIds[0] || null, categoryIds, feedIds }
+        { ...form, categoryId: categoryIds[0] || null, categoryIds, feedIds, hotelIds }
       );
       const saved = await res.json();
       const tourId = saved.id;
@@ -347,6 +364,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
             <TabsTrigger value="options" className="flex-1 gap-1"><ListChecks className="h-3.5 w-3.5" />{t("Опции", "Options")}</TabsTrigger>
             <TabsTrigger value="itinerary" className="flex-1 gap-1"><Route className="h-3.5 w-3.5" />{t("Программа", "Itinerary")}</TabsTrigger>
             <TabsTrigger value="pricing" className="flex-1 gap-1"><DollarSign className="h-3.5 w-3.5" />{t("Цены", "Pricing")}</TabsTrigger>
+            <TabsTrigger value="hotels" className="flex-1 gap-1"><HotelIcon className="h-3.5 w-3.5" />{t("Гостиницы", "Hotels")}</TabsTrigger>
           </TabsList>
 
           <form id="tour-form" onSubmit={handleSubmit}>
@@ -549,6 +567,17 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
               {isEdit
                 ? <PriceTiersManager tourId={tour.id} />
                 : <LocalPriceTiersManager tiers={localPriceTiers} setTiers={setLocalPriceTiers} />}
+              {saveBtn}
+            </TabsContent>
+
+            <TabsContent value="hotels" className="pt-2">
+              <HotelsTabContent
+                allHotels={allHotels}
+                countryId={form.countryId}
+                cityId={form.cityId}
+                hotelIds={hotelIds}
+                toggleHotel={toggleHotel}
+              />
               {saveBtn}
             </TabsContent>
           </form>
@@ -1267,6 +1296,98 @@ function PriceTiersManager({ tourId }: { tourId: string }) {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function HotelsTabContent({ allHotels, countryId, cityId, hotelIds, toggleHotel }: {
+  allHotels: any[];
+  countryId: string;
+  cityId: string;
+  hotelIds: string[];
+  toggleHotel: (id: string) => void;
+}) {
+  const { t, lang } = useI18n();
+
+  const filtered = allHotels.filter(h => {
+    if (countryId && h.countryId !== countryId) return false;
+    if (cityId && h.cityId !== cityId) return false;
+    return true;
+  });
+
+  if (!countryId && !cityId) {
+    return (
+      <div className="text-sm text-muted-foreground p-6 text-center border border-dashed rounded-md">
+        {t("Сначала выберите страну и город тура на вкладке «Основное».", "First select the tour's country and city on the Info tab.")}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-muted-foreground">
+        {t("Отметьте гостиницы, в которых будут проживать туристы.", "Check the hotels where tourists will stay.")}
+        {" "}{t("Показаны гостиницы из выбранной страны/города.", "Hotels are filtered by the selected country/city.")}
+      </p>
+
+      {filtered.length === 0 ? (
+        <div className="text-sm text-muted-foreground p-6 text-center border border-dashed rounded-md">
+          {t("Нет гостиниц для выбранной локации.", "No hotels available for the selected location.")}
+          {" "}<Link href="/admin/hotels"><span className="underline cursor-pointer">{t("Добавить гостиницу", "Add a hotel")}</span></Link>
+        </div>
+      ) : (
+        <div className="border rounded-md overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/40">
+              <tr>
+                <th className="w-10 p-2"></th>
+                <th className="text-left p-2 font-medium">{t("Фото", "Photo")}</th>
+                <th className="text-left p-2 font-medium">{t("Название", "Name")}</th>
+                <th className="text-left p-2 font-medium">{t("Описание", "Description")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(h => {
+                const checked = hotelIds.includes(h.id);
+                return (
+                  <tr
+                    key={h.id}
+                    className={`border-t cursor-pointer hover-elevate ${checked ? "bg-primary/5" : ""}`}
+                    onClick={() => toggleHotel(h.id)}
+                    data-testid={`row-hotel-${h.id}`}
+                  >
+                    <td className="p-2 text-center">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleHotel(h.id)}
+                        onClick={e => e.stopPropagation()}
+                        className="w-4 h-4 accent-primary cursor-pointer"
+                        data-testid={`checkbox-hotel-${h.id}`}
+                      />
+                    </td>
+                    <td className="p-2">
+                      {h.mainImage ? (
+                        <img src={h.mainImage} alt="" className="h-10 w-14 rounded object-cover" />
+                      ) : (
+                        <div className="h-10 w-14 rounded bg-muted" />
+                      )}
+                    </td>
+                    <td className="p-2 font-medium">{lang === "ru" ? h.nameRu : h.nameEn}</td>
+                    <td className="p-2 text-xs text-muted-foreground line-clamp-2 max-w-md">
+                      {(lang === "ru" ? h.descriptionRu : h.descriptionEn) || ""}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <p className="text-xs text-muted-foreground">
+        {t(`Выбрано: ${hotelIds.length}`, `Selected: ${hotelIds.length}`)}
+      </p>
     </div>
   );
 }

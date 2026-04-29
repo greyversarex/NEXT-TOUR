@@ -5,7 +5,7 @@ import {
   priceComponents, tourPriceComponents, tourOptions, tourItinerary, itineraryStops,
   banners, tourFeeds, tourFeedItems, reviews, bookings, news,
   favorites, introScreen, heroSlides, passwordResetTokens, currencies, settings,
-  alifPayments, inquiries,
+  alifPayments, inquiries, hotels, tourHotels,
   type User, type InsertUser, type Country, type InsertCountry,
   type City, type InsertCity, type Category, type InsertCategory,
   type Tour, type InsertTour, type TourDate, type InsertTourDate,
@@ -18,6 +18,7 @@ import {
   type News, type InsertNews, type Favorite, type IntroScreen, type HeroSlide,
   type PasswordResetToken, type Currency, type InsertCurrency,
   type Inquiry, type InsertInquiry,
+  type Hotel, type InsertHotel,
   type AnalyticsData, type LoyaltySettings,
 } from "@shared/schema";
 import bcrypt from "bcryptjs";
@@ -197,6 +198,16 @@ export interface IStorage {
   createCurrency(data: any): Promise<Currency>;
   updateCurrency(id: string, data: Partial<Currency>): Promise<Currency | undefined>;
   deleteCurrency(id: string): Promise<void>;
+
+  // Hotels
+  getHotels(filters?: { countryId?: string; cityId?: string }): Promise<Hotel[]>;
+  getHotel(id: string): Promise<Hotel | undefined>;
+  createHotel(data: InsertHotel): Promise<Hotel>;
+  updateHotel(id: string, data: Partial<Hotel>): Promise<Hotel | undefined>;
+  deleteHotel(id: string): Promise<void>;
+  getTourHotels(tourId: string): Promise<Hotel[]>;
+  getTourHotelIds(tourId: string): Promise<string[]>;
+  setTourHotels(tourId: string, hotelIds: string[]): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1151,6 +1162,53 @@ export class DatabaseStorage implements IStorage {
 
   async deleteInquiry(id: string) {
     await db.delete(inquiries).where(eq(inquiries.id, id));
+  }
+
+  async getHotels(filters?: { countryId?: string; cityId?: string }) {
+    const conds = [];
+    if (filters?.countryId) conds.push(eq(hotels.countryId, filters.countryId));
+    if (filters?.cityId) conds.push(eq(hotels.cityId, filters.cityId));
+    const whereClause = conds.length > 0 ? and(...conds) : undefined;
+    return db.select().from(hotels).where(whereClause).orderBy(asc(hotels.nameRu));
+  }
+
+  async getHotel(id: string) {
+    const [h] = await db.select().from(hotels).where(eq(hotels.id, id));
+    return h;
+  }
+
+  async createHotel(data: InsertHotel) {
+    const [h] = await db.insert(hotels).values(data as any).returning();
+    return h;
+  }
+
+  async updateHotel(id: string, data: Partial<Hotel>) {
+    const [h] = await db.update(hotels).set(data as any).where(eq(hotels.id, id)).returning();
+    return h;
+  }
+
+  async deleteHotel(id: string) {
+    await db.delete(tourHotels).where(eq(tourHotels.hotelId, id));
+    await db.delete(hotels).where(eq(hotels.id, id));
+  }
+
+  async getTourHotelIds(tourId: string): Promise<string[]> {
+    const rows = await db.select({ hotelId: tourHotels.hotelId })
+      .from(tourHotels).where(eq(tourHotels.tourId, tourId));
+    return rows.map(r => r.hotelId);
+  }
+
+  async getTourHotels(tourId: string): Promise<Hotel[]> {
+    const ids = await this.getTourHotelIds(tourId);
+    if (ids.length === 0) return [];
+    return db.select().from(hotels).where(inArray(hotels.id, ids)).orderBy(asc(hotels.nameRu));
+  }
+
+  async setTourHotels(tourId: string, hotelIds: string[]): Promise<void> {
+    await db.delete(tourHotels).where(eq(tourHotels.tourId, tourId));
+    if (hotelIds.length > 0) {
+      await db.insert(tourHotels).values(hotelIds.map(hid => ({ tourId, hotelId: hid })));
+    }
   }
 }
 
