@@ -368,37 +368,37 @@ export default function TourDetail() {
 
             {hotels.length > 0 && (
               <TabsContent value="accommodation">
-                <div className="grid sm:grid-cols-2 gap-4" data-testid="list-hotels">
+                <div className="flex gap-4 overflow-x-auto pb-3 -mx-1 px-1 snap-x snap-mandatory" data-testid="list-hotels">
                   {hotels.map((h: any) => {
                     const hName = lang === "ru" ? h.nameRu : h.nameEn;
                     const hDesc = lang === "ru" ? h.descriptionRu : h.descriptionEn;
                     return (
                       <div
                         key={h.id}
-                        className="rounded-2xl overflow-hidden border border-card-border bg-card flex flex-col"
+                        className="rounded-2xl overflow-hidden border border-card-border bg-card flex flex-col shrink-0 w-72 snap-start"
                         data-testid={`card-hotel-${h.id}`}
                       >
                         {h.mainImage && (
-                          <div className="aspect-[16/10] overflow-hidden bg-muted">
+                          <div className="h-44 overflow-hidden bg-muted">
                             <img src={h.mainImage} alt={hName} className="w-full h-full object-cover" loading="lazy" />
                           </div>
                         )}
                         <div className="p-4 flex-1 flex flex-col">
                           <h4 className="font-semibold text-base mb-1 flex items-center gap-2">
-                            <HotelIcon className="h-4 w-4 text-primary" />
+                            <HotelIcon className="h-4 w-4 text-primary shrink-0" />
                             {hName}
                           </h4>
                           {hDesc && (
-                            <p className="text-sm text-muted-foreground whitespace-pre-line">{hDesc}</p>
+                            <p className="text-sm text-muted-foreground line-clamp-3">{hDesc}</p>
                           )}
                           {h.images && h.images.length > 0 && (
-                            <div className="mt-3 grid grid-cols-4 gap-1.5">
+                            <div className="mt-3 flex gap-1.5">
                               {h.images.slice(0, 4).map((img: string, i: number) => (
-                                <a key={i} href={img} target="_blank" rel="noopener noreferrer">
+                                <a key={i} href={img} target="_blank" rel="noopener noreferrer" className="shrink-0">
                                   <img
                                     src={img}
                                     alt=""
-                                    className="w-full aspect-square object-cover rounded"
+                                    className="h-12 w-12 object-cover rounded"
                                     loading="lazy"
                                   />
                                 </a>
