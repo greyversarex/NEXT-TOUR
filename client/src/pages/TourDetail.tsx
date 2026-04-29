@@ -264,8 +264,8 @@ export default function TourDetail() {
               <TabsTrigger value="program">{t("Программа", "Itinerary")}</TabsTrigger>
               <TabsTrigger value="included">{t("Включено", "Included")}</TabsTrigger>
               {hotels.length > 0 && (
-                <TabsTrigger value="accommodation" className="gap-1" data-testid="tab-accommodation">
-                  <HotelIcon className="h-3.5 w-3.5" />{t("Проживание", "Accommodation")}
+                <TabsTrigger value="accommodation" data-testid="tab-accommodation">
+                  {t("Проживание", "Accommodation")}
                 </TabsTrigger>
               )}
               {reviews.length > 0 && <TabsTrigger value="reviews">{t("Отзывы", "Reviews")} ({reviews.length})</TabsTrigger>}
