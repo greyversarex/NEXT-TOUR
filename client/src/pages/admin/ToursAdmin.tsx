@@ -31,7 +31,7 @@ export default function ToursAdmin() {
   const [showForm, setShowForm] = useState(false);
 
   const { data: tours = [] } = useQuery<Tour[]>({ queryKey: ["/api/tours", "admin"],
-    queryFn: () => fetch("/api/tours", { credentials: "include" }).then(r => r.json()),
+    queryFn: () => fetch("/api/tours?includeInactive=true", { credentials: "include" }).then(r => r.json()),
   });
   const { data: countries = [] } = useQuery<Country[]>({ queryKey: ["/api/countries"] });
   const { data: categories = [] } = useQuery<any[]>({ queryKey: ["/api/categories"] });
