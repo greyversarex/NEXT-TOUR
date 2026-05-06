@@ -39,7 +39,7 @@ export default function TourDetail() {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const [datesOpen, setDatesOpen] = useState(!isMobile);
 
-  const { data, isLoading } = useQuery<any>({
+  const { data, isLoading, isError, error } = useQuery<any>({
     queryKey: [`/api/tours/${id}/full`],
     enabled: !!id,
   });
@@ -54,7 +54,7 @@ export default function TourDetail() {
     },
   });
 
-  if (isLoading || !data) {
+  if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Skeleton className="h-80 rounded-2xl mb-6" />
@@ -66,6 +66,21 @@ export default function TourDetail() {
           </div>
           <Skeleton className="h-64" />
         </div>
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 py-24 text-center">
+        <div className="text-5xl mb-4">😕</div>
+        <h2 className="text-2xl font-bold mb-2">{t("Не удалось загрузить тур", "Failed to load tour")}</h2>
+        <p className="text-muted-foreground mb-6">
+          {(error as Error)?.message || t("Попробуйте обновить страницу", "Please try refreshing the page")}
+        </p>
+        <Button variant="outline" onClick={() => window.location.reload()}>
+          {t("Обновить страницу", "Refresh page")}
+        </Button>
       </div>
     );
   }

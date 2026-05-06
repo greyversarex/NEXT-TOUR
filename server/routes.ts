@@ -319,10 +319,10 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // Countries
-  app.get("/api/countries", async (req, res) => {
+  app.get("/api/countries", ah(async (req, res) => {
     const showOnHome = req.query.showOnHome === "true";
     res.json(await storage.getCountries(showOnHome || undefined));
-  });
+  }));
   app.post("/api/countries", requireAdmin, async (req, res) => {
     const data = insertCountrySchema.parse(req.body);
     res.json(await storage.createCountry(data));
@@ -340,9 +340,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // Cities
-  app.get("/api/cities", async (req, res) => {
+  app.get("/api/cities", ah(async (req, res) => {
     res.json(await storage.getCities(req.query.countryId as string));
-  });
+  }));
   app.post("/api/cities", requireAdmin, async (req, res) => {
     const data = insertCitySchema.parse(req.body);
     res.json(await storage.createCity(data));
@@ -360,9 +360,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // Categories
-  app.get("/api/categories", async (req, res) => {
+  app.get("/api/categories", ah(async (req, res) => {
     res.json(await storage.getCategories());
-  });
+  }));
   app.post("/api/categories", requireAdmin, async (req, res) => {
     const data = insertCategorySchema.parse(req.body);
     res.json(await storage.createCategory(data));
@@ -376,7 +376,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // Tours
-  app.get("/api/tours", async (req, res) => {
+  app.get("/api/tours", ah(async (req, res) => {
     const filters = {
       countryId: req.query.countryId as string,
       cityId: req.query.cityId as string,
@@ -389,13 +389,13 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       includeInactive: req.query.includeInactive === "true" && req.isAuthenticated() && (req.user as any)?.role === "admin",
     };
     res.json(await storage.getTours(filters));
-  });
+  }));
 
-  app.get("/api/tours/:id", async (req, res) => {
+  app.get("/api/tours/:id", ah(async (req, res) => {
     const tour = await storage.getTour(req.params.id);
     if (!tour) return res.status(404).json({ message: "Tour not found" });
     res.json(tour);
-  });
+  }));
 
   app.post("/api/tours", requireAdmin, async (req, res) => {
     try {
@@ -435,10 +435,10 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json(tour);
   });
 
-  app.get("/api/tours/:id/feeds", async (req, res) => {
+  app.get("/api/tours/:id/feeds", ah(async (req, res) => {
     const feedIds = await storage.getFeedIdsForTour(req.params.id);
     res.json({ feedIds });
-  });
+  }));
 
   app.put("/api/tours/:id/feeds", requireAdmin, async (req, res) => {
     const feedIds = Array.isArray(req.body?.feedIds) ? req.body.feedIds : [];
@@ -469,13 +469,13 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
   });
 
-  app.get("/api/tours/:id/categories", async (req, res) => {
+  app.get("/api/tours/:id/categories", ah(async (req, res) => {
     const categoryIds = await storage.getTourCategoryIds(req.params.id);
     res.json({ categoryIds });
-  });
+  }));
 
   // Tour full details
-  app.get("/api/tours/:id/full", async (req, res) => {
+  app.get("/api/tours/:id/full", ah(async (req, res) => {
     const tour = await storage.getTour(req.params.id);
     if (!tour) return res.status(404).json({ message: "Tour not found" });
     const [dates, priceComponents, options, days, allStops, reviews, priceTiers, country, city, category, categoryIds, hotels] = await Promise.all([
@@ -483,27 +483,27 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       storage.getTourPriceComponents(req.params.id),
       storage.getTourOptions(req.params.id),
       storage.getTourItinerary(req.params.id),
-      storage.getAllStopsForTour(req.params.id),
+      storage.getAllStopsForTour(req.params.id).catch((e) => { console.error("[full] getAllStopsForTour failed:", e.message); return []; }),
       storage.getReviews(req.params.id, "approved"),
-      storage.getTourPriceTiers(req.params.id),
+      storage.getTourPriceTiers(req.params.id).catch((e) => { console.error("[full] getTourPriceTiers failed:", e.message); return []; }),
       tour.countryId ? storage.getCountry(tour.countryId) : Promise.resolve(undefined),
       tour.cityId ? storage.getCity(tour.cityId) : Promise.resolve(undefined),
       tour.categoryId ? storage.getCategory(tour.categoryId) : Promise.resolve(undefined),
-      storage.getTourCategoryIds(req.params.id),
-      storage.getTourHotels(req.params.id),
+      storage.getTourCategoryIds(req.params.id).catch((e) => { console.error("[full] getTourCategoryIds failed:", e.message); return []; }),
+      storage.getTourHotels(req.params.id).catch((e) => { console.error("[full] getTourHotels failed:", e.message); return []; }),
     ]);
     const itinerary = days.map(day => ({
       ...day,
-      stops: allStops.filter(s => s.itineraryDayId === day.id).sort((a, b) => a.stopOrder - b.stopOrder),
+      stops: allStops.filter((s: any) => s.itineraryDayId === day.id).sort((a: any, b: any) => a.stopOrder - b.stopOrder),
     }));
     let isFavorite = false;
     if (req.user) {
       isFavorite = await storage.isFavorite((req.user as any).id, req.params.id);
     }
     const allCategories = await storage.getCategories();
-    const categories = allCategories.filter(c => categoryIds.includes(c.id));
+    const categories = allCategories.filter((c: any) => (categoryIds as string[]).includes(c.id));
     res.json({ tour, dates, priceComponents, options, itinerary, reviews, priceTiers, isFavorite, country, city, category, categories, categoryIds, hotels });
-  });
+  }));
 
   // Tour Dates
   app.get("/api/tours/:id/price-tiers", ah(async (req, res) => {
@@ -603,9 +603,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // Itinerary Stops
-  app.get("/api/itinerary/:dayId/stops", async (req, res) => {
+  app.get("/api/itinerary/:dayId/stops", ah(async (req, res) => {
     res.json(await storage.getItineraryStops(req.params.dayId));
-  });
+  }));
   app.post("/api/itinerary/:dayId/stops", requireAdmin, async (req, res) => {
     res.json(await storage.createItineraryStop({ ...req.body, itineraryDayId: req.params.dayId }));
   });
@@ -618,9 +618,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // Banners
-  app.get("/api/banners", async (req, res) => {
+  app.get("/api/banners", ah(async (req, res) => {
     res.json(await storage.getBanners(req.query.active === "true"));
-  });
+  }));
   app.post("/api/banners", requireAdmin, async (req, res) => {
     res.json(await storage.createBanner(req.body));
   });
@@ -639,7 +639,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // Tour Feeds
-  app.get("/api/tour-feeds", async (req, res) => {
+  app.get("/api/tour-feeds", ah(async (req, res) => {
     const feeds = await storage.getTourFeeds(req.query.active === "true");
     if (req.query.withTours === "true") {
       const result = [];
@@ -650,7 +650,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       return res.json(result);
     }
     res.json(feeds);
-  });
+  }));
   app.post("/api/tour-feeds", requireAdmin, async (req, res) => {
     res.json(await storage.createTourFeed(req.body));
   });
@@ -661,10 +661,10 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     await storage.deleteTourFeed(req.params.id);
     res.json({ success: true });
   });
-  app.get("/api/tour-feeds/:id/tours", async (req, res) => {
+  app.get("/api/tour-feeds/:id/tours", ah(async (req, res) => {
     const includeInactive = req.query.includeInactive === "true" && req.isAuthenticated() && (req.user as any)?.role === "admin";
     res.json(await storage.getTourFeedItems(req.params.id, includeInactive));
-  });
+  }));
   app.post("/api/tour-feeds/:id/tours", requireAdmin, async (req, res) => {
     res.json(await storage.addTourToFeed(req.params.id, req.body.tourId));
   });
@@ -674,12 +674,12 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // Reviews
-  app.get("/api/reviews", async (req, res) => {
+  app.get("/api/reviews", ah(async (req, res) => {
     res.json(await storage.getReviews(req.query.tourId as string, req.query.status as string));
-  });
-  app.get("/api/reviews/featured", async (req, res) => {
+  }));
+  app.get("/api/reviews/featured", ah(async (req, res) => {
     res.json(await storage.getFeaturedReviews());
-  });
+  }));
   app.post("/api/reviews", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
@@ -776,17 +776,17 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // Hotels
-  app.get("/api/hotels", async (req, res) => {
+  app.get("/api/hotels", ah(async (req, res) => {
     const filters: { countryId?: string; cityId?: string } = {};
     if (req.query.countryId) filters.countryId = req.query.countryId as string;
     if (req.query.cityId) filters.cityId = req.query.cityId as string;
     res.json(await storage.getHotels(filters));
-  });
-  app.get("/api/hotels/:id", async (req, res) => {
+  }));
+  app.get("/api/hotels/:id", ah(async (req, res) => {
     const hotel = await storage.getHotel(req.params.id);
     if (!hotel) return res.status(404).json({ message: "Hotel not found" });
     res.json(hotel);
-  });
+  }));
   app.post("/api/hotels", requireAdmin, async (req, res) => {
     try {
       const data = insertHotelSchema.parse(req.body);
@@ -804,9 +804,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // Tour Hotels (selection per tour)
-  app.get("/api/tours/:id/hotels", async (req, res) => {
+  app.get("/api/tours/:id/hotels", ah(async (req, res) => {
     res.json(await storage.getTourHotels(req.params.id));
-  });
+  }));
   app.put("/api/tours/:id/hotels", requireAdmin, async (req, res) => {
     const hotelIds = Array.isArray(req.body?.hotelIds) ? req.body.hotelIds : [];
     await storage.setTourHotels(req.params.id, hotelIds);
@@ -843,15 +843,15 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // News
-  app.get("/api/news", async (req, res) => {
+  app.get("/api/news", ah(async (req, res) => {
     const publishedOnly = req.query.all !== "true" || !(req.user && (req.user as any).role === "admin");
     res.json(await storage.getNews(publishedOnly));
-  });
-  app.get("/api/news/:id", async (req, res) => {
+  }));
+  app.get("/api/news/:id", ah(async (req, res) => {
     const item = await storage.getNewsItem(req.params.id);
     if (!item) return res.status(404).json({ message: "Not found" });
     res.json(item);
-  });
+  }));
   app.post("/api/news", requireAdmin, async (req, res) => {
     res.json(await storage.createNews(req.body));
   });
@@ -875,17 +875,17 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // Intro Screen
-  app.get("/api/intro-screen", async (req, res) => {
+  app.get("/api/intro-screen", ah(async (req, res) => {
     res.json(await storage.getIntroScreen());
-  });
+  }));
   app.post("/api/intro-screen", requireAdmin, async (req, res) => {
     res.json(await storage.upsertIntroScreen(req.body));
   });
 
   // Hero Slides
-  app.get("/api/hero-slides", async (req, res) => {
+  app.get("/api/hero-slides", ah(async (req, res) => {
     res.json(await storage.getHeroSlides(req.query.active === "true"));
-  });
+  }));
   app.post("/api/hero-slides", requireAdmin, async (req, res) => {
     res.json(await storage.createHeroSlide(req.body));
   });
