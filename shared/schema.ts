@@ -76,6 +76,7 @@ export const tours = pgTable("tours", {
   isHot: boolean("is_hot").notNull().default(false),
   isFeatured: boolean("is_featured").notNull().default(false),
   isActive: boolean("is_active").notNull().default(true),
+  deletedAt: timestamp("deleted_at"),
   includedRu: text("included_ru"),
   includedEn: text("included_en"),
   notIncludedRu: text("not_included_ru"),

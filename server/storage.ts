@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { eq, and, desc, asc, ilike, or, inArray, sql, ne } from "drizzle-orm";
+import { eq, and, desc, asc, ilike, or, inArray, sql, ne, isNull } from "drizzle-orm";
 import {
   users, countries, cities, categories, tours, tourCategories, tourDates, tourPriceTiers,
   priceComponents, tourPriceComponents, tourOptions, tourItinerary, itineraryStops,
@@ -411,6 +411,8 @@ export class DatabaseStorage implements IStorage {
 
   async getTours(filters?: { countryId?: string; cityId?: string; categoryId?: string; search?: string; minPrice?: number; maxPrice?: number; duration?: number; isHot?: boolean; includeInactive?: boolean }) {
     const conditions = [];
+    // Always exclude deleted (trashed) tours from main list
+    conditions.push(isNull(tours.deletedAt));
     if (!filters?.includeInactive) conditions.push(eq(tours.isActive, true));
     if (filters?.countryId) conditions.push(eq(tours.countryId, filters.countryId));
     if (filters?.cityId) conditions.push(eq(tours.cityId, filters.cityId));
@@ -456,7 +458,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteTour(id: string) {
-    await db.update(tours).set({ isActive: false }).where(eq(tours.id, id));
+    await db.update(tours).set({ isActive: false, deletedAt: new Date() }).where(eq(tours.id, id));
   }
 
   async cloneTour(id: string) {

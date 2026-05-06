@@ -96,6 +96,7 @@ export default function ToursAdmin() {
                     <p className="font-medium text-sm truncate">{lang === "ru" ? tour.titleRu : tour.titleEn}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-xs text-muted-foreground">{tour.duration} {t("дн.", "days")} · {Number(tour.basePrice).toFixed(0)} TJS</span>
+                      {!tour.isActive && <Badge className="text-xs py-0 bg-gray-100 text-gray-500 border border-gray-300">{t("Неактивный", "Inactive")}</Badge>}
                       {tour.isHot && <Badge className="text-xs py-0 bg-orange-100 text-orange-700">{t("Горящий", "Hot")}</Badge>}
                       {tour.discountPercent > 0 && <Badge variant="secondary" className="text-xs py-0">-{tour.discountPercent}%</Badge>}
                     </div>
