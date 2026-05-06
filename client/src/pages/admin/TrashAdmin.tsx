@@ -16,10 +16,10 @@ export default function TrashAdmin() {
 
   const { data: allTours = [], isLoading } = useQuery<Tour[]>({
     queryKey: ["/api/tours", "trash"],
-    queryFn: () => fetch("/api/tours?includeInactive=true", { credentials: "include" }).then(r => r.json()),
+    queryFn: () => fetch("/api/tours?deletedOnly=true", { credentials: "include" }).then(r => r.json()),
   });
 
-  const trashedTours = allTours.filter(t => !!(t as any).deletedAt);
+  const trashedTours = allTours;
 
   const restoreMutation = useMutation({
     mutationFn: (id: string) => apiRequest("PUT", `/api/tours/${id}`, { isActive: true, deletedAt: null }),

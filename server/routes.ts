@@ -387,6 +387,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       duration: req.query.duration ? Number(req.query.duration) : undefined,
       isHot: req.query.isHot === "true",
       includeInactive: req.query.includeInactive === "true" && req.isAuthenticated() && (req.user as any)?.role === "admin",
+      deletedOnly: req.query.deletedOnly === "true" && req.isAuthenticated() && (req.user as any)?.role === "admin",
     };
     res.json(await storage.getTours(filters));
   }));

@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { eq, and, desc, asc, ilike, or, inArray, sql, ne, isNull } from "drizzle-orm";
+import { eq, and, desc, asc, ilike, or, inArray, sql, ne, isNull, isNotNull } from "drizzle-orm";
 import {
   users, countries, cities, categories, tours, tourCategories, tourDates, tourPriceTiers,
   priceComponents, tourPriceComponents, tourOptions, tourItinerary, itineraryStops,
@@ -409,11 +409,16 @@ export class DatabaseStorage implements IStorage {
     await db.delete(categories).where(eq(categories.id, id));
   }
 
-  async getTours(filters?: { countryId?: string; cityId?: string; categoryId?: string; search?: string; minPrice?: number; maxPrice?: number; duration?: number; isHot?: boolean; includeInactive?: boolean }) {
+  async getTours(filters?: { countryId?: string; cityId?: string; categoryId?: string; search?: string; minPrice?: number; maxPrice?: number; duration?: number; isHot?: boolean; includeInactive?: boolean; deletedOnly?: boolean }) {
     const conditions = [];
-    // Always exclude deleted (trashed) tours from main list
-    conditions.push(isNull(tours.deletedAt));
-    if (!filters?.includeInactive) conditions.push(eq(tours.isActive, true));
+    if (filters?.deletedOnly) {
+      // Trash view: only deleted tours (deletedAt IS NOT NULL)
+      conditions.push(isNotNull(tours.deletedAt));
+    } else {
+      // Normal view: always exclude deleted tours
+      conditions.push(isNull(tours.deletedAt));
+      if (!filters?.includeInactive) conditions.push(eq(tours.isActive, true));
+    }
     if (filters?.countryId) conditions.push(eq(tours.countryId, filters.countryId));
     if (filters?.cityId) conditions.push(eq(tours.cityId, filters.cityId));
     if (filters?.categoryId) conditions.push(eq(tours.categoryId, filters.categoryId));
