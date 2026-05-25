@@ -47,7 +47,7 @@ export default function Tours() {
   const [categoryId, setCategoryId] = useState(params.get("categoryId") || "all");
   const [isHot, setIsHot] = useState(false);
   const [discountOnly, setDiscountOnly] = useState(false);
-  const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [maxPriceFilter, setMaxPriceFilter] = useState(100000);
   const [durations, setDurations] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("newest");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -71,6 +71,11 @@ export default function Tours() {
     queryKey: [`/api/tours?${qp.toString()}`],
   });
 
+  const maxTourPrice = useMemo(() => {
+    if (tours.length === 0) return 100000;
+    return Math.ceil(Math.max(...tours.map(t => Number(t.basePrice))) / 1000) * 1000;
+  }, [tours]);
+
   const sorted = useMemo(() => [...tours].sort((a, b) => {
     if (sortBy === "price_asc") return Number(a.basePrice) - Number(b.basePrice);
     if (sortBy === "price_desc") return Number(b.basePrice) - Number(a.basePrice);
@@ -80,7 +85,7 @@ export default function Tours() {
 
   const filtered = useMemo(() => sorted.filter(tour => {
     const effectivePrice = Number(tour.basePrice) * (1 - tour.discountPercent / 100);
-    if (effectivePrice < priceRange[0] || effectivePrice > priceRange[1]) return false;
+    if (effectivePrice > maxPriceFilter) return false;
     if (cityId !== "all" && tour.cityId !== cityId) return false;
     if (discountOnly && tour.discountPercent === 0) return false;
     if (durations.length > 0) {
@@ -91,29 +96,24 @@ export default function Tours() {
       if (!match) return false;
     }
     return true;
-  }), [sorted, priceRange, cityId, discountOnly, durations]);
+  }), [sorted, maxPriceFilter, cityId, discountOnly, durations]);
 
   const toggleDuration = (key: string) => {
     setDurations(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
   };
 
-  const maxTourPrice = useMemo(() => {
-    if (tours.length === 0) return 100000;
-    return Math.ceil(Math.max(...tours.map(t => Number(t.basePrice))) / 1000) * 1000;
-  }, [tours]);
-
   const clearFilters = () => {
     setSearch(""); setCountryId("all"); setCityId("all"); setCategoryId("all");
-    setIsHot(false); setDiscountOnly(false); setPriceRange([0, maxTourPrice]); setDurations([]);
+    setIsHot(false); setDiscountOnly(false); setMaxPriceFilter(maxTourPrice); setDurations([]);
   };
 
   const activeFilterCount = [
     search, countryId !== "all", cityId !== "all", categoryId !== "all",
     isHot, discountOnly, durations.length > 0,
-    priceRange[0] > 0 || priceRange[1] < maxTourPrice
+    maxPriceFilter < maxTourPrice
   ].filter(Boolean).length;
 
-  const Sidebar = () => (
+  const sidebarJsx = (
     <aside className="w-full lg:w-72 shrink-0">
       <div className="bg-white dark:bg-card border border-border/50 rounded-2xl p-6 shadow-sm sticky top-24">
         <div className="flex items-center justify-between mb-6">
@@ -185,13 +185,15 @@ export default function Tours() {
         <FilterSection title={t("Цена (TJS/чел.)", "Price (TJS/person)")}>
           <div className="mb-4">
             <div className="flex justify-between text-sm font-semibold text-primary mb-3">
-              <span>{priceRange[0].toLocaleString()} TJS</span>
-              <span>{priceRange[1].toLocaleString()} TJS</span>
+              <span>0 TJS</span>
+              <span>{maxPriceFilter.toLocaleString()} TJS</span>
             </div>
             <Slider
-              min={0} max={maxTourPrice} step={100}
-              value={priceRange}
-              onValueChange={setPriceRange}
+              min={0}
+              max={maxTourPrice}
+              step={100}
+              value={[maxPriceFilter]}
+              onValueChange={([val]) => setMaxPriceFilter(val)}
               className="mt-1"
               data-testid="slider-price"
             />
@@ -277,7 +279,6 @@ export default function Tours() {
 
   return (
     <div className="min-h-screen">
-      {/* Page header */}
       <div className="relative overflow-hidden bg-white/15 backdrop-blur-2xl border-b border-white/20">
         <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 relative">
@@ -292,7 +293,6 @@ export default function Tours() {
             {t("Найдите идеальное путешествие из нашей коллекции эксклюзивных маршрутов", "Find your perfect journey from our collection of exclusive routes")}
           </p>
 
-          {/* Search bar inside header */}
           <div className="mt-6 max-w-2xl">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
@@ -318,7 +318,6 @@ export default function Tours() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Mobile filter toggle */}
         <div className="lg:hidden mb-4">
           <Button
             variant="outline"
@@ -332,18 +331,15 @@ export default function Tours() {
               <Badge className="h-5 w-5 p-0 flex items-center justify-center text-[10px] rounded-full">{activeFilterCount}</Badge>
             )}
           </Button>
-          {sidebarOpen && <div className="mt-4"><Sidebar /></div>}
+          {sidebarOpen && <div className="mt-4">{sidebarJsx}</div>}
         </div>
 
         <div className="flex gap-8">
-          {/* Desktop sidebar */}
           <div className="hidden lg:block">
-            <Sidebar />
+            {sidebarJsx}
           </div>
 
-          {/* Main content */}
           <div className="flex-1 min-w-0">
-            {/* Results header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
               <div>
                 {isLoading ? (
@@ -378,7 +374,6 @@ export default function Tours() {
               </div>
             </div>
 
-            {/* Active filter chips */}
             {activeFilterCount > 0 && (
               <div className="flex flex-wrap gap-2 mb-5">
                 {search && (
@@ -423,7 +418,6 @@ export default function Tours() {
               </div>
             )}
 
-            {/* Tour grid */}
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)}
