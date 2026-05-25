@@ -1,5 +1,6 @@
 import { useI18n } from "@/lib/i18n";
-import { MapPin, Phone, Mail, Clock, Award, Shield, Plane, Star, Headphones } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Award, Shield, Plane, Star, Headphones, FileText, Lock, ScrollText } from "lucide-react";
+import { Link } from "wouter";
 import officePhoto from "@assets/Generated_Image_March_13,_2026_-_2_17AM_1773350294824.png";
 
 export default function About() {
@@ -120,6 +121,39 @@ export default function About() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="mb-12 sm:mb-16">
+          <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">{t("Правовые документы", "Legal Documents")}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Link href="/offer" className="flex items-start gap-4 bg-card border border-card-border rounded-xl p-5 hover-elevate transition-all duration-300 hover:-translate-y-1 group">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <FileText className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-bold text-sm mb-1 group-hover:text-primary transition-colors">{t("Договор-оферта", "Public Offer Agreement")}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{t("Публичный договор на оказание туристических услуг", "Public agreement for tourist services")}</p>
+              </div>
+            </Link>
+            <Link href="/privacy" className="flex items-start gap-4 bg-card border border-card-border rounded-xl p-5 hover-elevate transition-all duration-300 hover:-translate-y-1 group">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <Lock className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-bold text-sm mb-1 group-hover:text-primary transition-colors">{t("Политика конфиденциальности", "Privacy Policy")}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{t("Как мы обрабатываем и защищаем ваши данные", "How we process and protect your data")}</p>
+              </div>
+            </Link>
+            <Link href="/terms" className="flex items-start gap-4 bg-card border border-card-border rounded-xl p-5 hover-elevate transition-all duration-300 hover:-translate-y-1 group">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <ScrollText className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-bold text-sm mb-1 group-hover:text-primary transition-colors">{t("Условия использования", "Terms of Service")}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{t("Правила пользования сервисом NEXT TOUR", "Rules for using the NEXT TOUR service")}</p>
+              </div>
+            </Link>
           </div>
         </div>
 

@@ -23,7 +23,10 @@ export default function Footer() {
 
         <div className="border-t border-white/8 mt-5 sm:mt-8 pt-4 sm:pt-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] sm:text-xs text-white/25">
           <span>© {new Date().getFullYear()} NEXT TOUR. Все права защищены.</span>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-end">
+            <Link href="/offer" className="hover:text-white/50 transition-colors">
+              Договор-оферта
+            </Link>
             <Link href="/privacy" className="hover:text-white/50 transition-colors" data-testid="link-privacy">
               Политика конфиденциальности
             </Link>

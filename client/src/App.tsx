@@ -51,6 +51,7 @@ import VerifyEmail from "@/pages/VerifyEmail";
 import PaymentResult from "@/pages/PaymentResult";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
+import Offer from "@/pages/Offer";
 
 // Admin pages — lazy (грузятся только при открытии /admin/*)
 const Dashboard          = lazy(() => import("@/pages/admin/Dashboard"));
@@ -100,6 +101,7 @@ function Router() {
       <Route path="/payment/result" component={PaymentResult} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
+      <Route path="/offer" component={Offer} />
       <Route path="/admin">
         {() => <Suspense fallback={<AdminFallback />}><Dashboard /></Suspense>}
       </Route>
