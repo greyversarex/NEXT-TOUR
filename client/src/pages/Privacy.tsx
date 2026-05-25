@@ -5,6 +5,7 @@ export default function Privacy() {
 
   return (
     <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-12 sm:py-16">
+      <div className="bg-white/95 dark:bg-card/98 backdrop-blur-xl rounded-2xl sm:rounded-3xl px-6 sm:px-10 py-10 sm:py-12 shadow-xl border border-white/30">
       <h1 className="text-3xl font-bold mb-2">{t("Политика конфиденциальности", "Privacy Policy")}</h1>
       <p className="text-muted-foreground text-sm mb-10">{t("Последнее обновление: 12 апреля 2026 г.", "Last updated: April 12, 2026")}</p>
 
@@ -116,6 +117,7 @@ export default function Privacy() {
           </ul>
         </section>
 
+      </div>
       </div>
     </div>
   );

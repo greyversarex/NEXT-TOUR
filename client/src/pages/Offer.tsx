@@ -6,6 +6,7 @@ export default function Offer() {
 
   return (
     <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-12 sm:py-16">
+      <div className="bg-white/95 dark:bg-card/98 backdrop-blur-xl rounded-2xl sm:rounded-3xl px-6 sm:px-10 py-10 sm:py-12 shadow-xl border border-white/30">
       <div className="flex items-center gap-3 mb-2">
         <FileText className="h-7 w-7 text-primary shrink-0" />
         <h1 className="text-3xl font-bold">{t("Публичный договор-оферта", "Public Offer Agreement")}</h1>
@@ -242,6 +243,7 @@ export default function Offer() {
           </p>
         </section>
 
+      </div>
       </div>
     </div>
   );
