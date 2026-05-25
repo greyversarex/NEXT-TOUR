@@ -47,7 +47,7 @@ export default function Tours() {
   const [categoryId, setCategoryId] = useState(params.get("categoryId") || "all");
   const [isHot, setIsHot] = useState(false);
   const [discountOnly, setDiscountOnly] = useState(false);
-  const [priceRange, setPriceRange] = useState([0, 5000]);
+  const [priceRange, setPriceRange] = useState([0, 100000]);
   const [durations, setDurations] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("newest");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -97,15 +97,20 @@ export default function Tours() {
     setDurations(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
   };
 
+  const maxTourPrice = useMemo(() => {
+    if (tours.length === 0) return 100000;
+    return Math.ceil(Math.max(...tours.map(t => Number(t.basePrice))) / 1000) * 1000;
+  }, [tours]);
+
   const clearFilters = () => {
     setSearch(""); setCountryId("all"); setCityId("all"); setCategoryId("all");
-    setIsHot(false); setDiscountOnly(false); setPriceRange([0, 5000]); setDurations([]);
+    setIsHot(false); setDiscountOnly(false); setPriceRange([0, maxTourPrice]); setDurations([]);
   };
 
   const activeFilterCount = [
     search, countryId !== "all", cityId !== "all", categoryId !== "all",
     isHot, discountOnly, durations.length > 0,
-    priceRange[0] > 0 || priceRange[1] < 5000
+    priceRange[0] > 0 || priceRange[1] < maxTourPrice
   ].filter(Boolean).length;
 
   const Sidebar = () => (
@@ -177,22 +182,22 @@ export default function Tours() {
           </FilterSection>
         )}
 
-        <FilterSection title={t("Цена ($/чел.)", "Price ($/person)")}>
+        <FilterSection title={t("Цена (TJS/чел.)", "Price (TJS/person)")}>
           <div className="mb-4">
             <div className="flex justify-between text-sm font-semibold text-primary mb-3">
-              <span>${priceRange[0].toLocaleString()}</span>
-              <span>${priceRange[1].toLocaleString()}</span>
+              <span>{priceRange[0].toLocaleString()} TJS</span>
+              <span>{priceRange[1].toLocaleString()} TJS</span>
             </div>
             <Slider
-              min={0} max={5000} step={50}
+              min={0} max={maxTourPrice} step={100}
               value={priceRange}
               onValueChange={setPriceRange}
               className="mt-1"
               data-testid="slider-price"
             />
             <div className="flex justify-between text-xs text-muted-foreground mt-2">
-              <span>$0</span>
-              <span>$5,000</span>
+              <span>0 TJS</span>
+              <span>{maxTourPrice.toLocaleString()} TJS</span>
             </div>
           </div>
         </FilterSection>
