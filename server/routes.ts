@@ -48,7 +48,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   app.use(session({
     store: new PgSession({ pool, createTableIfMissing: true }),
-    secret: process.env.SESSION_SECRET || "travel-platform-secret-key-2024",
+    secret: process.env.SESSION_SECRET!,
     resave: false,
     saveUninitialized: false,
     cookie: {
