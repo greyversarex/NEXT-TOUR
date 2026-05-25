@@ -831,9 +831,9 @@ function LocalItineraryManager({ items, setItems }: { items: any[]; setItems: (i
                       <Input placeholder={t("Название (RU)", "Title (RU)")} value={stopForm.titleRu} onChange={e => setStopForm(p => ({ ...p, titleRu: e.target.value }))} className="h-8 text-xs" />
                       <Input placeholder={t("Название (EN)", "Title (EN)")} value={stopForm.titleEn} onChange={e => setStopForm(p => ({ ...p, titleEn: e.target.value }))} className="h-8 text-xs" />
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Input placeholder={t("Описание (RU)", "Desc (RU)")} value={stopForm.descriptionRu} onChange={e => setStopForm(p => ({ ...p, descriptionRu: e.target.value }))} className="h-8 text-xs" />
-                      <Input placeholder={t("Описание (EN)", "Desc (EN)")} value={stopForm.descriptionEn} onChange={e => setStopForm(p => ({ ...p, descriptionEn: e.target.value }))} className="h-8 text-xs" />
+                    <div className="space-y-2">
+                      <div><Label className="text-xs">{t("Описание (RU)", "Desc (RU)")}</Label><div className="mt-1"><RichTextEditor value={stopForm.descriptionRu} onChange={v => setStopForm(p => ({ ...p, descriptionRu: v }))} placeholder={t("Описание остановки...", "Stop description...")} minHeight="60px" /></div></div>
+                      <div><Label className="text-xs">{t("Описание (EN)", "Desc (EN)")}</Label><div className="mt-1"><RichTextEditor value={stopForm.descriptionEn} onChange={v => setStopForm(p => ({ ...p, descriptionEn: v }))} placeholder="Stop description..." minHeight="60px" /></div></div>
                     </div>
                     <div className="flex gap-2 items-end">
                       <Input type="number" placeholder={t("Минут", "Minutes")} value={stopForm.durationMinutes} onChange={e => setStopForm(p => ({ ...p, durationMinutes: e.target.value }))} className="h-8 text-xs w-24" min={1} />
@@ -1130,9 +1130,9 @@ function ItineraryManager({ tourId }: { tourId: string }) {
                           <Input placeholder={t("Название (RU)", "Title (RU)")} value={editingStop.titleRu || ""} onChange={e => setEditingStop((p: any) => ({ ...p, titleRu: e.target.value }))} className="h-8 text-xs" />
                           <Input placeholder={t("Название (EN)", "Title (EN)")} value={editingStop.titleEn || ""} onChange={e => setEditingStop((p: any) => ({ ...p, titleEn: e.target.value }))} className="h-8 text-xs" />
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <Textarea placeholder={t("Описание (RU)", "Desc (RU)")} value={editingStop.descriptionRu || ""} onChange={e => setEditingStop((p: any) => ({ ...p, descriptionRu: e.target.value }))} className="text-xs min-h-[60px]" />
-                          <Textarea placeholder={t("Описание (EN)", "Desc (EN)")} value={editingStop.descriptionEn || ""} onChange={e => setEditingStop((p: any) => ({ ...p, descriptionEn: e.target.value }))} className="text-xs min-h-[60px]" />
+                        <div className="space-y-2">
+                          <div><Label className="text-xs">{t("Описание (RU)", "Desc (RU)")}</Label><div className="mt-1"><RichTextEditor value={editingStop.descriptionRu || ""} onChange={v => setEditingStop((p: any) => ({ ...p, descriptionRu: v }))} placeholder={t("Описание остановки...", "Stop description...")} minHeight="60px" /></div></div>
+                          <div><Label className="text-xs">{t("Описание (EN)", "Desc (EN)")}</Label><div className="mt-1"><RichTextEditor value={editingStop.descriptionEn || ""} onChange={v => setEditingStop((p: any) => ({ ...p, descriptionEn: v }))} placeholder="Stop description..." minHeight="60px" /></div></div>
                         </div>
                         <div className="flex gap-2 items-end">
                           <Input type="number" placeholder={t("Минут", "Minutes")} value={editingStop.durationMinutes ?? ""} onChange={e => setEditingStop((p: any) => ({ ...p, durationMinutes: e.target.value ? Number(e.target.value) : null }))} className="h-8 text-xs w-24" min={1} />
@@ -1161,9 +1161,9 @@ function ItineraryManager({ tourId }: { tourId: string }) {
                       <Input placeholder={t("Название (RU)", "Title (RU)")} value={stopForm.titleRu} onChange={e => setStopForm(p => ({ ...p, titleRu: e.target.value }))} className="h-8 text-xs" />
                       <Input placeholder={t("Название (EN)", "Title (EN)")} value={stopForm.titleEn} onChange={e => setStopForm(p => ({ ...p, titleEn: e.target.value }))} className="h-8 text-xs" />
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Input placeholder={t("Описание (RU)", "Desc (RU)")} value={stopForm.descriptionRu} onChange={e => setStopForm(p => ({ ...p, descriptionRu: e.target.value }))} className="h-8 text-xs" />
-                      <Input placeholder={t("Описание (EN)", "Desc (EN)")} value={stopForm.descriptionEn} onChange={e => setStopForm(p => ({ ...p, descriptionEn: e.target.value }))} className="h-8 text-xs" />
+                    <div className="space-y-2">
+                      <div><Label className="text-xs">{t("Описание (RU)", "Desc (RU)")}</Label><div className="mt-1"><RichTextEditor value={stopForm.descriptionRu} onChange={v => setStopForm(p => ({ ...p, descriptionRu: v }))} placeholder={t("Описание остановки...", "Stop description...")} minHeight="60px" /></div></div>
+                      <div><Label className="text-xs">{t("Описание (EN)", "Desc (EN)")}</Label><div className="mt-1"><RichTextEditor value={stopForm.descriptionEn} onChange={v => setStopForm(p => ({ ...p, descriptionEn: v }))} placeholder="Stop description..." minHeight="60px" /></div></div>
                     </div>
                     <div className="flex gap-2 items-end">
                       <Input type="number" placeholder={t("Минут", "Minutes")} value={stopForm.durationMinutes} onChange={e => setStopForm(p => ({ ...p, durationMinutes: e.target.value }))} className="h-8 text-xs w-24" min={1} />

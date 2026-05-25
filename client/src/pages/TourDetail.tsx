@@ -325,9 +325,12 @@ export default function TourDetail() {
                                   <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-primary/40 border-2 border-background" />
                                   <div>
                                     <p className="text-sm font-medium">{idx + 1}. {lang === "ru" ? stop.titleRu : stop.titleEn}</p>
-                                    {(lang === "ru" ? stop.descriptionRu : stop.descriptionEn) && (
-                                      <p className="text-xs text-muted-foreground mt-0.5">{lang === "ru" ? stop.descriptionRu : stop.descriptionEn}</p>
-                                    )}
+                                    {(lang === "ru" ? stop.descriptionRu : stop.descriptionEn) && (() => {
+                                      const stopDesc = lang === "ru" ? stop.descriptionRu : stop.descriptionEn;
+                                      return /<[a-z][\s\S]*>/i.test(stopDesc)
+                                        ? <div className="text-xs text-muted-foreground mt-0.5 prose prose-sm max-w-none [&_p]:mb-0.5 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4" dangerouslySetInnerHTML={{ __html: stopDesc }} />
+                                        : <p className="text-xs text-muted-foreground mt-0.5">{stopDesc}</p>;
+                                    })()}
                                     {stop.durationMinutes && (
                                       <span className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
                                         <Clock className="h-3 w-3" /> {stop.durationMinutes} {t("мин.", "min.")}
