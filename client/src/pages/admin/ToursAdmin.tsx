@@ -793,9 +793,9 @@ function LocalItineraryManager({ items, setItems }: { items: any[]; setItems: (i
           <div><Label className="text-xs">{t("Заголовок (RU)", "Title (RU)")}</Label><Input value={form.titleRu} onChange={e => setForm(p => ({ ...p, titleRu: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
           <div><Label className="text-xs">{t("Заголовок (EN)", "Title (EN)")}</Label><Input value={form.titleEn} onChange={e => setForm(p => ({ ...p, titleEn: e.target.value }))} className="mt-1 h-9 text-sm" /></div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div><Label className="text-xs">{t("Описание (RU)", "Desc (RU)")}</Label><Textarea value={form.descriptionRu} onChange={e => setForm(p => ({ ...p, descriptionRu: e.target.value }))} className="mt-1 text-sm min-h-[60px]" /></div>
-          <div><Label className="text-xs">{t("Описание (EN)", "Desc (EN)")}</Label><Textarea value={form.descriptionEn} onChange={e => setForm(p => ({ ...p, descriptionEn: e.target.value }))} className="mt-1 text-sm min-h-[60px]" /></div>
+        <div className="space-y-3">
+          <div><Label className="text-xs">{t("Описание (RU)", "Desc (RU)")}</Label><div className="mt-1"><RichTextEditor value={form.descriptionRu} onChange={v => setForm(p => ({ ...p, descriptionRu: v }))} placeholder={t("Описание дня...", "Day description...")} minHeight="80px" /></div></div>
+          <div><Label className="text-xs">{t("Описание (EN)", "Desc (EN)")}</Label><div className="mt-1"><RichTextEditor value={form.descriptionEn} onChange={v => setForm(p => ({ ...p, descriptionEn: v }))} placeholder="Day description..." minHeight="80px" /></div></div>
         </div>
         <Button type="button" size="sm" onClick={addDay}>{t("Добавить", "Add")}</Button>
       </div>
@@ -1081,14 +1081,14 @@ function ItineraryManager({ tourId }: { tourId: string }) {
             <Input value={activeForm.titleEn} onChange={e => setF("titleEn", e.target.value)} className="mt-1 h-9 text-sm" />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-3">
           <div>
             <Label className="text-xs">{t("Описание (RU)", "Description (RU)")}</Label>
-            <Textarea value={activeForm.descriptionRu} onChange={e => setF("descriptionRu", e.target.value)} className="mt-1 text-sm min-h-[60px]" />
+            <div className="mt-1"><RichTextEditor value={activeForm.descriptionRu} onChange={v => setF("descriptionRu", v)} placeholder={t("Описание дня...", "Day description...")} minHeight="80px" /></div>
           </div>
           <div>
             <Label className="text-xs">{t("Описание (EN)", "Description (EN)")}</Label>
-            <Textarea value={activeForm.descriptionEn} onChange={e => setF("descriptionEn", e.target.value)} className="mt-1 text-sm min-h-[60px]" />
+            <div className="mt-1"><RichTextEditor value={activeForm.descriptionEn} onChange={v => setF("descriptionEn", v)} placeholder="Day description..." minHeight="80px" /></div>
           </div>
         </div>
         <div className="flex gap-2">
