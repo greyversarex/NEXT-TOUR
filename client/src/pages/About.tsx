@@ -69,20 +69,38 @@ export default function About() {
           <div className="space-y-4">
             <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
               {t(
-                "NEXT TOUR — туристическая компания из Душанбе, основанная в 2023 году. Мы специализируемся на организации групповых и индивидуальных туров по самым популярным направлениям мира: от пляжного отдыха в Юго-Восточной Азии до экскурсионных программ по Европе и Ближнему Востоку.",
-                "NEXT TOUR is a travel company from Dushanbe, founded in 2023. We specialize in organizing group and individual tours to the world's most popular destinations: from beach holidays in Southeast Asia to sightseeing programs across Europe and the Middle East."
+                "NEXT TOUR - современная туристическая компания из Душанбе, официально работающая на рынке с 2023 года. Несмотря на молодой возраст, мы уже успели зарекомендовать себя как надёжный партнёр в сфере туризма, успешно организовав более 500 туров по Таджикистану и странам Центральной Азии.",
+                "NEXT TOUR is a modern travel company from Dushanbe, officially operating since 2023. Despite our young age, we have already established ourselves as a reliable partner in tourism, having successfully organized over 500 tours across Tajikistan and Central Asia."
               )}
             </p>
             <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
               {t(
-                "За годы работы мы помогли тысячам клиентов организовать идеальный отдых. Наша команда опытных менеджеров лично знает каждое направление и подберёт тур, который подойдёт именно вам — будь то романтическое путешествие, семейный отдых или приключение с друзьями.",
-                "Over the years, we have helped thousands of clients organize the perfect vacation. Our team of experienced managers personally knows every destination and will find a tour that suits you — whether it's a romantic trip, a family holiday, or an adventure with friends."
+                "Мы специализируемся на создании групповых и индивидуальных путешествий, продумывая каждую деталь — от маршрута до атмосферы поездки. Наша цель — не просто показать достопримечательности, а подарить клиентам настоящие эмоции, впечатления и комфорт на каждом этапе путешествия.",
+                "We specialize in creating group and individual journeys, thinking through every detail — from the itinerary to the atmosphere of the trip. Our goal is not just to show the sights, but to give our clients real emotions, experiences, and comfort at every stage of their journey."
               )}
             </p>
             <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
               {t(
-                "Мы работаем напрямую с авиакомпаниями, отелями и принимающими сторонами, что позволяет нам гарантировать лучшие цены и качество обслуживания на каждом этапе вашего путешествия.",
-                "We work directly with airlines, hotels, and local partners, which allows us to guarantee the best prices and service quality at every stage of your journey."
+                "Команда NEXT TOUR — это опытные менеджеры и гиды, которые лично знают маршруты, отели и особенности каждого направления. Благодаря этому мы подбираем туры, максимально соответствующие запросам туриста — будь то романтический отдых, семейное путешествие или активное приключение с друзьями.",
+                "The NEXT TOUR team consists of experienced managers and guides who personally know the routes, hotels, and features of each destination. This allows us to select tours that best match what each traveler is looking for — whether it's a romantic getaway, a family trip, or an active adventure with friends."
+              )}
+            </p>
+            <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
+              {t(
+                "Мы напрямую сотрудничаем с отелями, транспортными компаниями и принимающими сторонами, что позволяет нам предлагать лучшие цены без посредников, обеспечивать высокий уровень сервиса и оперативно решать любые вопросы во время поездки.",
+                "We work directly with hotels, transport companies, and local partners, which allows us to offer the best prices without intermediaries, ensure a high level of service, and promptly resolve any issues during the trip."
+              )}
+            </p>
+            <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
+              {t(
+                "Особое внимание мы уделяем развитию внутреннего туризма, открывая для наших гостей уникальную природу и культуру Таджикистана — от живописных горных озёр до древних исторических маршрутов.",
+                "We pay special attention to the development of domestic tourism, revealing to our guests the unique nature and culture of Tajikistan — from picturesque mountain lakes to ancient historical routes."
+              )}
+            </p>
+            <p className="text-muted-foreground leading-relaxed text-sm sm:text-base font-medium">
+              {t(
+                "NEXT TOUR — это не просто туры. Это путешествия, которые остаются в памяти.",
+                "NEXT TOUR — it's not just tours. These are journeys that stay with you forever."
               )}
             </p>
           </div>
