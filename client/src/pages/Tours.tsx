@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
+import { useCurrency } from "@/lib/currency";
 import { Search, SlidersHorizontal, X, Compass, ChevronDown, ChevronUp } from "lucide-react";
 import type { Tour, Country, City, Category } from "@shared/schema";
 
@@ -38,6 +39,7 @@ function FilterSection({ title, children, defaultOpen = true }: { title: string;
 
 export default function Tours() {
   const { t, lang } = useI18n();
+  const { formatPrice, currentSymbol } = useCurrency();
   const searchStr = useSearch();
   const params = new URLSearchParams(searchStr);
 
@@ -182,11 +184,11 @@ export default function Tours() {
           </FilterSection>
         )}
 
-        <FilterSection title={t("Цена (TJS/чел.)", "Price (TJS/person)")}>
+        <FilterSection title={t(`Цена (${currentSymbol}/чел.)`, `Price (${currentSymbol}/person)`)}>
           <div className="mb-4">
             <div className="flex justify-between text-sm font-semibold text-primary mb-3">
-              <span>0 TJS</span>
-              <span>{maxPriceFilter.toLocaleString()} TJS</span>
+              <span>{formatPrice(0)}</span>
+              <span>{formatPrice(maxPriceFilter)}</span>
             </div>
             <Slider
               min={0}
@@ -198,8 +200,8 @@ export default function Tours() {
               data-testid="slider-price"
             />
             <div className="flex justify-between text-xs text-muted-foreground mt-2">
-              <span>0 TJS</span>
-              <span>{maxTourPrice.toLocaleString()} TJS</span>
+              <span>{formatPrice(0)}</span>
+              <span>{formatPrice(maxTourPrice)}</span>
             </div>
           </div>
         </FilterSection>
