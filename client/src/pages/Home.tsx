@@ -664,7 +664,7 @@ function DestinationsSection() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 md:gap-6 mt-[66px] mb-[66px]">
             {destinations.map((dest, i) => {
               const size = (dest as any).cardSize || "normal";
               let wrapClass = "";
