@@ -657,16 +657,6 @@ function DestinationsSection() {
   return (
     <section className="py-6 sm:py-12 md:py-20 relative overflow-hidden text-[16px] mt-[-131px] mb-[-80px]">
       <div className="relative px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <Reveal className="text-center mb-6 sm:mb-10 md:mb-14">
-          <p className="text-cyan-300 font-semibold text-xs sm:text-sm uppercase tracking-widest mb-1.5 sm:mb-3 flex items-center justify-center gap-1.5" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
-            <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> {t("Исследуйте", "Explore")}
-          </p>
-          <h2 className="text-xl sm:text-2xl md:text-5xl font-bold mb-2 sm:mb-4 leading-tight text-white" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>{t("Направления мечты", "Dream Destinations")}</h2>
-          <p className="text-white/70 max-w-xl mx-auto text-xs sm:text-sm md:text-base leading-relaxed px-2" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.4)" }}>
-            {t("Откройте для себя самые красивые уголки планеты с нашими эксклюзивными турами", "Discover the most beautiful corners of the planet with our exclusive tours")}
-          </p>
-        </Reveal>
-
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 md:gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
