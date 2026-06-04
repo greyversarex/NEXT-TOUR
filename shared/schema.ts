@@ -325,6 +325,20 @@ export const tourHotels = pgTable("tour_hotels", {
   pk: primaryKey({ columns: [t.tourId, t.hotelId] }),
 }));
 
+export const tourCountries = pgTable("tour_countries", {
+  tourId: varchar("tour_id").notNull().references(() => tours.id, { onDelete: "cascade" }),
+  countryId: varchar("country_id").notNull().references(() => countries.id, { onDelete: "cascade" }),
+}, (t) => ({
+  pk: primaryKey({ columns: [t.tourId, t.countryId] }),
+}));
+
+export const tourCities = pgTable("tour_cities", {
+  tourId: varchar("tour_id").notNull().references(() => tours.id, { onDelete: "cascade" }),
+  cityId: varchar("city_id").notNull().references(() => cities.id, { onDelete: "cascade" }),
+}, (t) => ({
+  pk: primaryKey({ columns: [t.tourId, t.cityId] }),
+}));
+
 export const settings = pgTable("settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   key: text("key").notNull().unique(),
@@ -365,6 +379,8 @@ export const insertIntroScreenSchema = createInsertSchema(introScreen).omit({ id
 export const insertHeroSlideSchema = createInsertSchema(heroSlides).omit({ id: true });
 export const insertTourCategorySchema = createInsertSchema(tourCategories);
 export const insertHotelSchema = createInsertSchema(hotels).omit({ id: true, createdAt: true });
+export const insertTourCountrySchema = createInsertSchema(tourCountries);
+export const insertTourCitySchema = createInsertSchema(tourCities);
 
 // Types
 export type User = typeof users.$inferSelect;

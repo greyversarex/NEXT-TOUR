@@ -85,13 +85,13 @@ export default function TourDetail() {
     );
   }
 
-  const { tour, dates, options, itinerary, reviews, priceTiers = [], isFavorite, country, city, category, categories: tourCategoriesList, hotels = [] } = data;
+  const { tour, dates, options, itinerary, reviews, priceTiers = [], isFavorite, country, city, category, categories: tourCategoriesList, hotels = [], tourCountriesList = [], tourCitiesList = [] } = data;
   const title = lang === "ru" ? tour.titleRu : tour.titleEn;
   const description = lang === "ru" ? tour.descriptionRu : tour.descriptionEn;
   const included = lang === "ru" ? tour.includedRu : tour.includedEn;
   const notIncluded = lang === "ru" ? tour.notIncludedRu : tour.notIncludedEn;
-  const countryName = country ? (lang === "ru" ? country.nameRu : country.nameEn) : null;
-  const cityName = city ? (lang === "ru" ? city.nameRu : city.nameEn) : null;
+  const displayCountries: any[] = tourCountriesList.length > 0 ? tourCountriesList : (country ? [country] : []);
+  const displayCities: any[] = tourCitiesList.length > 0 ? tourCitiesList : (city ? [city] : []);
   const categoryNames: string[] = (tourCategoriesList && tourCategoriesList.length > 0)
     ? tourCategoriesList.map((c: any) => lang === "ru" ? c.nameRu : c.nameEn)
     : category ? [lang === "ru" ? category.nameRu : category.nameEn] : [];
@@ -224,24 +224,24 @@ export default function TourDetail() {
                 <Clock className="h-4 w-4 text-primary" /> {tour.duration} {t("дней", "days")}
               </span>
 
-              {/* Country */}
-              {countryName && (
-                <span className="flex items-center gap-1.5 text-sm font-medium bg-muted/60 rounded-full px-3 py-1.5">
-                  {country?.countryCode
-                    ? <span className="text-base leading-none">{String.fromCodePoint(...[...country.countryCode.toUpperCase()].map(c => 0x1F1E0 - 65 + c.charCodeAt(0)))}</span>
+              {/* Countries */}
+              {displayCountries.map((c: any) => (
+                <span key={c.id} className="flex items-center gap-1.5 text-sm font-medium bg-muted/60 rounded-full px-3 py-1.5">
+                  {c.countryCode
+                    ? <span className="text-base leading-none">{String.fromCodePoint(...[...c.countryCode.toUpperCase()].map((ch: string) => 0x1F1E0 - 65 + ch.charCodeAt(0)))}</span>
                     : <MapPin className="h-4 w-4 text-primary" />
                   }
-                  {countryName}
+                  {lang === "ru" ? c.nameRu : c.nameEn}
                 </span>
-              )}
+              ))}
 
-              {/* City */}
-              {cityName && (
-                <span className="flex items-center gap-1.5 text-sm font-medium bg-muted/60 rounded-full px-3 py-1.5">
+              {/* Cities */}
+              {displayCities.map((c: any) => (
+                <span key={c.id} className="flex items-center gap-1.5 text-sm font-medium bg-muted/60 rounded-full px-3 py-1.5">
                   <MapPin className="h-4 w-4 text-primary/70" />
-                  {cityName}
+                  {lang === "ru" ? c.nameRu : c.nameEn}
                 </span>
-              )}
+              ))}
 
               {/* Categories */}
               {categoryNames.map((name, i) => (

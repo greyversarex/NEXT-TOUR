@@ -76,7 +76,16 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
   const city = cities.find(c => c.id === tour.cityId);
   const countryName = country ? (lang === "ru" ? country.nameRu : country.nameEn) : null;
   const cityName = city ? (lang === "ru" ? city.nameRu : city.nameEn) : null;
-  const locationLabel = [cityName, countryName].filter(Boolean).join(", ");
+  const tourCountries: Country[] = (tour as any).countryIds?.length
+    ? countries.filter(c => (tour as any).countryIds.includes(c.id))
+    : country ? [country] : [];
+  const tourCities: City[] = (tour as any).cityIds?.length
+    ? cities.filter(c => (tour as any).cityIds.includes(c.id))
+    : city ? [city] : [];
+  const locationLabel = [
+    ...tourCities.map(c => lang === "ru" ? c.nameRu : c.nameEn),
+    ...tourCountries.map(c => lang === "ru" ? c.nameRu : c.nameEn),
+  ].filter(Boolean).join(", ") || [cityName, countryName].filter(Boolean).join(", ");
 
   const [copied, setCopied] = useState(false);
 

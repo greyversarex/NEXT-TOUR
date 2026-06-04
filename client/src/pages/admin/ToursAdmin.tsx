@@ -160,6 +160,12 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
   );
   const [feedIds, setFeedIds] = useState<string[]>([]);
   const [hotelIds, setHotelIds] = useState<string[]>([]);
+  const [countryIds, setCountryIds] = useState<string[]>(
+    tour.countryId ? [tour.countryId] : []
+  );
+  const [cityIds, setCityIds] = useState<string[]>(
+    tour.cityId ? [tour.cityId] : []
+  );
 
   const { data: existingCats } = useQuery<{ categoryIds: string[] }>({
     queryKey: ["/api/tours", tour.id, "categories"],
@@ -173,6 +179,11 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
 
   const { data: existingHotels } = useQuery<any[]>({
     queryKey: ["/api/tours", tour.id, "hotels"],
+    enabled: !!tour.id,
+  });
+
+  const { data: existingLocations } = useQuery<{ countryIds: string[]; cityIds: string[] }>({
+    queryKey: ["/api/tours", tour.id, "locations"],
     enabled: !!tour.id,
   });
 
@@ -201,8 +212,32 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
     }
   }, [existingHotels]);
 
+  useEffect(() => {
+    if (existingLocations) {
+      if (existingLocations.countryIds.length > 0) setCountryIds(existingLocations.countryIds);
+      if (existingLocations.cityIds.length > 0) setCityIds(existingLocations.cityIds);
+    }
+  }, [existingLocations]);
+
   const toggleHotel = (id: string) => {
     setHotelIds(prev => prev.includes(id) ? prev.filter(h => h !== id) : [...prev, id]);
+  };
+
+  const toggleCountry = (id: string) => {
+    setCountryIds(prev => prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]);
+    setCityIds(prev => {
+      const remainingCountries = countryIds.includes(id)
+        ? countryIds.filter(c => c !== id)
+        : [...countryIds, id];
+      return prev.filter(cityId => {
+        const city = cities.find((c: any) => c.id === cityId);
+        return city && remainingCountries.includes(city.countryId);
+      });
+    });
+  };
+
+  const toggleCity = (id: string) => {
+    setCityIds(prev => prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]);
   };
 
   const toggleCategory = (id: string) => {
@@ -313,7 +348,7 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
       const res = await apiRequest(
         isEdit ? "PUT" : "POST",
         isEdit ? `/api/tours/${tour.id}` : "/api/tours",
-        { ...form, categoryId: categoryIds[0] || null, categoryIds, feedIds, hotelIds }
+        { ...form, countryId: countryIds[0] || null, cityId: cityIds[0] || null, categoryId: categoryIds[0] || null, categoryIds, feedIds, hotelIds, countryIds, cityIds }
       );
       const saved = await res.json();
       const tourId = saved.id;
@@ -385,18 +420,42 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <Label>{t("Страна", "Country")}</Label>
-                    <Select value={form.countryId} onValueChange={v => set("countryId", v)}>
-                      <SelectTrigger className="mt-1"><SelectValue placeholder={t("Выберите", "Select")} /></SelectTrigger>
-                      <SelectContent>{countries.map((c: any) => <SelectItem key={c.id} value={c.id}>{lang === "ru" ? c.nameRu : c.nameEn}</SelectItem>)}</SelectContent>
-                    </Select>
+                    <Label>{t("Страны", "Countries")}</Label>
+                    <div className="mt-1 border rounded-md p-2 space-y-1 max-h-36 overflow-y-auto">
+                      {countries.map((c: any) => (
+                        <label key={c.id} className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 rounded px-1 py-0.5">
+                          <input
+                            type="checkbox"
+                            checked={countryIds.includes(c.id)}
+                            onChange={() => toggleCountry(c.id)}
+                            className="accent-primary"
+                          />
+                          <span className="text-sm">{lang === "ru" ? c.nameRu : c.nameEn}</span>
+                        </label>
+                      ))}
+                      {countries.length === 0 && <p className="text-xs text-muted-foreground px-1">{t("Нет стран", "No countries")}</p>}
+                    </div>
                   </div>
                   <div>
-                    <Label>{t("Город", "City")}</Label>
-                    <Select value={form.cityId} onValueChange={v => set("cityId", v)}>
-                      <SelectTrigger className="mt-1"><SelectValue placeholder={t("Выберите", "Select")} /></SelectTrigger>
-                      <SelectContent>{cities.filter((c: any) => !form.countryId || c.countryId === form.countryId).map((c: any) => <SelectItem key={c.id} value={c.id}>{lang === "ru" ? c.nameRu : c.nameEn}</SelectItem>)}</SelectContent>
-                    </Select>
+                    <Label>{t("Города", "Cities")}</Label>
+                    <div className="mt-1 border rounded-md p-2 space-y-1 max-h-36 overflow-y-auto">
+                      {cities
+                        .filter((c: any) => countryIds.length === 0 || countryIds.includes(c.countryId))
+                        .map((c: any) => (
+                          <label key={c.id} className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 rounded px-1 py-0.5">
+                            <input
+                              type="checkbox"
+                              checked={cityIds.includes(c.id)}
+                              onChange={() => toggleCity(c.id)}
+                              className="accent-primary"
+                            />
+                            <span className="text-sm">{lang === "ru" ? c.nameRu : c.nameEn}</span>
+                          </label>
+                        ))}
+                      {cities.filter((c: any) => countryIds.length === 0 || countryIds.includes(c.countryId)).length === 0 && (
+                        <p className="text-xs text-muted-foreground px-1">{t("Нет городов", "No cities")}</p>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <Label>{t("Категории", "Categories")}</Label>

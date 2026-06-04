@@ -400,7 +400,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   app.post("/api/tours", requireAdmin, async (req, res) => {
     try {
-      const { categoryIds, feedIds, hotelIds, ...tourData } = req.body;
+      const { categoryIds, feedIds, hotelIds, countryIds, cityIds, ...tourData } = req.body;
       const tour = await storage.createTour(tourData);
       if (Array.isArray(categoryIds) && categoryIds.length > 0) {
         await storage.setTourCategories(tour.id, categoryIds);
@@ -413,6 +413,16 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       if (Array.isArray(hotelIds)) {
         await storage.setTourHotels(tour.id, hotelIds);
       }
+      if (Array.isArray(countryIds)) {
+        await storage.setTourCountries(tour.id, countryIds);
+      } else if (tour.countryId) {
+        await storage.setTourCountries(tour.id, [tour.countryId]);
+      }
+      if (Array.isArray(cityIds)) {
+        await storage.setTourCities(tour.id, cityIds);
+      } else if (tour.cityId) {
+        await storage.setTourCities(tour.id, [tour.cityId]);
+      }
       res.json(tour);
     } catch (e: any) {
       res.status(400).json({ message: e.message });
@@ -420,7 +430,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   app.put("/api/tours/:id", requireAdmin, async (req, res) => {
-    const { categoryIds, feedIds, hotelIds, ...tourData } = req.body;
+    const { categoryIds, feedIds, hotelIds, countryIds, cityIds, ...tourData } = req.body;
     const tour = await storage.updateTour(req.params.id, tourData);
     if (tour) {
       if (Array.isArray(categoryIds)) {
@@ -431,6 +441,12 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       }
       if (Array.isArray(hotelIds)) {
         await storage.setTourHotels(tour.id, hotelIds);
+      }
+      if (Array.isArray(countryIds)) {
+        await storage.setTourCountries(tour.id, countryIds);
+      }
+      if (Array.isArray(cityIds)) {
+        await storage.setTourCities(tour.id, cityIds);
       }
     }
     res.json(tour);
@@ -475,11 +491,19 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json({ categoryIds });
   }));
 
+  app.get("/api/tours/:id/locations", ah(async (req, res) => {
+    const [countryIds, cityIds] = await Promise.all([
+      storage.getTourCountryIds(req.params.id),
+      storage.getTourCityIds(req.params.id),
+    ]);
+    res.json({ countryIds, cityIds });
+  }));
+
   // Tour full details
   app.get("/api/tours/:id/full", ah(async (req, res) => {
     const tour = await storage.getTour(req.params.id);
     if (!tour) return res.status(404).json({ message: "Tour not found" });
-    const [dates, priceComponents, options, days, allStops, reviews, priceTiers, country, city, category, categoryIds, hotels] = await Promise.all([
+    const [dates, priceComponents, options, days, allStops, reviews, priceTiers, country, city, category, categoryIds, hotels, countryIds, cityIds] = await Promise.all([
       storage.getTourDates(req.params.id),
       storage.getTourPriceComponents(req.params.id),
       storage.getTourOptions(req.params.id),
@@ -492,6 +516,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       tour.categoryId ? storage.getCategory(tour.categoryId) : Promise.resolve(undefined),
       storage.getTourCategoryIds(req.params.id).catch((e) => { console.error("[full] getTourCategoryIds failed:", e.message); return []; }),
       storage.getTourHotels(req.params.id).catch((e) => { console.error("[full] getTourHotels failed:", e.message); return []; }),
+      storage.getTourCountryIds(req.params.id).catch(() => [] as string[]),
+      storage.getTourCityIds(req.params.id).catch(() => [] as string[]),
     ]);
     const itinerary = days.map(day => ({
       ...day,
@@ -503,7 +529,11 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
     const allCategories = await storage.getCategories();
     const categories = allCategories.filter((c: any) => (categoryIds as string[]).includes(c.id));
-    res.json({ tour, dates, priceComponents, options, itinerary, reviews, priceTiers, isFavorite, country, city, category, categories, categoryIds, hotels });
+    const allCountries = await storage.getCountries();
+    const allCities = await storage.getCities();
+    const tourCountriesList = allCountries.filter((c: any) => (countryIds as string[]).includes(c.id));
+    const tourCitiesList = allCities.filter((c: any) => (cityIds as string[]).includes(c.id));
+    res.json({ tour, dates, priceComponents, options, itinerary, reviews, priceTiers, isFavorite, country, city, category, categories, categoryIds, hotels, countryIds, cityIds, tourCountriesList, tourCitiesList });
   }));
 
   // Tour Dates

@@ -5,7 +5,7 @@ import {
   priceComponents, tourPriceComponents, tourOptions, tourItinerary, itineraryStops,
   banners, tourFeeds, tourFeedItems, reviews, bookings, news,
   favorites, introScreen, heroSlides, passwordResetTokens, currencies, settings,
-  alifPayments, inquiries, hotels, tourHotels,
+  alifPayments, inquiries, hotels, tourHotels, tourCountries, tourCities,
   type User, type InsertUser, type Country, type InsertCountry,
   type City, type InsertCity, type Category, type InsertCategory,
   type Tour, type InsertTour, type TourDate, type InsertTourDate,
@@ -62,6 +62,10 @@ export interface IStorage {
   getTour(id: string): Promise<Tour | undefined>;
   getTourCategoryIds(tourId: string): Promise<string[]>;
   setTourCategories(tourId: string, categoryIds: string[]): Promise<void>;
+  getTourCountryIds(tourId: string): Promise<string[]>;
+  setTourCountries(tourId: string, countryIds: string[]): Promise<void>;
+  getTourCityIds(tourId: string): Promise<string[]>;
+  setTourCities(tourId: string, cityIds: string[]): Promise<void>;
   createTour(data: InsertTour): Promise<Tour>;
   updateTour(id: string, data: Partial<Tour>): Promise<Tour | undefined>;
   deleteTour(id: string): Promise<void>;
@@ -452,6 +456,32 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  async getTourCountryIds(tourId: string): Promise<string[]> {
+    const rows = await db.select({ countryId: tourCountries.countryId })
+      .from(tourCountries).where(eq(tourCountries.tourId, tourId));
+    return rows.map(r => r.countryId);
+  }
+
+  async setTourCountries(tourId: string, countryIds: string[]): Promise<void> {
+    await db.delete(tourCountries).where(eq(tourCountries.tourId, tourId));
+    if (countryIds.length > 0) {
+      await db.insert(tourCountries).values(countryIds.map(cid => ({ tourId, countryId: cid })));
+    }
+  }
+
+  async getTourCityIds(tourId: string): Promise<string[]> {
+    const rows = await db.select({ cityId: tourCities.cityId })
+      .from(tourCities).where(eq(tourCities.tourId, tourId));
+    return rows.map(r => r.cityId);
+  }
+
+  async setTourCities(tourId: string, cityIds: string[]): Promise<void> {
+    await db.delete(tourCities).where(eq(tourCities.tourId, tourId));
+    if (cityIds.length > 0) {
+      await db.insert(tourCities).values(cityIds.map(cid => ({ tourId, cityId: cid })));
+    }
+  }
+
   async createTour(data: InsertTour) {
     const [t] = await db.insert(tours).values(data as any).returning();
     return t;
@@ -478,14 +508,18 @@ export class DatabaseStorage implements IStorage {
       isActive: false,
     }).returning();
 
-    const [categoryIds, priceTiers, options, itineraryDays] = await Promise.all([
+    const [categoryIds, countryIds, cityIds, priceTiers, options, itineraryDays] = await Promise.all([
       this.getTourCategoryIds(id),
+      this.getTourCountryIds(id),
+      this.getTourCityIds(id),
       db.select().from(tourPriceTiers).where(eq(tourPriceTiers.tourId, id)),
       db.select().from(tourOptions).where(eq(tourOptions.tourId, id)),
       db.select().from(tourItinerary).where(eq(tourItinerary.tourId, id)).orderBy(asc(tourItinerary.dayNumber)),
     ]);
 
     if (categoryIds.length > 0) await this.setTourCategories(cloned.id, categoryIds);
+    if (countryIds.length > 0) await this.setTourCountries(cloned.id, countryIds);
+    if (cityIds.length > 0) await this.setTourCities(cloned.id, cityIds);
 
     if (priceTiers.length > 0) {
       await db.insert(tourPriceTiers).values(priceTiers.map(({ id: _id, ...t }) => ({ ...t, tourId: cloned.id })));
