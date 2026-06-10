@@ -38,7 +38,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev"
+args = "NODE_ENV=development npx tsx server/index.ts"
 waitForPort = 5000
 
 [agent]
@@ -49,4 +49,4 @@ stack = "FULLSTACK_JS"
 
 [userenv.shared]
 ALIF_TEST_MODE = "false"
-APP_URL = "https://nexttour.tj"
+APP_URL = "https://eb84cd4a-4270-495b-a87f-85458f81145b-00-25d4jkwhq88bs.pike.replit.dev"

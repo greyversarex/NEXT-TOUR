@@ -1,0 +1,1 @@
+- [Workflow startup](workflow-startup.md) — dev workflow must use `npx tsx` not `npm run dev` because node_modules/.bin is not in PATH by default.
