@@ -633,8 +633,9 @@ function TourForm({ tour, countries, categories, cities, onSaved, onClose }: any
             <TabsContent value="hotels" className="pt-2">
               <HotelsTabContent
                 allHotels={allHotels}
-                countryId={form.countryId}
-                cityId={form.cityId}
+                countryIds={countryIds}
+                cityIds={cityIds}
+                cities={cities}
                 hotelIds={hotelIds}
                 toggleHotel={toggleHotel}
               />
@@ -1360,22 +1361,33 @@ function PriceTiersManager({ tourId }: { tourId: string }) {
   );
 }
 
-function HotelsTabContent({ allHotels, countryId, cityId, hotelIds, toggleHotel }: {
+function HotelsTabContent({ allHotels, countryIds, cityIds, cities, hotelIds, toggleHotel }: {
   allHotels: any[];
-  countryId: string;
-  cityId: string;
+  countryIds: string[];
+  cityIds: string[];
+  cities: any[];
   hotelIds: string[];
   toggleHotel: (id: string) => void;
 }) {
   const { t, lang } = useI18n();
 
   const filtered = allHotels.filter(h => {
-    if (countryId && h.countryId !== countryId) return false;
-    if (cityId && h.cityId !== cityId) return false;
+    if (countryIds.length > 0 && !countryIds.includes(h.countryId)) return false;
+    if (cityIds.length > 0) {
+      const citiesForCountry = cityIds.filter(cid => {
+        const city = cities.find((c: any) => c.id === cid);
+        return city && city.countryId === h.countryId;
+      });
+      if (citiesForCountry.length > 0) {
+        if (!citiesForCountry.includes(h.cityId)) return false;
+      } else if (countryIds.length === 0) {
+        return false;
+      }
+    }
     return true;
   });
 
-  if (!countryId && !cityId) {
+  if (countryIds.length === 0 && cityIds.length === 0) {
     return (
       <div className="text-sm text-muted-foreground p-6 text-center border border-dashed rounded-md">
         {t("Сначала выберите страну и город тура на вкладке «Основное».", "First select the tour's country and city on the Info tab.")}
