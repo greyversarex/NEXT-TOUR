@@ -200,9 +200,15 @@ function EditProfileForm() {
 function BookingsTab() {
   const { t, lang } = useI18n();
   const { formatPrice } = useCurrency();
-  const { data: bookings = [], isLoading } = useQuery<any[]>({ queryKey: ["/api/bookings"] });
+  const { data: allBookings = [], isLoading } = useQuery<any[]>({ queryKey: ["/api/bookings"] });
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  // Only show real bookings: paid or with a deposit. Cancelled and never-paid
+  // ("new") records are not surfaced to the user.
+  const bookings = allBookings.filter(
+    (b: any) => b.bookingStatus === "paid" || b.bookingStatus === "prepaid"
+  );
 
   const statusLabels: Record<string, { ru: string; en: string; color: string }> = {
     new: { ru: "Новое", en: "New", color: "bg-blue-100 text-blue-700" },

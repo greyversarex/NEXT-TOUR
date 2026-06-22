@@ -218,7 +218,8 @@ export const bookings = pgTable("bookings", {
 
 export const alifPayments = pgTable("alif_payments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  bookingId: varchar("booking_id").notNull().references(() => bookings.id),
+  bookingId: varchar("booking_id").references(() => bookings.id),
+  bookingData: jsonb("booking_data"),
   orderId: text("order_id").notNull().unique(),
   transactionId: text("transaction_id"),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),

@@ -41,6 +41,36 @@ const ah = (fn: (req: Request, res: Response, next: any) => Promise<any>) =>
   (req: Request, res: Response, next: any) =>
     Promise.resolve(fn(req, res, next)).catch(next);
 
+async function sendBookingConfirmation(booking: any, toEmail: string, toName: string) {
+  if (!toEmail) return;
+  try {
+    const tour = await storage.getTour(booking.tourId);
+    let startDate: string | undefined;
+    let endDate: string | undefined;
+    if (booking.tourDateId) {
+      const dates = await storage.getTourDates(booking.tourId);
+      const d = dates.find((x: any) => x.id === booking.tourDateId);
+      if (d) {
+        startDate = new Date(d.startDate).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" });
+        endDate = new Date(d.endDate).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" });
+      }
+    }
+    await sendBookingConfirmationEmail({
+      toEmail,
+      name: toName,
+      tourTitle: tour?.titleRu || "Тур",
+      bookingId: booking.id,
+      adults: booking.adults,
+      children: booking.children,
+      totalPrice: booking.totalPrice,
+      startDate,
+      endDate,
+    });
+  } catch (err) {
+    console.error("[email] booking confirmation error:", err);
+  }
+}
+
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
@@ -744,7 +774,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
     res.json(booking);
   });
-  app.post("/api/bookings", async (req, res) => {
+  app.post("/api/bookings", requireAdmin, async (req, res) => {
     try {
       const user = req.user as any;
       const { guestName, guestEmail, guestPhone, ...rest } = req.body;
@@ -1183,22 +1213,70 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   app.post("/api/payments/initiate", ah(async (req, res) => {
     const user = req.user as any;
     const { bookingId, gate = "vsa" } = req.body;
-    if (!bookingId) return res.status(400).json({ message: "bookingId required" });
 
-    const booking = await storage.getBooking(bookingId);
-    if (!booking) return res.status(404).json({ message: "Booking not found" });
-    if (user && user.role !== "admin" && booking.userId && booking.userId !== user.id) {
-      return res.status(403).json({ message: "Forbidden" });
+    let amount: number;
+    let infoTitle: string;
+    let payEmail: string;
+    let payPhone: string;
+    const createPaymentArgs: { bookingId?: string | null; bookingData?: any } = {};
+
+    if (bookingId) {
+      // Legacy / admin path: pay for an already-existing booking
+      const booking = await storage.getBooking(bookingId);
+      if (!booking) return res.status(404).json({ message: "Booking not found" });
+      if (user && user.role !== "admin" && booking.userId && booking.userId !== user.id) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      const existing = await storage.getAlifPaymentByBookingId(bookingId);
+      if (existing && existing.status === "ok") {
+        return res.status(400).json({ message: "Booking already paid" });
+      }
+      const totalPrice = Number(booking.totalPrice);
+      amount = booking.paymentType === "prepay" ? totalPrice * 0.3 : totalPrice;
+      infoTitle = (booking as any).tour?.titleRu || "Бронирование";
+      payEmail = user?.email || (booking as any).guestEmail || "";
+      payPhone = (booking as any).guestPhone || "";
+      createPaymentArgs.bookingId = bookingId;
+    } else {
+      // Deferred path: no booking is created until the payment succeeds
+      const { tourId, tourDateId, adults, children, selectedOptions, totalPrice, paymentType, guestName, guestEmail, guestPhone } = req.body;
+      if (!tourId || totalPrice == null || !paymentType) {
+        return res.status(400).json({ message: "Недостаточно данных для оплаты" });
+      }
+      if (!user && !guestEmail && !guestPhone) {
+        return res.status(400).json({ message: "Укажите email или телефон для связи" });
+      }
+      const tour = await storage.getTour(tourId);
+      if (!tour) return res.status(404).json({ message: "Tour not found" });
+
+      let parsedOptions: any = [];
+      if (typeof selectedOptions === "string") {
+        try { parsedOptions = JSON.parse(selectedOptions || "[]"); } catch { parsedOptions = []; }
+      } else if (Array.isArray(selectedOptions)) {
+        parsedOptions = selectedOptions;
+      }
+
+      const bookingData = {
+        userId: user?.id || null,
+        guestName: user ? null : (guestName || null),
+        guestEmail: user ? null : (guestEmail || null),
+        guestPhone: user ? null : (guestPhone || null),
+        tourId,
+        tourDateId: tourDateId || null,
+        adults: parseInt(String(adults), 10) || 1,
+        children: parseInt(String(children), 10) || 0,
+        selectedOptions: parsedOptions,
+        totalPrice: String(totalPrice),
+        paymentType,
+      };
+
+      const total = Number(totalPrice);
+      amount = paymentType === "prepay" ? total * 0.3 : total;
+      infoTitle = tour.titleRu || "Бронирование";
+      payEmail = user?.email || guestEmail || "";
+      payPhone = guestPhone || "";
+      createPaymentArgs.bookingData = bookingData;
     }
-
-    const existing = await storage.getAlifPaymentByBookingId(bookingId);
-    if (existing && existing.status === "ok") {
-      return res.status(400).json({ message: "Booking already paid" });
-    }
-
-    const paymentType = booking.paymentType;
-    const totalPrice = Number(booking.totalPrice);
-    const amount = paymentType === "prepay" ? totalPrice * 0.3 : totalPrice;
 
     const appUrl = process.env.APP_URL || getAppBaseUrl(req);
     const orderId = String(Date.now());
@@ -1207,7 +1285,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
     try {
       await storage.createAlifPayment({
-        bookingId,
+        ...createPaymentArgs,
         orderId,
         amount: amount.toFixed(2),
         gate,
@@ -1219,9 +1297,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         gate,
         callbackUrl,
         returnUrl,
-        info: `Тур: ${(booking as any).tour?.titleRu || "Бронирование"}`,
-        email: user?.email || (booking as any).guestEmail || "",
-        phone: (booking as any).guestPhone || "",
+        info: `Тур: ${infoTitle}`,
+        email: payEmail,
+        phone: payPhone,
       });
 
       if (result.type === "redirect" && result.url) {
@@ -1297,17 +1375,37 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       });
 
       if (alifStatus === "ok") {
-        const booking = await storage.getBooking(payment.bookingId);
-        if (booking) {
-          const newBookingStatus = booking.paymentType === "prepay" ? "prepaid" : "paid";
-          const paidAmount = rawAmount != null
-            ? Number(rawAmount).toFixed(2)
-            : payment.amount;
-          await storage.updateBooking(payment.bookingId, {
-            bookingStatus: newBookingStatus as any,
-            paidAmount,
-          });
-          console.log(`[alif] Payment ${orderId} SUCCESS → booking ${payment.bookingId} → ${newBookingStatus}`);
+        // Re-fetch the freshest payment to stay idempotent across repeated callbacks
+        const fresh = await storage.getAlifPaymentByOrderId(orderId) || payment;
+        const paidAmount = rawAmount != null
+          ? Number(rawAmount).toFixed(2)
+          : fresh.amount;
+
+        if (fresh.bookingId) {
+          // Booking already exists (legacy flow or a previous callback already created it)
+          const booking = await storage.getBooking(fresh.bookingId);
+          if (booking) {
+            const newBookingStatus = booking.paymentType === "prepay" ? "prepaid" : "paid";
+            await storage.updateBooking(fresh.bookingId, {
+              bookingStatus: newBookingStatus as any,
+              paidAmount,
+            });
+            console.log(`[alif] Payment ${orderId} SUCCESS → booking ${fresh.bookingId} → ${newBookingStatus}`);
+          }
+        } else if ((fresh as any).bookingData) {
+          // Deferred flow: create the real booking only now, after successful payment.
+          // Atomic + row-locked so concurrent callbacks can never create duplicates.
+          const bd: any = (fresh as any).bookingData;
+          const newBookingStatus = bd.paymentType === "prepay" ? "prepaid" : "paid";
+          const created = await storage.createBookingForPayment(fresh.id, bd, newBookingStatus, paidAmount);
+          if (created) {
+            console.log(`[alif] Payment ${orderId} SUCCESS → booking CREATED ${created.id} → ${newBookingStatus}`);
+            const toEmail = bd.guestEmail || (bd.userId ? (await storage.getUser(bd.userId))?.email : "") || "";
+            const toName = bd.guestName || (bd.userId ? (await storage.getUser(bd.userId))?.name : "") || "Уважаемый клиент";
+            await sendBookingConfirmation(created, toEmail, toName);
+          } else {
+            console.log(`[alif] Payment ${orderId} SUCCESS → booking already created by a concurrent callback, skipping`);
+          }
         }
       } else {
         console.log(`[alif] Payment ${orderId} status=${alifStatus} — booking NOT updated`);
@@ -1337,12 +1435,29 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     const user = req.user as any;
     const payment = await storage.getAlifPaymentByOrderId(req.params.orderId);
     if (!payment) return res.status(404).json({ message: "Payment not found" });
-    const booking = await storage.getBooking(payment.bookingId);
-    if (!booking) return res.status(404).json({ message: "Booking not found" });
-    if (user && user.role !== "admin" && booking.userId && booking.userId !== user.id) {
-      return res.status(403).json({ message: "Forbidden" });
+
+    if (payment.bookingId) {
+      const booking = await storage.getBooking(payment.bookingId);
+      if (booking) {
+        if (user && user.role !== "admin" && booking.userId && booking.userId !== user.id) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
+        return res.json({ payment, booking });
+      }
     }
-    res.json({ payment, booking });
+
+    // Deferred flow: booking not created yet (payment pending/failed).
+    // Return a lightweight booking-like object (with the tour) so the result page can render details.
+    const bd: any = (payment as any).bookingData;
+    if (bd) {
+      if (user && user.role !== "admin" && bd.userId && bd.userId !== user.id) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      const tour = bd.tourId ? await storage.getTour(bd.tourId) : undefined;
+      return res.json({ payment, booking: tour ? { tour } : null });
+    }
+
+    res.json({ payment, booking: null });
   }));
 
   // Check txn status from Alif directly
@@ -1350,7 +1465,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     const user = req.user as any;
     const payment = await storage.getAlifPaymentByOrderId(req.params.orderId);
     if (!payment) return res.status(404).json({ message: "Not found" });
-    const booking = await storage.getBooking(payment.bookingId);
+    const booking = payment.bookingId ? await storage.getBooking(payment.bookingId) : undefined;
     if (!booking) return res.status(404).json({ message: "Not found" });
     if (user.role !== "admin" && booking.userId !== user.id) {
       return res.status(403).json({ message: "Forbidden" });

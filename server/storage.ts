@@ -140,6 +140,7 @@ export interface IStorage {
   getBookings(userId?: string): Promise<(Booking & { tour: Tour; tourDate?: TourDate; user?: Pick<User, "id" | "name" | "email"> })[]>;
   getBooking(id: string): Promise<(Booking & { tour: Tour; tourDate?: TourDate; user?: Pick<User, "id" | "name" | "email"> }) | undefined>;
   createBooking(data: InsertBooking): Promise<Booking>;
+  createBookingForPayment(paymentId: string, bookingData: InsertBooking, bookingStatus: "paid" | "prepaid", paidAmount: string): Promise<Booking | null>;
   updateBooking(id: string, data: Partial<Booking>): Promise<Booking | undefined>;
 
   // News
@@ -185,7 +186,7 @@ export interface IStorage {
   setSiteBackground(data: { imageUrl: string; overlay: number; position: string }): Promise<void>;
 
   // Alif Payments
-  createAlifPayment(data: { bookingId: string; orderId: string; amount: string; gate: string }): Promise<AlifPayment>;
+  createAlifPayment(data: { bookingId?: string | null; bookingData?: any; orderId: string; amount: string; gate: string }): Promise<AlifPayment>;
   getAlifPaymentByOrderId(orderId: string): Promise<AlifPayment | undefined>;
   getAlifPaymentByBookingId(bookingId: string): Promise<AlifPayment | undefined>;
   updateAlifPayment(id: string, data: Partial<AlifPayment>): Promise<AlifPayment | undefined>;
@@ -868,6 +869,24 @@ export class DatabaseStorage implements IStorage {
     return b;
   }
 
+  async createBookingForPayment(paymentId: string, bookingData: InsertBooking, bookingStatus: "paid" | "prepaid", paidAmount: string) {
+    const created = await db.transaction(async (tx) => {
+      const [p] = await tx.select().from(alifPayments).where(eq(alifPayments.id, paymentId)).for("update");
+      if (!p || p.bookingId) return null;
+      const [b] = await tx.insert(bookings).values({
+        ...(bookingData as any),
+        bookingStatus,
+        paidAmount,
+      }).returning();
+      await tx.update(alifPayments).set({ bookingId: b.id, updatedAt: new Date() }).where(eq(alifPayments.id, paymentId));
+      return b;
+    });
+    if (created && created.userId && (created.bookingStatus === "paid" || created.bookingStatus === "prepaid")) {
+      await this.updateUserLoyalty(created.userId);
+    }
+    return created;
+  }
+
   async updateBooking(id: string, data: Partial<Booking>) {
     const [b] = await db.update(bookings).set(data as any).where(eq(bookings.id, id)).returning();
     if (b.userId && data.bookingStatus === "paid") {
@@ -1135,8 +1154,8 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async createAlifPayment(data: { bookingId: string; orderId: string; amount: string; gate: string }) {
-    const [p] = await db.insert(alifPayments).values({ ...data, status: "pending" }).returning();
+  async createAlifPayment(data: { bookingId?: string | null; bookingData?: any; orderId: string; amount: string; gate: string }) {
+    const [p] = await db.insert(alifPayments).values({ ...data, status: "pending" } as any).returning();
     return p;
   }
 

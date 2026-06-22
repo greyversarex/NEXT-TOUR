@@ -810,7 +810,6 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
   const [children, setChildren] = useState(initialChildren);
   const [selectedOptions, setSelectedOptions] = useState<string[]>(preselectedOptions);
   const [paymentType, setPaymentType] = useState<"prepay" | "full">("full");
-  const [createdBookingId, setCreatedBookingId] = useState<string | null>(null);
   const [payGate] = useState("km");
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
@@ -848,39 +847,40 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
     : (basePrice + optionsTotal) * travelers;
   const toPay = paymentType === "prepay" ? totalPrice * 0.3 : totalPrice;
 
-  const mutation = useMutation({
-    mutationFn: (data: any) => apiRequest("POST", "/api/bookings", data).then(res => res.json()),
-    onSuccess: (booking: any) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
-      payMutation.mutate({ bookingId: booking.id, gate: payGate });
-    },
-    onError: (err: any) => {
-      toast({ title: t("Ошибка", "Error"), description: err.message, variant: "destructive" });
-    },
-  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const payMutation = useMutation({
-    mutationFn: async ({ bookingId, gate }: { bookingId: string; gate: string }) => {
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = `/api/payments/initiate?redirect=true`;
-      const addField = (name: string, value: string) => {
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = name;
-        input.value = value;
-        form.appendChild(input);
-      };
-      addField("bookingId", bookingId);
-      addField("gate", gate);
-      document.body.appendChild(form);
-      form.submit();
-      return new Promise(() => {});
-    },
-    onError: (err: any) => {
-      toast({ title: t("Ошибка оплаты", "Payment error"), description: err.message, variant: "destructive" });
-    },
-  });
+  // Booking is NOT created up front. We send the booking details straight to the
+  // payment gateway; the actual booking record is created only after a successful
+  // payment (in the Alif callback). This prevents unpaid/abandoned bookings from
+  // ever being stored.
+  const submitToPayment = () => {
+    setIsSubmitting(true);
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = `/api/payments/initiate?redirect=true`;
+    const addField = (name: string, value: string) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
+    };
+    addField("gate", payGate);
+    addField("tourId", tour.id);
+    addField("tourDateId", selectedDateId || "");
+    addField("adults", String(adults));
+    addField("children", String(children));
+    addField("selectedOptions", JSON.stringify(selectedOptions));
+    addField("totalPrice", totalPrice.toFixed(2));
+    addField("paymentType", paymentType);
+    if (!user) {
+      addField("guestName", guestName || "");
+      addField("guestEmail", guestEmail || "");
+      addField("guestPhone", guestPhone || "");
+    }
+    document.body.appendChild(form);
+    form.submit();
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -888,16 +888,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
       toast({ title: t("Укажите контакт", "Contact required"), description: t("Введите email или телефон для связи", "Please enter your email or phone"), variant: "destructive" });
       return;
     }
-    mutation.mutate({
-      tourId: tour.id,
-      tourDateId: selectedDateId || null,
-      adults,
-      children,
-      selectedOptions,
-      totalPrice: totalPrice.toFixed(2),
-      paymentType,
-      ...(!user && { guestName: guestName || undefined, guestEmail: guestEmail || undefined, guestPhone: guestPhone || undefined }),
-    });
+    submitToPayment();
   };
 
   const selectedDate = dates.find((d: any) => d.id === selectedDateId);
@@ -907,66 +898,10 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
       <DialogContent className="sm:max-w-xl p-0 overflow-hidden max-h-[90vh] flex flex-col">
         <div className="bg-gradient-to-r from-primary to-primary/80 px-6 py-5 text-primary-foreground shrink-0">
           <DialogTitle className="text-lg font-bold text-white">
-            {createdBookingId ? t("Бронирование создано!", "Booking Created!") : t("Бронирование тура", "Book Tour")}
+            {t("Бронирование тура", "Book Tour")}
           </DialogTitle>
           <p className="text-sm text-white/80 mt-0.5 truncate">{lang === "ru" ? tour.titleRu : tour.titleEn}</p>
         </div>
-
-        {createdBookingId ? (
-          <div className="px-6 py-8 space-y-6 text-center">
-            <div className="space-y-2">
-              <CheckCircle className="h-14 w-14 text-green-500 mx-auto" />
-              <h3 className="text-lg font-semibold">{t("Заявка принята!", "Request Accepted!")}</h3>
-              <p className="text-sm text-muted-foreground">
-                {t("Оплатите тур онлайн прямо сейчас через Alif Bank или наш менеджер свяжется с вами.", "Pay for your tour online now via Alif Bank, or our manager will contact you.")}
-              </p>
-            </div>
-
-            <div className="bg-muted/40 rounded-xl px-5 py-4 text-left space-y-2 text-sm border border-border">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t("К оплате", "Amount due")}</span>
-                <span className="font-bold text-primary text-base">{formatPrice(toPay)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t("Тип оплаты", "Payment type")}</span>
-                <span className="font-medium">{paymentType === "prepay" ? t("Предоплата 30%", "Deposit 30%") : t("Полная оплата", "Full payment")}</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <svg className="h-4 w-auto" viewBox="0 0 48 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="28" height="16" rx="3" fill="#1A1F71"/>
-                <text x="14" y="12" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold" fontFamily="Arial">VISA</text>
-                <rect x="30" width="18" height="16" rx="3" fill="#EB001B" fillOpacity="0.15"/>
-                <circle cx="36" cy="8" r="5" fill="#EB001B"/>
-                <circle cx="42" cy="8" r="5" fill="#F79E1B"/>
-              </svg>
-              <span>{t("Оплата картой Visa / Mastercard", "Pay by Visa / Mastercard")}</span>
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1"
-                onClick={onClose}
-                data-testid="button-pay-later"
-              >
-                {t("Позже", "Later")}
-              </Button>
-              <Button
-                type="button"
-                className="flex-1 font-semibold"
-                disabled={payMutation.isPending}
-                onClick={() => payMutation.mutate({ bookingId: createdBookingId!, gate: payGate })}
-                data-testid="button-pay-online"
-              >
-                {payMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
-                {t("Оплатить онлайн", "Pay Online")}
-              </Button>
-            </div>
-          </div>
-        ) : (
 
         <form onSubmit={handleSubmit} className="overflow-y-auto flex-1">
           <div className="px-6 py-4 space-y-5">
@@ -1214,16 +1149,15 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
                 {t(", чтобы получать скидки и накапливать бонусы", " to get discounts and earn loyalty bonuses")}
               </p>
             )}
-            <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={mutation.isPending || payMutation.isPending} data-testid="button-confirm-booking">
-              {(mutation.isPending || payMutation.isPending) ? (
-                <><Loader2 className="h-4 w-4 animate-spin mr-2" />{payMutation.isPending ? t("Переход к оплате...", "Redirecting...") : t("Создание...", "Creating...")}</>
+            <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={isSubmitting} data-testid="button-confirm-booking">
+              {isSubmitting ? (
+                <><Loader2 className="h-4 w-4 animate-spin mr-2" />{t("Переход к оплате...", "Redirecting...")}</>
               ) : (
                 t("Забронировать и оплатить", "Book & Pay Now")
               )}
             </Button>
           </div>
         </form>
-        )}
       </DialogContent>
     </Dialog>
   );

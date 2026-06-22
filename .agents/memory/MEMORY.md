@@ -1,2 +1,3 @@
 - [Workflow startup](workflow-startup.md) — dev workflow must use `npx tsx` not `npm run dev` because node_modules/.bin is not in PATH by default.
+- [Booking creation flow](booking-creation-flow.md) — bookings are payment-gated: created only in the Alif callback, never up-front; POST /api/bookings is admin-only.
 - [Production deployment](production-deploy.md) — production is on Timeweb server, not Replit. Replit is dev-only; changes go GitHub → Timeweb via git pull.
