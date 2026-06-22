@@ -2,3 +2,4 @@
 - [Booking creation flow](booking-creation-flow.md) — bookings are payment-gated: created only in the Alif callback, never up-front; POST /api/bookings is admin-only.
 - [Alif payment gates](alif-payment-gates.md) — `gate` selects card brand (vsa=Visa, mcr=Mastercard, km=Korti Milli); all use the same /v2/ endpoint, backend just forwards it.
 - [Production deployment](production-deploy.md) — production is on Timeweb server, not Replit. Replit is dev-only; changes go GitHub → Timeweb via git pull.
+- [Work quality mandate](work-quality-mandate.md) — this is a live production site; every task must be done thoroughly and responsibly, never superficially.
