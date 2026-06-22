@@ -1,0 +1,195 @@
+root@6899447-yr427605:/var/www/nexttour# ./deploy.sh
+
+╔══════════════════════════════════════╗
+║        NEXT TOUR  —  DEPLOY          ║
+║  2026-06-22 22:08:54               ║
+╚══════════════════════════════════════╝
+
+
+▶ 0/5  Загрузка переменных окружения
+✓ .env загружен
+
+▶ 1/5  git pull origin main
+remote: Enumerating objects: 63, done.
+remote: Counting objects: 100% (63/63), done.
+remote: Compressing objects: 100% (40/40), done.
+remote: Total 50 (delta 10), reused 50 (delta 10), pack-reused 0 (from 0)
+Unpacking objects: 100% (50/50), 9.52 MiB | 14.59 MiB/s, done.
+From https://github.com/greyversarex/NEXT-TOUR
+ * branch            main       -> FETCH_HEAD
+   0c0ce1b..4bca555  main       -> origin/main
+Updating 0c0ce1b..4bca555
+Fast-forward
+ .agents/memory/production-deploy.md                |  10 +
+ ...www-nexttour-deploy-sh--17821_1782165778358.txt |  70 +++++
+ deploy.sh                                          |   5 +-
+ dist/index.cjs                                     | 302 +++++++++++----------
+ dist/public/assets/AdminLayout-3SMe27dS.js         |   1 +
+ dist/public/assets/AdminLayout-dFN3wb7K.js         |   1 -
+ dist/public/assets/BannersAdmin-CDcDitti.js        |   1 -
+ dist/public/assets/BannersAdmin-CSH15xt_.js        |   1 +
+ dist/public/assets/BookingsAdmin-CDS_4Ij8.js       |   8 +
+ dist/public/assets/BookingsAdmin-DGh4b1h6.js       |   8 -
+ dist/public/assets/CategoriesAdmin-8vUk0vnI.js     |   1 +
+ dist/public/assets/CategoriesAdmin-BHCLFHxk.js     |   1 -
+ dist/public/assets/CitiesAdmin-CI1SFeGj.js         |   1 +
+ dist/public/assets/CitiesAdmin-DQsiluxh.js         |   1 -
+ dist/public/assets/CountriesAdmin-CaWLEK9G.js      |   1 -
+ dist/public/assets/CountriesAdmin-DZEhORng.js      |   1 +
+ dist/public/assets/CurrenciesAdmin-DeTCbbq4.js     |   1 +
+ dist/public/assets/Dashboard-3XdE2UZy.js           |   1 +
+ dist/public/assets/Dashboard-BjAh48df.js           |   1 -
+ dist/public/assets/EmailAdmin-mALx3Ne_.js          |  22 ++
+ dist/public/assets/FeedsAdmin-CRb4MzsF.js          |   1 -
+ dist/public/assets/FeedsAdmin-_keXLVSW.js          |   1 +
+ ...ch_13__2026_-_2_17AM_1773350294824-BrSSivC6.png | Bin 0 -> 2287009 bytes
+ dist/public/assets/HeroSlidesAdmin-BGEEb7HN.js     |   1 -
+ dist/public/assets/HeroSlidesAdmin-CW8p3f2D.js     |   1 +
+ dist/public/assets/HotelsAdmin-B6fIBZ7E.js         |   1 +
+ dist/public/assets/InquiriesAdmin-CWS8DIJF.js      |   1 +
+ ...in-5TfJdnPm.js => IntroScreenAdmin-Csv0jO8W.js} |   2 +-
+ dist/public/assets/LoyaltyAdmin-0DdY1h4E.js        |   1 -
+ dist/public/assets/LoyaltyAdmin-C_1eeWzx.js        |   1 +
+ dist/public/assets/NewsAdmin-CUgujHXd.js           |   1 -
+ dist/public/assets/NewsAdmin-Cw6T9X2C.js           |   1 +
+ .../public/assets/PriceComponentsAdmin-D-FbVAbA.js |   1 -
+ ...sAdmin-BNhKn9hm.js => ReviewsAdmin-b52t31RT.js} |   2 +-
+ dist/public/assets/SiteSettingsAdmin-CCL4pH04.js   |   1 +
+ dist/public/assets/StatisticsAdmin-C1Q7o6Jx.js     |  60 ----
+ dist/public/assets/StatisticsAdmin-CjSFgd8t.js     |  60 ++++
+ dist/public/assets/ToursAdmin-CLQKMPgj.js          |   2 +
+ dist/public/assets/ToursAdmin-DzN1Q3nO.js          |   1 -
+ dist/public/assets/TrashAdmin-D_RxRDFg.js          |   1 +
+ dist/public/assets/UsersAdmin-Byg2p0PM.js          |   1 +
+ dist/public/assets/UsersAdmin-CCuqiej2.js          |   1 -
+ dist/public/assets/image-upload-c0dtyDEl.js        |   1 -
+ dist/public/assets/image-upload-jw2PJN7Q.js        |   1 +
+ dist/public/assets/index-BcT2w_Mm.css              |   1 -
+ dist/public/assets/index-CHxIUkbP.js               | 251 +++++++++++++++++
+ dist/public/assets/index-DFNeKR8N.css              |   1 +
+ dist/public/assets/index-DG7ld_Pl.js               |  96 -------
+ dist/public/assets/ru-D-qGT4T6.js                  |   1 +
+ .../assets/{save-DQJPcoec.js => save-D4tc4Q8A.js}  |   2 +-
+ dist/public/assets/square-pen-CUrHZN6t.js          |   1 +
+ .../{switch-CHN1UvnA.js => switch-eOeADBL0.js}     |   2 +-
+ .../{textarea-D6TrdY-n.js => textarea-DTEkGKG7.js} |   2 +-
+ dist/public/assets/trash-2-Dkwyef9P.js             |   1 -
+ dist/public/favicon.svg                            |  28 +-
+ dist/public/images/tour-alps.png                   | Bin 0 -> 1871907 bytes
+ dist/public/images/tour-athens.png                 | Bin 0 -> 2040828 bytes
+ dist/public/images/tour-bali-villa.png             | Bin 0 -> 1868307 bytes
+ dist/public/images/tour-loire.png                  | Bin 0 -> 1728404 bytes
+ dist/public/images/tour-maldives-bungalow.png      | Bin 0 -> 1812765 bytes
+ dist/public/index.html                             |   6 +-
+ 61 files changed, 625 insertions(+), 349 deletions(-)
+ create mode 100644 attached_assets/Pasted-root-6899447-yr427605-var-www-nexttour-deploy-sh--17821_1782165778358.txt
+ create mode 100644 dist/public/assets/AdminLayout-3SMe27dS.js
+ delete mode 100644 dist/public/assets/AdminLayout-dFN3wb7K.js
+ delete mode 100644 dist/public/assets/BannersAdmin-CDcDitti.js
+ create mode 100644 dist/public/assets/BannersAdmin-CSH15xt_.js
+ create mode 100644 dist/public/assets/BookingsAdmin-CDS_4Ij8.js
+ delete mode 100644 dist/public/assets/BookingsAdmin-DGh4b1h6.js
+ create mode 100644 dist/public/assets/CategoriesAdmin-8vUk0vnI.js
+ delete mode 100644 dist/public/assets/CategoriesAdmin-BHCLFHxk.js
+ create mode 100644 dist/public/assets/CitiesAdmin-CI1SFeGj.js
+ delete mode 100644 dist/public/assets/CitiesAdmin-DQsiluxh.js
+ delete mode 100644 dist/public/assets/CountriesAdmin-CaWLEK9G.js
+ create mode 100644 dist/public/assets/CountriesAdmin-DZEhORng.js
+ create mode 100644 dist/public/assets/CurrenciesAdmin-DeTCbbq4.js
+ create mode 100644 dist/public/assets/Dashboard-3XdE2UZy.js
+ delete mode 100644 dist/public/assets/Dashboard-BjAh48df.js
+ create mode 100644 dist/public/assets/EmailAdmin-mALx3Ne_.js
+ delete mode 100644 dist/public/assets/FeedsAdmin-CRb4MzsF.js
+ create mode 100644 dist/public/assets/FeedsAdmin-_keXLVSW.js
+ create mode 100644 dist/public/assets/Generated_Image_March_13__2026_-_2_17AM_1773350294824-BrSSivC6.png
+ delete mode 100644 dist/public/assets/HeroSlidesAdmin-BGEEb7HN.js
+ create mode 100644 dist/public/assets/HeroSlidesAdmin-CW8p3f2D.js
+ create mode 100644 dist/public/assets/HotelsAdmin-B6fIBZ7E.js
+ create mode 100644 dist/public/assets/InquiriesAdmin-CWS8DIJF.js
+ rename dist/public/assets/{IntroScreenAdmin-5TfJdnPm.js => IntroScreenAdmin-Csv0jO8W.js} (90%)
+ delete mode 100644 dist/public/assets/LoyaltyAdmin-0DdY1h4E.js
+ create mode 100644 dist/public/assets/LoyaltyAdmin-C_1eeWzx.js
+ delete mode 100644 dist/public/assets/NewsAdmin-CUgujHXd.js
+ create mode 100644 dist/public/assets/NewsAdmin-Cw6T9X2C.js
+ delete mode 100644 dist/public/assets/PriceComponentsAdmin-D-FbVAbA.js
+ rename dist/public/assets/{ReviewsAdmin-BNhKn9hm.js => ReviewsAdmin-b52t31RT.js} (69%)
+ create mode 100644 dist/public/assets/SiteSettingsAdmin-CCL4pH04.js
+ delete mode 100644 dist/public/assets/StatisticsAdmin-C1Q7o6Jx.js
+ create mode 100644 dist/public/assets/StatisticsAdmin-CjSFgd8t.js
+ create mode 100644 dist/public/assets/ToursAdmin-CLQKMPgj.js
+ delete mode 100644 dist/public/assets/ToursAdmin-DzN1Q3nO.js
+ create mode 100644 dist/public/assets/TrashAdmin-D_RxRDFg.js
+ create mode 100644 dist/public/assets/UsersAdmin-Byg2p0PM.js
+ delete mode 100644 dist/public/assets/UsersAdmin-CCuqiej2.js
+ delete mode 100644 dist/public/assets/image-upload-c0dtyDEl.js
+ create mode 100644 dist/public/assets/image-upload-jw2PJN7Q.js
+ delete mode 100644 dist/public/assets/index-BcT2w_Mm.css
+ create mode 100644 dist/public/assets/index-CHxIUkbP.js
+ create mode 100644 dist/public/assets/index-DFNeKR8N.css
+ delete mode 100644 dist/public/assets/index-DG7ld_Pl.js
+ create mode 100644 dist/public/assets/ru-D-qGT4T6.js
+ rename dist/public/assets/{save-DQJPcoec.js => save-D4tc4Q8A.js} (80%)
+ create mode 100644 dist/public/assets/square-pen-CUrHZN6t.js
+ rename dist/public/assets/{switch-CHN1UvnA.js => switch-eOeADBL0.js} (56%)
+ rename dist/public/assets/{textarea-D6TrdY-n.js => textarea-DTEkGKG7.js} (87%)
+ delete mode 100644 dist/public/assets/trash-2-Dkwyef9P.js
+ create mode 100644 dist/public/images/tour-alps.png
+ create mode 100644 dist/public/images/tour-athens.png
+ create mode 100644 dist/public/images/tour-bali-villa.png
+ create mode 100644 dist/public/images/tour-loire.png
+ create mode 100644 dist/public/images/tour-maldives-bungalow.png
+✓ Исходный код обновлён
+
+▶ 2/5  npm install
+
+up to date, audited 576 packages in 6s
+
+114 packages are looking for funding
+  run `npm fund` for details
+
+22 vulnerabilities (2 low, 8 moderate, 12 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+✓ Зависимости установлены (включая devDependencies)
+
+▶ 3/5  npm run build
+
+> rest-express@1.0.0 build
+> tsx script/build.ts
+
+building client...
+vite v7.3.1 building client environment for production...
+transforming (8) src/lib/i18n.tsx
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+
+<--- Last few GCs --->
+
+[26809:0xfd1b630]    32387 ms: Mark-Compact 468.3 (488.9) -> 464.3 (488.9) MB, 1012.25 / 0.00 ms  (average mu = 0.127, current mu = 0.048) allocation failure; scavenge might not succeed
+[26809:0xfd1b630]    33324 ms: Mark-Compact 468.3 (488.9) -> 464.3 (488.9) MB, 854.27 / 0.00 ms  (average mu = 0.108, current mu = 0.088) allocation failure; scavenge might not succeed
+
+
+<--- JS stacktrace --->
+
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0xb78db1 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [/usr/bin/node]
+ 2: 0xee82f0 v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/usr/bin/node]
+ 3: 0xee85d7 v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/usr/bin/node]
+ 4: 0x10fa275  [/usr/bin/node]
+ 5: 0x10fa804 v8::internal::Heap::RecomputeLimits(v8::internal::GarbageCollector) [/usr/bin/node]
+ 6: 0x11116f4 v8::internal::Heap::PerformGarbageCollection(v8::internal::GarbageCollector, v8::internal::GarbageCollectionReason, char const*) [/usr/bin/node]
+ 7: 0x1111f0c v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/usr/bin/node]
+ 8: 0x10e8211 v8::internal::HeapAllocator::AllocateRawWithLightRetrySlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/usr/bin/node]
+ 9: 0x10e93a5 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/usr/bin/node]
+10: 0x10c69f6 v8::internal::Factory::NewFillerObject(int, v8::internal::AllocationAlignment, v8::internal::AllocationType, v8::internal::AllocationOrigin) [/usr/bin/node]
+11: 0x1522276 v8::internal::Runtime_AllocateInYoungGeneration(int, unsigned long*, v8::internal::Isolate*) [/usr/bin/node]
+12: 0x195bef6  [/usr/bin/node]
+✗ Ошибка: npm run build
+root@6899447-yr427605:/var/www/nexttour#

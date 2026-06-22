@@ -28,12 +28,15 @@ Some tables (e.g. `alif_payments`) are NOT in `migrations/` — they are created
 
 **Prevent:** always deploy via `./deploy.sh` (does git pull + install + build + drizzle-kit push + restart), never bare `git pull`.
 
-## Build OOM on the Timeweb VPS
+## Build OOM on the Timeweb VPS — build on Replit, ship prebuilt dist/
 
 The Timeweb VPS is RAM-constrained: a prod `vite build` self-caps V8 heap (~489 MB) and dies with "JavaScript heap out of memory" at step 3/5 of `deploy.sh`. Dev on Replit (7.7 GB) builds fine, so this never reproduces here.
 
-**Fix (both are needed together):**
-1. One-time on the server: add swap (e.g. 2 GB `/swapfile` + fstab entry) — gives V8 memory to grow into.
-2. Raise the heap limit only for the build: `NODE_OPTIONS="--max-old-space-size=2048"`. This is now baked into `deploy.sh` step 3 (inline, so it does NOT leak into the pm2 runtime). Raising the limit alone without swap just lets the OS OOM-killer fire; swap alone doesn't help because V8 self-caps — need both.
+**Decision: the server does NOT build.** `dist/` is committed to git (it is NOT in `.gitignore`), so the build is done on Replit, `dist/` is committed, and `git pull` ships it to the server. `deploy.sh` defaults to using the prebuilt `dist/` (`BUILD_ON_SERVER=false`); `--build` opts back into a server-side build (only sane if swap was added).
 
-**Why:** small VPS, memory-heavy Rollup/Vite production build.
+**Why this and not just raising the heap limit:** raising `--max-old-space-size` without swap just trips the OS OOM-killer; swap alone doesn't help because V8 self-caps. Both-together is fragile on a tiny box, and `script/build.ts` does `rm -rf dist` *before* vite runs — so a failed server build DELETES `dist/` and breaks the live folder. Skipping the build avoids all of this.
+
+**How to apply:**
+- Any prod-bound code change: run `npm run build` on Replit FIRST so the committed `dist/` is current, THEN push. Stale `dist/` = server runs old code.
+- `deploy.sh` skip-build path runs `git checkout -- dist` to restore `dist/` if a prior `--build` attempt wiped it.
+- The first run right after editing `deploy.sh` is unreliable: `git pull` (step 1) overwrites `deploy.sh` mid-execution, so the running shell may still be the old script. Changes take effect from the NEXT run.
