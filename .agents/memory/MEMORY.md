@@ -1,1 +1,2 @@
 - [Workflow startup](workflow-startup.md) — dev workflow must use `npx tsx` not `npm run dev` because node_modules/.bin is not in PATH by default.
+- [Production deployment](production-deploy.md) — production is on Timeweb server, not Replit. Replit is dev-only; changes go GitHub → Timeweb via git pull.
