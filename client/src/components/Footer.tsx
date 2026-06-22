@@ -2,9 +2,10 @@ import { Link } from "wouter";
 
 export default function Footer() {
   return (
-    <footer className="relative mt-12 sm:mt-24 overflow-hidden" style={{ background: "linear-gradient(160deg, hsl(215 40% 12%) 0%, hsl(220 45% 9%) 100%)" }}>
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
-      <div className="absolute w-96 h-96 rounded-full bg-primary/6 blur-[120px] -top-24 -left-24 pointer-events-none" />
+    <footer className="relative mt-12 sm:mt-24 overflow-hidden" style={{ background: "linear-gradient(160deg, hsl(214 60% 22%) 0%, hsl(222 55% 30%) 50%, hsl(210 50% 26%) 100%)" }}>
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+      <div className="absolute w-96 h-96 rounded-full bg-blue-400/10 blur-[120px] -top-24 -left-24 pointer-events-none" />
+      <div className="absolute w-64 h-64 rounded-full bg-indigo-400/10 blur-[100px] -bottom-16 right-16 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         <div className="rounded-xl overflow-hidden shadow-2xl border border-white/10 h-[180px] sm:h-[260px] w-full">
