@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/lib/auth";
 import { useSearch } from "wouter";
 import TourCard from "@/components/TourCard";
 import { Button } from "@/components/ui/button";
@@ -54,9 +55,15 @@ export default function Tours() {
   const [sortBy, setSortBy] = useState("newest");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const { user } = useAuth();
   const { data: countries = [] } = useQuery<Country[]>({ queryKey: ["/api/countries"] });
   const { data: allCities = [] } = useQuery<City[]>({ queryKey: ["/api/cities"] });
   const { data: categories = [] } = useQuery<Category[]>({ queryKey: ["/api/categories"] });
+  const { data: favorites = [] } = useQuery<any[]>({
+    queryKey: ["/api/favorites"],
+    enabled: !!user,
+  });
+  const favoriteIds = useMemo(() => new Set((favorites as any[]).map((f: any) => f.id)), [favorites]);
 
   const filteredCities = useMemo(() =>
     countryId === "all" ? allCities : allCities.filter(c => c.countryId === countryId),
@@ -439,7 +446,7 @@ export default function Tours() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filtered.map(tour => <TourCard key={tour.id} tour={tour} />)}
+                {filtered.map(tour => <TourCard key={tour.id} tour={tour} isFavorite={favoriteIds.has(tour.id)} />)}
               </div>
             )}
           </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Link, useLocation } from "wouter";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -462,7 +462,7 @@ function SearchSection() {
 const CARD_WIDTHS: Record<string, number> = { small: 220, medium: 260, large: 320 };
 const CARD_WIDTHS_MD: Record<string, number> = { small: 280, medium: 340, large: 420 };
 
-function TourScrollFeed({ tours, cardWidth = "medium" }: { tours: Tour[]; cardWidth?: string }) {
+function TourScrollFeed({ tours, cardWidth = "medium", favoriteIds = new Set<string>() }: { tours: Tour[]; cardWidth?: string; favoriteIds?: Set<string> }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isMd, setIsMd] = useState(false);
   useEffect(() => {
@@ -486,7 +486,7 @@ function TourScrollFeed({ tours, cardWidth = "medium" }: { tours: Tour[]; cardWi
         <div className="flex gap-3 sm:gap-5 items-stretch">
           {tours.map(tour => (
             <div key={tour.id} className="flex-shrink-0" style={{ width: `${px}px` }}>
-              <TourCard tour={tour} />
+              <TourCard tour={tour} isFavorite={favoriteIds.has(tour.id)} />
             </div>
           ))}
         </div>
@@ -513,7 +513,7 @@ function TourScrollFeed({ tours, cardWidth = "medium" }: { tours: Tour[]; cardWi
   );
 }
 
-function HotToursSection({ tours, cardWidth }: { tours: Tour[]; cardWidth?: string }) {
+function HotToursSection({ tours, cardWidth, favoriteIds = new Set<string>() }: { tours: Tour[]; cardWidth?: string; favoriteIds?: Set<string> }) {
   const { t } = useI18n();
   if (tours.length === 0) return null;
   return (
@@ -532,7 +532,7 @@ function HotToursSection({ tours, cardWidth }: { tours: Tour[]; cardWidth?: stri
             </Button>
           </Link>
         </Reveal>
-        <TourScrollFeed tours={tours} cardWidth={cardWidth} />
+        <TourScrollFeed tours={tours} cardWidth={cardWidth} favoriteIds={favoriteIds} />
         <div className="mt-8 flex justify-center md:hidden">
           <Link href="/promotions">
             <Button className="rounded-full px-8 py-4 bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm">
@@ -545,7 +545,7 @@ function HotToursSection({ tours, cardWidth }: { tours: Tour[]; cardWidth?: stri
   );
 }
 
-function FeedSection({ feed }: { feed: any }) {
+function FeedSection({ feed, favoriteIds = new Set<string>() }: { feed: any; favoriteIds?: Set<string> }) {
   const { t, lang } = useI18n();
   const name = lang === "ru" ? feed.nameRu : (feed.nameEn || feed.nameRu);
   if (!feed.tours?.length) return null;
@@ -562,7 +562,7 @@ function FeedSection({ feed }: { feed: any }) {
             </Button>
           </Link>
         </Reveal>
-        <TourScrollFeed tours={feed.tours} cardWidth={feed.cardWidth} />
+        <TourScrollFeed tours={feed.tours} cardWidth={feed.cardWidth} favoriteIds={favoriteIds} />
         <div className="mt-8 flex justify-center md:hidden">
           <Link href="/tours">
             <Button className="rounded-full px-8 py-4 bg-white/15 hover:bg-white/25 text-white border border-white/40 backdrop-blur-sm">
@@ -989,6 +989,11 @@ export default function Home() {
   });
   const { data: banners = [] } = useQuery<any[]>({ queryKey: ["/api/banners?active=true"] });
   const { data: savedLayout } = useQuery<string[]>({ queryKey: ["/api/settings/home-layout"] });
+  const { data: favorites = [] } = useQuery<any[]>({
+    queryKey: ["/api/favorites"],
+    enabled: !!user,
+  });
+  const favoriteIds = useMemo(() => new Set((favorites as any[]).map((f: any) => f.id)), [favorites]);
 
   const [sectionOrder, setSectionOrder] = useState<string[]>([]);
 
@@ -1082,7 +1087,7 @@ export default function Home() {
           labelRu: f.nameRu,
           labelEn: f.nameEn || f.nameRu,
           editHref: "/admin/feeds",
-          node: <FeedSection feed={f} />,
+          node: <FeedSection feed={f} favoriteIds={favoriteIds} />,
         },
       ])
     )),

@@ -22,6 +22,7 @@ export default function TourCard({ tour, isFavorite = false, onFavoriteToggle }:
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [favState, setFavState] = useState(isFavorite);
+  useEffect(() => { setFavState(isFavorite); }, [isFavorite]);
   const [showPositionEditor, setShowPositionEditor] = useState(false);
   const [pendingPosition, setPendingPosition] = useState((tour as any).mainImagePosition || "50% 50%");
   const isAdmin = (user as any)?.role === "admin";
