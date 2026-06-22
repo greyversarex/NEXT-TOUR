@@ -810,7 +810,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
   const [children, setChildren] = useState(initialChildren);
   const [selectedOptions, setSelectedOptions] = useState<string[]>(preselectedOptions);
   const [paymentType, setPaymentType] = useState<"prepay" | "full">("full");
-  const [payGate] = useState("km");
+  const [payGate, setPayGate] = useState("vsa");
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [phoneCode, setPhoneCode] = useState("+992");
@@ -1106,15 +1106,53 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
 
             <div>
               <p className="text-sm font-semibold mb-3">{t("Способ платежа", "Payment Method")}</p>
-              <div className="flex items-center gap-3 rounded-xl border-2 border-primary bg-primary/5 px-4 py-3">
-                <svg className="h-5 w-auto shrink-0" viewBox="0 0 56 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="32" height="18" rx="3" fill="#1A1F71"/>
-                  <text x="16" y="13" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">VISA</text>
-                  <circle cx="39" cy="9" r="6" fill="#EB001B"/>
-                  <circle cx="47" cy="9" r="6" fill="#F79E1B"/>
-                  <path d="M43 4.8a6 6 0 010 8.4A6 6 0 0143 4.8z" fill="#FF5F00"/>
-                </svg>
-                <span className="text-sm font-medium text-primary">{t("Visa / Mastercard", "Visa / Mastercard")}</span>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  {
+                    value: "vsa",
+                    label: "Visa",
+                    icon: (
+                      <svg className="h-4 w-auto" viewBox="0 0 32 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="32" height="18" rx="3" fill="#1A1F71"/>
+                        <text x="16" y="13" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="Arial">VISA</text>
+                      </svg>
+                    ),
+                  },
+                  {
+                    value: "mcr",
+                    label: "Mastercard",
+                    icon: (
+                      <svg className="h-4 w-auto" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="9" cy="9" r="7" fill="#EB001B"/>
+                        <circle cx="15" cy="9" r="7" fill="#F79E1B"/>
+                        <path d="M12 3.5a7 7 0 010 11A7 7 0 0112 3.5z" fill="#FF5F00"/>
+                      </svg>
+                    ),
+                  },
+                  {
+                    value: "km",
+                    label: t("Корти Милли", "Korti Milli"),
+                    icon: (
+                      <svg className="h-4 w-auto" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="24" height="18" rx="3" fill="#0B6E4F"/>
+                        <rect x="3" y="6" width="6" height="4.5" rx="1" fill="#FFD23F"/>
+                      </svg>
+                    ),
+                  },
+                ].map(m => (
+                  <button
+                    key={m.value}
+                    type="button"
+                    onClick={() => setPayGate(m.value)}
+                    className={`flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 px-2 py-3 text-center transition-all ${payGate === m.value
+                      ? "border-primary bg-primary/8 shadow-sm"
+                      : "border-border hover:border-primary/50"}`}
+                    data-testid={`payment-method-${m.value}`}
+                  >
+                    {m.icon}
+                    <span className={`text-xs font-semibold leading-tight ${payGate === m.value ? "text-primary" : "text-muted-foreground"}`}>{m.label}</span>
+                  </button>
+                ))}
               </div>
             </div>
           </div>
