@@ -2,7 +2,7 @@ import { Link } from "wouter";
 
 export default function Footer() {
   return (
-    <footer className="relative mt-12 sm:mt-24 overflow-hidden bg-[#0b1f3a]">
+    <footer className="relative mt-12 sm:mt-24 overflow-hidden bg-[#0b1f3a]/90 backdrop-blur-xl border-t border-white/10 shadow-[0_-2px_24px_rgba(0,0,0,0.25)]">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
