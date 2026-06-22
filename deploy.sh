@@ -46,7 +46,10 @@ ok "Зависимости установлены (включая devDependencie
 
 step "3/5  npm run build"
 export PATH="$DIR/node_modules/.bin:$PATH"
-npm run build || fail "npm run build"
+# Поднимаем лимит кучи Node только для сборки, иначе на сервере с малым
+# объёмом RAM сборка Vite падает с "JavaScript heap out of memory".
+# Переменная задаётся inline и не утекает в pm2/рантайм-процесс сервера.
+NODE_OPTIONS="--max-old-space-size=2048" npm run build || fail "npm run build"
 ok "Проект собран"
 
 if [ "$SKIP_DB" = true ]; then

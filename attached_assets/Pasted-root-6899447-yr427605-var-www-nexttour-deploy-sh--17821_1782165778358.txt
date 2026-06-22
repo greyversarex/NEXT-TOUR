@@ -1,0 +1,70 @@
+root@6899447-yr427605:/var/www/nexttour# ./deploy.sh
+
+╔══════════════════════════════════════╗
+║        NEXT TOUR  —  DEPLOY          ║
+║  2026-06-22 22:00:25               ║
+╚══════════════════════════════════════╝
+
+
+▶ 0/5  Загрузка переменных окружения
+✓ .env загружен
+
+▶ 1/5  git pull origin main
+From https://github.com/greyversarex/NEXT-TOUR
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+✓ Исходный код обновлён
+
+▶ 2/5  npm install
+
+up to date, audited 576 packages in 7s
+
+114 packages are looking for funding
+  run `npm fund` for details
+
+22 vulnerabilities (2 low, 8 moderate, 12 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+✓ Зависимости установлены (включая devDependencies)
+
+▶ 3/5  npm run build
+
+> rest-express@1.0.0 build
+> tsx script/build.ts
+
+building client...
+vite v7.3.1 building client environment for production...
+transforming (6) ../node_modules/wouter/src/index.js
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+
+<--- Last few GCs --->
+
+[26502:0x18316630]    33021 ms: Mark-Compact 468.2 (488.9) -> 464.3 (488.9) MB, 777.20 / 0.00 ms  (average mu = 0.215, current mu = 0.063) allocation failure; scavenge might not succeed
+[26502:0x18316630]    33914 ms: Mark-Compact 468.5 (489.2) -> 464.1 (488.9) MB, 766.39 / 0.00 ms  (average mu = 0.180, current mu = 0.142) allocation failure; scavenge might not succeed
+
+
+<--- JS stacktrace --->
+
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0xb78db1 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [/usr/bin/node]
+ 2: 0xee82f0 v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/usr/bin/node]
+ 3: 0xee85d7 v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/usr/bin/node]
+ 4: 0x10fa275  [/usr/bin/node]
+ 5: 0x10fa804 v8::internal::Heap::RecomputeLimits(v8::internal::GarbageCollector) [/usr/bin/node]
+ 6: 0x11116f4 v8::internal::Heap::PerformGarbageCollection(v8::internal::GarbageCollector, v8::internal::GarbageCollectionReason, char const*) [/usr/bin/node]
+ 7: 0x1111f0c v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/usr/bin/node]
+ 8: 0x10e8211 v8::internal::HeapAllocator::AllocateRawWithLightRetrySlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/usr/bin/node]
+ 9: 0x10e93a5 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/usr/bin/node]
+10: 0x10c69f6 v8::internal::Factory::NewFillerObject(int, v8::internal::AllocationAlignment, v8::internal::AllocationType, v8::internal::AllocationOrigin) [/usr/bin/node]
+11: 0x1522276 v8::internal::Runtime_AllocateInYoungGeneration(int, unsigned long*, v8::internal::Isolate*) [/usr/bin/node]
+12: 0x195bef6  [/usr/bin/node]
+✗ Ошибка: npm run build
+root@6899447-yr427605:/var/www/nexttour#
