@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Send, X, MessageCircle } from "lucide-react";
+import { Send, X } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
+import { RiCustomerService2Fill } from "react-icons/ri";
 
 export default function FloatingContact() {
   const [open, setOpen] = useState(false);
@@ -72,8 +73,8 @@ export default function FloatingContact() {
           }}
         >
           {open
-            ? <X size={22} className="text-white" />
-            : <MessageCircle size={22} className="text-white" />
+            ? <X size={20} className="text-white" />
+            : <RiCustomerService2Fill size={24} className="text-white" />
           }
         </span>
       </button>
