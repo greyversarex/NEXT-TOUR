@@ -117,31 +117,25 @@ export default function Footer() {
                 <div className="mt-0.5 w-7 h-7 rounded-lg bg-blue-500/15 border border-blue-400/20 flex items-center justify-center flex-shrink-0">
                   <Phone size={13} className="text-blue-400" />
                 </div>
-                <div>
-                  <a href="tel:+992885260101" className="text-white/70 hover:text-white text-sm transition-colors block">+992 885 26-01-01</a>
-                  <a href="tel:+992370260101" className="text-white/70 hover:text-white text-sm transition-colors block">+992 370 26-01-01</a>
-                </div>
+                <a href="tel:+992885260101" className="text-white/70 hover:text-white text-sm transition-colors mt-0.5">+992 885 260 101</a>
               </li>
               <li className="flex items-start gap-3">
                 <div className="mt-0.5 w-7 h-7 rounded-lg bg-blue-500/15 border border-blue-400/20 flex items-center justify-center flex-shrink-0">
                   <Mail size={13} className="text-blue-400" />
                 </div>
-                <a href="mailto:info@nexttour.tj" className="text-white/70 hover:text-white text-sm transition-colors mt-0.5">info@nexttour.tj</a>
+                <a href="mailto:nexttour23@gmail.com" className="text-white/70 hover:text-white text-sm transition-colors mt-0.5">nexttour23@gmail.com</a>
               </li>
               <li className="flex items-start gap-3">
                 <div className="mt-0.5 w-7 h-7 rounded-lg bg-blue-500/15 border border-blue-400/20 flex items-center justify-center flex-shrink-0">
                   <MapPin size={13} className="text-blue-400" />
                 </div>
-                <span className="text-white/60 text-sm leading-relaxed">г. Душанбе, ул. Рудаки, 33</span>
+                <span className="text-white/60 text-sm leading-relaxed">г. Душанбе, ул. Гаффора Валаматзаде, 8/1</span>
               </li>
               <li className="flex items-start gap-3">
                 <div className="mt-0.5 w-7 h-7 rounded-lg bg-blue-500/15 border border-blue-400/20 flex items-center justify-center flex-shrink-0">
                   <Clock size={13} className="text-blue-400" />
                 </div>
-                <div className="text-white/60 text-sm leading-relaxed">
-                  <span className="block">Пн–Пт: 09:00–18:00</span>
-                  <span className="block">Сб: 10:00–15:00</span>
-                </div>
+                <span className="text-white/60 text-sm leading-relaxed">Пн–Сб: 9:00–18:00</span>
               </li>
             </ul>
           </div>
