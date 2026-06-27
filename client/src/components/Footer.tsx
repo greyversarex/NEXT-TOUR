@@ -1,17 +1,159 @@
 import { Link } from "wouter";
+import { Phone, Mail, MapPin, Clock, Send, Instagram, Facebook, Youtube } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="relative mt-12 sm:mt-24 overflow-hidden bg-black/20 backdrop-blur-md border-t border-white/10">
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+    <footer className="relative mt-12 sm:mt-24 overflow-hidden bg-[#07111f] border-t border-white/10">
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0b1c30]/60 to-[#07111f] pointer-events-none" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-        <div className="rounded-xl overflow-hidden shadow-2xl border border-white/10 h-[180px] sm:h-[260px] w-full">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-0">
+
+        {/* Main grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+          {/* Brand column */}
+          <div className="lg:col-span-1 flex flex-col gap-5">
+            <div>
+              <span className="text-white text-2xl font-bold tracking-wide">NEXT <span className="text-blue-400">TOUR</span></span>
+              <p className="mt-3 text-white/55 text-sm leading-relaxed">
+                Ваш надёжный партнёр в мире путешествий. Лучшие туры по всему миру по доступным ценам.
+              </p>
+            </div>
+            {/* Social */}
+            <div className="flex items-center gap-3 mt-1">
+              <a
+                href="https://t.me/nexttour_tj"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-full bg-white/8 hover:bg-blue-500/30 border border-white/10 hover:border-blue-400/40 flex items-center justify-center text-white/60 hover:text-blue-300 transition-all duration-200"
+                data-testid="link-telegram"
+              >
+                <Send size={15} />
+              </a>
+              <a
+                href="https://instagram.com/nexttour_tj"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-full bg-white/8 hover:bg-pink-500/30 border border-white/10 hover:border-pink-400/40 flex items-center justify-center text-white/60 hover:text-pink-300 transition-all duration-200"
+                data-testid="link-instagram"
+              >
+                <Instagram size={15} />
+              </a>
+              <a
+                href="https://facebook.com/nexttour.tj"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-full bg-white/8 hover:bg-blue-600/30 border border-white/10 hover:border-blue-500/40 flex items-center justify-center text-white/60 hover:text-blue-400 transition-all duration-200"
+                data-testid="link-facebook"
+              >
+                <Facebook size={15} />
+              </a>
+              <a
+                href="https://youtube.com/@nexttour_tj"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-full bg-white/8 hover:bg-red-500/30 border border-white/10 hover:border-red-400/40 flex items-center justify-center text-white/60 hover:text-red-400 transition-all duration-200"
+                data-testid="link-youtube"
+              >
+                <Youtube size={15} />
+              </a>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div>
+            <h4 className="text-white/90 text-sm font-semibold uppercase tracking-widest mb-5">Навигация</h4>
+            <ul className="flex flex-col gap-3">
+              {[
+                { href: "/", label: "Главная" },
+                { href: "/tours", label: "Туры" },
+                { href: "/promotions", label: "Акции" },
+                { href: "/news", label: "Новости" },
+                { href: "/about", label: "О компании" },
+              ].map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="text-white/55 hover:text-white text-sm transition-colors duration-150 flex items-center gap-2 group"
+                    data-testid={`link-footer-${label.toLowerCase()}`}
+                  >
+                    <span className="w-1 h-1 rounded-full bg-blue-400/50 group-hover:bg-blue-400 transition-colors" />
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Info */}
+          <div>
+            <h4 className="text-white/90 text-sm font-semibold uppercase tracking-widest mb-5">Информация</h4>
+            <ul className="flex flex-col gap-3">
+              {[
+                { href: "/offer", label: "Договор-оферта" },
+                { href: "/privacy", label: "Конфиденциальность" },
+                { href: "/terms", label: "Условия" },
+                { href: "/profile", label: "Личный кабинет" },
+              ].map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="text-white/55 hover:text-white text-sm transition-colors duration-150 flex items-center gap-2 group"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-blue-400/50 group-hover:bg-blue-400 transition-colors" />
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contacts */}
+          <div>
+            <h4 className="text-white/90 text-sm font-semibold uppercase tracking-widest mb-5">Контакты</h4>
+            <ul className="flex flex-col gap-4">
+              <li className="flex items-start gap-3">
+                <div className="mt-0.5 w-7 h-7 rounded-lg bg-blue-500/15 border border-blue-400/20 flex items-center justify-center flex-shrink-0">
+                  <Phone size={13} className="text-blue-400" />
+                </div>
+                <div>
+                  <a href="tel:+992885260101" className="text-white/70 hover:text-white text-sm transition-colors block">+992 885 26-01-01</a>
+                  <a href="tel:+992370260101" className="text-white/70 hover:text-white text-sm transition-colors block">+992 370 26-01-01</a>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <div className="mt-0.5 w-7 h-7 rounded-lg bg-blue-500/15 border border-blue-400/20 flex items-center justify-center flex-shrink-0">
+                  <Mail size={13} className="text-blue-400" />
+                </div>
+                <a href="mailto:info@nexttour.tj" className="text-white/70 hover:text-white text-sm transition-colors mt-0.5">info@nexttour.tj</a>
+              </li>
+              <li className="flex items-start gap-3">
+                <div className="mt-0.5 w-7 h-7 rounded-lg bg-blue-500/15 border border-blue-400/20 flex items-center justify-center flex-shrink-0">
+                  <MapPin size={13} className="text-blue-400" />
+                </div>
+                <span className="text-white/60 text-sm leading-relaxed">г. Душанбе, ул. Рудаки, 33</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <div className="mt-0.5 w-7 h-7 rounded-lg bg-blue-500/15 border border-blue-400/20 flex items-center justify-center flex-shrink-0">
+                  <Clock size={13} className="text-blue-400" />
+                </div>
+                <div className="text-white/60 text-sm leading-relaxed">
+                  <span className="block">Пн–Пт: 09:00–18:00</span>
+                  <span className="block">Сб: 10:00–15:00</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Map — reduced height */}
+        <div className="rounded-xl overflow-hidden shadow-2xl border border-white/8 h-[130px] sm:h-[160px] w-full mb-0">
           <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3057.8!2d68.7738!3d38.5598!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38b5d17e5db5b1f7%3A0x6c06d1fa43d6e7e0!2sDushanbe!5e0!3m2!1sru!2s!4v1700000000000!5m2!1sru!2s"
             width="100%"
             height="100%"
-            style={{ border: 0 }}
+            style={{ border: 0, filter: "invert(90%) hue-rotate(180deg) brightness(0.85) saturate(0.8)" }}
             allowFullScreen={true}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
@@ -20,19 +162,10 @@ export default function Footer() {
           />
         </div>
 
-        <div className="border-t border-white/8 mt-5 sm:mt-8 pt-4 sm:pt-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] sm:text-xs text-white/25">
+        {/* Bottom bar */}
+        <div className="border-t border-white/8 mt-0 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-white/35">
           <span>© {new Date().getFullYear()} NEXT TOUR. Все права защищены.</span>
-          <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-end">
-            <Link href="/offer" className="hover:text-white/50 transition-colors">
-              Договор-оферта
-            </Link>
-            <Link href="/privacy" className="hover:text-white/50 transition-colors" data-testid="link-privacy">
-              Политика конфиденциальности
-            </Link>
-            <Link href="/terms" className="hover:text-white/50 transition-colors" data-testid="link-terms">
-              Условия использования
-            </Link>
-          </div>
+          <span className="text-white/20">Лицензия ГТРТ №0012 · Таджикистан</span>
         </div>
       </div>
     </footer>
