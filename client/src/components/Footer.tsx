@@ -1,5 +1,6 @@
 import { Link } from "wouter";
-import { Phone, Mail, MapPin, Clock, Send, Instagram, Facebook, Youtube } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Send, Instagram, Facebook } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 
 export default function Footer() {
   return (
@@ -23,7 +24,7 @@ export default function Footer() {
             {/* Social */}
             <div className="flex items-center gap-3 mt-1">
               <a
-                href="https://t.me/nexttour_tj"
+                href="https://t.me/+992885260101"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full bg-white/8 hover:bg-blue-500/30 border border-white/10 hover:border-blue-400/40 flex items-center justify-center text-white/60 hover:text-blue-300 transition-all duration-200"
@@ -32,7 +33,16 @@ export default function Footer() {
                 <Send size={15} />
               </a>
               <a
-                href="https://instagram.com/nexttour_tj"
+                href="https://wa.me/992885260101"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-full bg-white/8 hover:bg-green-500/30 border border-white/10 hover:border-green-400/40 flex items-center justify-center text-white/60 hover:text-green-400 transition-all duration-200"
+                data-testid="link-whatsapp"
+              >
+                <FaWhatsapp size={15} />
+              </a>
+              <a
+                href="https://www.instagram.com/nexttour.tj/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full bg-white/8 hover:bg-pink-500/30 border border-white/10 hover:border-pink-400/40 flex items-center justify-center text-white/60 hover:text-pink-300 transition-all duration-200"
@@ -48,15 +58,6 @@ export default function Footer() {
                 data-testid="link-facebook"
               >
                 <Facebook size={15} />
-              </a>
-              <a
-                href="https://youtube.com/@nexttour_tj"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-white/8 hover:bg-red-500/30 border border-white/10 hover:border-red-400/40 flex items-center justify-center text-white/60 hover:text-red-400 transition-all duration-200"
-                data-testid="link-youtube"
-              >
-                <Youtube size={15} />
               </a>
             </div>
           </div>
