@@ -11,6 +11,7 @@ import NotFound from "@/pages/not-found";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import IntroScreen from "@/components/IntroScreen";
+import FloatingContact from "@/components/FloatingContact";
 
 function SiteBackgroundApplier() {
   const { data } = useQuery<{ imageUrl: string; overlay: number; position: string }>({
@@ -190,6 +191,7 @@ function AppShell() {
         <Router />
       </main>
       <Footer />
+      <FloatingContact />
     </div>
   );
 }
