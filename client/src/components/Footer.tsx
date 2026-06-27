@@ -147,21 +147,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Map — reduced height */}
-        <div className="rounded-xl overflow-hidden shadow-2xl border border-white/8 h-[130px] sm:h-[160px] w-full mb-0">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3057.8!2d68.7738!3d38.5598!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38b5d17e5db5b1f7%3A0x6c06d1fa43d6e7e0!2sDushanbe!5e0!3m2!1sru!2s!4v1700000000000!5m2!1sru!2s"
-            width="100%"
-            height="100%"
-            style={{ border: 0, filter: "invert(90%) hue-rotate(180deg) brightness(0.85) saturate(0.8)" }}
-            allowFullScreen={true}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Office Location"
-            data-testid="iframe-google-map"
-          />
-        </div>
-
         {/* Bottom bar */}
         <div className="border-t border-white/8 mt-0 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-white/35">
           <span>© {new Date().getFullYear()} NEXT TOUR. Все права защищены.</span>
