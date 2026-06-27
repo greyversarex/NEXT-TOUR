@@ -1,12 +1,11 @@
 import { Link } from "wouter";
-import { Phone, Mail, MapPin, Clock, Send, Instagram, Facebook } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Send, Instagram } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 
 export default function Footer() {
   return (
-    <footer className="relative mt-12 sm:mt-24 overflow-hidden bg-[#07111f] border-t border-white/10">
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0b1c30]/60 to-[#07111f] pointer-events-none" />
+    <footer className="relative mt-12 sm:mt-24 overflow-hidden bg-black/20 backdrop-blur-xl border-t border-white/10">
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-0">
 
@@ -49,15 +48,6 @@ export default function Footer() {
                 data-testid="link-instagram"
               >
                 <Instagram size={15} />
-              </a>
-              <a
-                href="https://facebook.com/nexttour.tj"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-white/8 hover:bg-blue-600/30 border border-white/10 hover:border-blue-500/40 flex items-center justify-center text-white/60 hover:text-blue-400 transition-all duration-200"
-                data-testid="link-facebook"
-              >
-                <Facebook size={15} />
               </a>
             </div>
           </div>
