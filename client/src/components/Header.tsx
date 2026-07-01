@@ -30,6 +30,7 @@ export default function Header() {
   const navLinks = [
     { href: "/", label: t("Главная", "Home") },
     { href: "/tours", label: t("Туры", "Tours") },
+    { href: "/transfer", label: t("Трансфер", "Transfer") },
     { href: "/promotions", label: t("Акции", "Deals") },
     { href: "/news", label: t("Новости", "News") },
     { href: "/about", label: t("О компании", "About") },

@@ -20,7 +20,7 @@ import {
   insertBannerSchema, insertTourFeedSchema,
   insertReviewSchema, insertBookingSchema,
   insertNewsSchema, insertCountrySchema, insertCitySchema, insertCategorySchema,
-  insertHotelSchema,
+  insertHotelSchema, insertTransferInquirySchema,
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -1458,6 +1458,29 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
 
     res.json({ payment, booking: null });
+  }));
+
+  // ── Transfer Inquiries ──────────────────────────────────────────────────
+  app.get("/api/transfer-inquiries", requireAdmin, ah(async (_req, res) => {
+    res.json(await storage.getTransferInquiries());
+  }));
+
+  app.post("/api/transfer-inquiries", ah(async (req, res) => {
+    const parsed = insertTransferInquirySchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: "Validation error", errors: parsed.error.errors });
+    const row = await storage.createTransferInquiry(parsed.data);
+    res.status(201).json(row);
+  }));
+
+  app.put("/api/transfer-inquiries/:id", requireAdmin, ah(async (req, res) => {
+    const row = await storage.updateTransferInquiry(req.params.id, req.body);
+    if (!row) return res.status(404).json({ message: "Not found" });
+    res.json(row);
+  }));
+
+  app.delete("/api/transfer-inquiries/:id", requireAdmin, ah(async (req, res) => {
+    await storage.deleteTransferInquiry(req.params.id);
+    res.json({ ok: true });
   }));
 
   // Check txn status from Alif directly

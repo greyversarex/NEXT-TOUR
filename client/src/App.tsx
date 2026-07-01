@@ -53,6 +53,7 @@ import PaymentResult from "@/pages/PaymentResult";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import Offer from "@/pages/Offer";
+import TransferPage from "@/pages/Transfer";
 
 // Admin pages — lazy (грузятся только при открытии /admin/*)
 const Dashboard          = lazy(() => import("@/pages/admin/Dashboard"));
@@ -75,7 +76,8 @@ const EmailAdmin         = lazy(() => import("@/pages/admin/EmailAdmin"));
 const InquiriesAdmin     = lazy(() => import("@/pages/admin/InquiriesAdmin"));
 const TrashAdmin         = lazy(() => import("@/pages/admin/TrashAdmin"));
 const SiteSettingsAdmin  = lazy(() => import("@/pages/admin/SiteSettingsAdmin"));
-const HotelsAdmin        = lazy(() => import("@/pages/admin/HotelsAdmin"));
+const HotelsAdmin              = lazy(() => import("@/pages/admin/HotelsAdmin"));
+const TransferInquiriesAdmin   = lazy(() => import("@/pages/admin/TransferInquiriesAdmin"));
 
 function AdminFallback() {
   return (
@@ -103,6 +105,7 @@ function Router() {
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
       <Route path="/offer" component={Offer} />
+      <Route path="/transfer" component={TransferPage} />
       <Route path="/admin">
         {() => <Suspense fallback={<AdminFallback />}><Dashboard /></Suspense>}
       </Route>
@@ -165,6 +168,9 @@ function Router() {
       </Route>
       <Route path="/admin/site-settings">
         {() => <Suspense fallback={<AdminFallback />}><SiteSettingsAdmin /></Suspense>}
+      </Route>
+      <Route path="/admin/transfer-inquiries">
+        {() => <Suspense fallback={<AdminFallback />}><TransferInquiriesAdmin /></Suspense>}
       </Route>
       <Route component={NotFound} />
     </Switch>

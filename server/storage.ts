@@ -5,7 +5,7 @@ import {
   priceComponents, tourPriceComponents, tourOptions, tourItinerary, itineraryStops,
   banners, tourFeeds, tourFeedItems, reviews, bookings, news,
   favorites, introScreen, heroSlides, passwordResetTokens, currencies, settings,
-  alifPayments, inquiries, hotels, tourHotels, tourCountries, tourCities,
+  alifPayments, inquiries, hotels, tourHotels, tourCountries, tourCities, transferInquiries,
   type User, type InsertUser, type Country, type InsertCountry,
   type City, type InsertCity, type Category, type InsertCategory,
   type Tour, type InsertTour, type TourDate, type InsertTourDate,
@@ -19,6 +19,7 @@ import {
   type PasswordResetToken, type Currency, type InsertCurrency,
   type Inquiry, type InsertInquiry,
   type Hotel, type InsertHotel,
+  type TransferInquiry, type InsertTransferInquiry,
   type AnalyticsData, type LoyaltySettings,
 } from "@shared/schema";
 import bcrypt from "bcryptjs";
@@ -213,6 +214,13 @@ export interface IStorage {
   getTourHotels(tourId: string): Promise<Hotel[]>;
   getTourHotelIds(tourId: string): Promise<string[]>;
   setTourHotels(tourId: string, hotelIds: string[]): Promise<void>;
+
+  // Transfer Inquiries
+  getTransferInquiries(): Promise<TransferInquiry[]>;
+  getTransferInquiry(id: string): Promise<TransferInquiry | undefined>;
+  createTransferInquiry(data: InsertTransferInquiry): Promise<TransferInquiry>;
+  updateTransferInquiry(id: string, data: Partial<TransferInquiry>): Promise<TransferInquiry | undefined>;
+  deleteTransferInquiry(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1269,6 +1277,29 @@ export class DatabaseStorage implements IStorage {
     if (hotelIds.length > 0) {
       await db.insert(tourHotels).values(hotelIds.map(hid => ({ tourId, hotelId: hid })));
     }
+  }
+
+  async getTransferInquiries(): Promise<TransferInquiry[]> {
+    return db.select().from(transferInquiries).orderBy(desc(transferInquiries.createdAt));
+  }
+
+  async getTransferInquiry(id: string): Promise<TransferInquiry | undefined> {
+    const [row] = await db.select().from(transferInquiries).where(eq(transferInquiries.id, id));
+    return row;
+  }
+
+  async createTransferInquiry(data: InsertTransferInquiry): Promise<TransferInquiry> {
+    const [row] = await db.insert(transferInquiries).values(data as any).returning();
+    return row;
+  }
+
+  async updateTransferInquiry(id: string, data: Partial<TransferInquiry>): Promise<TransferInquiry | undefined> {
+    const [row] = await db.update(transferInquiries).set(data as any).where(eq(transferInquiries.id, id)).returning();
+    return row;
+  }
+
+  async deleteTransferInquiry(id: string): Promise<void> {
+    await db.delete(transferInquiries).where(eq(transferInquiries.id, id));
   }
 }
 

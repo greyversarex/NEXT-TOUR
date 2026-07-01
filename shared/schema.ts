@@ -346,6 +346,25 @@ export const settings = pgTable("settings", {
   value: jsonb("value").notNull(),
 });
 
+export const transferInquiries = pgTable("transfer_inquiries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  country: text("country"),
+  departureCity: text("departure_city"),
+  pickupLocation: text("pickup_location"),
+  dropoffLocation: text("dropoff_location"),
+  startDate: text("start_date"),
+  endDate: text("end_date"),
+  pickupTime: text("pickup_time"),
+  passengers: integer("passengers").notNull().default(1),
+  notes: text("notes"),
+  status: inquiryStatusEnum("status").notNull().default("new"),
+  adminNotes: text("admin_notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Insert Schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, loyaltyLevel: true, bookingsCount: true, discountsLeft: true }).extend({
   password: z.string().optional(),
@@ -382,6 +401,7 @@ export const insertTourCategorySchema = createInsertSchema(tourCategories);
 export const insertHotelSchema = createInsertSchema(hotels).omit({ id: true, createdAt: true });
 export const insertTourCountrySchema = createInsertSchema(tourCountries);
 export const insertTourCitySchema = createInsertSchema(tourCities);
+export const insertTransferInquirySchema = createInsertSchema(transferInquiries).omit({ id: true, createdAt: true, status: true, adminNotes: true });
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -428,6 +448,8 @@ export type InsertCurrency = z.infer<typeof insertCurrencySchema>;
 export type Settings = typeof settings.$inferSelect;
 export type Hotel = typeof hotels.$inferSelect;
 export type InsertHotel = z.infer<typeof insertHotelSchema>;
+export type TransferInquiry = typeof transferInquiries.$inferSelect;
+export type InsertTransferInquiry = z.infer<typeof insertTransferInquirySchema>;
 
 export interface AnalyticsData {
   totalBookings: number;
