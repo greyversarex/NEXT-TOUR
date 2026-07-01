@@ -10,7 +10,7 @@ import { Pool } from "pg";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import path from "path";
-import { sendPasswordResetEmail, sendWelcomeEmail, sendBookingConfirmationEmail, sendBulkEmail, sendVerificationEmail } from "./email";
+import { sendPasswordResetEmail, sendWelcomeEmail, sendBookingConfirmationEmail, sendBulkEmail, sendVerificationEmail, sendTransferConfirmationEmail } from "./email";
 import { initiateAlifPayment, checkAlifTransaction, verifyCallbackToken, normalizeAlifStatus } from "./payment";
 import multer from "multer";
 import { storage } from "./storage";
@@ -1469,6 +1469,20 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     const parsed = insertTransferInquirySchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: "Validation error", errors: parsed.error.errors });
     const row = await storage.createTransferInquiry(parsed.data);
+    if (row.email?.trim()) {
+      sendTransferConfirmationEmail({
+        toEmail: row.email,
+        name: row.name,
+        inquiryId: row.id,
+        departureCity: row.departureCity,
+        pickupLocation: row.pickupLocation,
+        dropoffLocation: row.dropoffLocation,
+        startDate: row.startDate,
+        endDate: row.endDate,
+        pickupTime: row.pickupTime,
+        passengers: row.passengers,
+      }).catch((err) => console.error("[transfer] confirmation email failed:", err));
+    }
     res.status(201).json(row);
   }));
 

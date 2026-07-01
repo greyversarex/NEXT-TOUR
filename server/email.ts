@@ -10,6 +10,16 @@ const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 const brandColor = "#0b1f3a";
 const accentColor = "#3b82f6";
 
+function esc(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function isConfigured() {
   if (!resend) {
     console.log("[email] Resend API key not configured.");
@@ -187,6 +197,64 @@ export async function sendBookingConfirmationEmail(opts: {
   `);
 
   return send(toEmail, `NEXT TOUR — Бронирование тура: ${tourTitle}`, html);
+}
+
+export async function sendTransferConfirmationEmail(opts: {
+  toEmail: string;
+  name: string;
+  inquiryId: string;
+  departureCity?: string | null;
+  pickupLocation?: string | null;
+  dropoffLocation?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  pickupTime?: string | null;
+  passengers?: number | null;
+}): Promise<boolean> {
+  const { toEmail, name, inquiryId, departureCity, pickupLocation, dropoffLocation, startDate, endDate, pickupTime, passengers } = opts;
+
+  const row = (label: string, value?: string | number | null) =>
+    value || value === 0
+      ? `<tr><td style="color:#64748b;padding:6px 0;">${label}</td><td style="font-weight:600;padding:6px 0;">${esc(value)}</td></tr>`
+      : "";
+
+  const dateRange = startDate && endDate ? `${esc(startDate)} — ${esc(endDate)}` : esc(startDate || "");
+
+  const html = wrap(`
+    ${header("Заявка на трансфер принята")}
+    <div style="background:#fff;padding:32px;border-radius:0 0 8px 8px;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+      <h2 style="color:${brandColor};margin:0 0 8px;">Ваша заявка принята! 🚗</h2>
+      <p style="color:#475569;margin:0 0 24px;">Здравствуйте, ${esc(name)}! Мы получили вашу заявку на трансфер. Детали:</p>
+
+      <div style="background:#f8fafc;border-radius:12px;padding:20px 24px;margin:0 0 24px;">
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          ${row("Город отправления", departureCity)}
+          ${row("Откуда забрать", pickupLocation)}
+          ${row("Куда доставить", dropoffLocation)}
+          ${row("Дата", dateRange)}
+          ${row("Время подачи", pickupTime)}
+          ${row("Пассажиров", passengers)}
+          <tr style="border-top:1px solid #e2e8f0;">
+            <td style="color:#64748b;padding:10px 0 6px;font-weight:600;">Номер заявки</td>
+            <td style="font-weight:700;padding:10px 0 6px;font-family:monospace;color:${accentColor};">#${inquiryId.slice(0, 8).toUpperCase()}</td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="color:#475569;margin:0 0 20px;font-size:14px;line-height:1.6;">
+        Наш менеджер свяжется с вами в ближайшее время для подтверждения и уточнения деталей.
+        Если у вас есть вопросы — напишите нам в WhatsApp.
+      </p>
+
+      <a href="https://wa.me/992885260101"
+         style="display:inline-block;background:#25D366;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:14px;">
+        WhatsApp →
+      </a>
+      ${footer()}
+    </div>
+  `);
+
+  return send(toEmail, "NEXT TOUR — Заявка на трансфер принята 🚗", html);
 }
 
 export async function sendBulkEmail(opts: {

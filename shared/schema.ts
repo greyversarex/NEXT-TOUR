@@ -401,7 +401,10 @@ export const insertTourCategorySchema = createInsertSchema(tourCategories);
 export const insertHotelSchema = createInsertSchema(hotels).omit({ id: true, createdAt: true });
 export const insertTourCountrySchema = createInsertSchema(tourCountries);
 export const insertTourCitySchema = createInsertSchema(tourCities);
-export const insertTransferInquirySchema = createInsertSchema(transferInquiries).omit({ id: true, createdAt: true, status: true, adminNotes: true });
+export const insertTransferInquirySchema = createInsertSchema(transferInquiries).omit({ id: true, createdAt: true, status: true, adminNotes: true }).extend({
+  name: z.string().min(1),
+  email: z.string().email().optional().or(z.literal("")).nullable(),
+});
 
 // Types
 export type User = typeof users.$inferSelect;
