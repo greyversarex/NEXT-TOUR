@@ -360,6 +360,21 @@ export const vehicles = pgTable("vehicles", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const documents = pgTable("documents", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: text("slug").notNull().unique(),
+  titleRu: text("title_ru").notNull(),
+  titleEn: text("title_en").notNull(),
+  descriptionRu: text("description_ru"),
+  descriptionEn: text("description_en"),
+  fileUrl: text("file_url"),
+  fileName: text("file_name"),
+  isSystem: boolean("is_system").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const transferInquiries = pgTable("transfer_inquiries", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
@@ -428,6 +443,12 @@ export const insertTransferInquirySchema = createInsertSchema(transferInquiries)
   email: z.string().email().optional().or(z.literal("")).nullable(),
 });
 
+export const insertDocumentSchema = createInsertSchema(documents).omit({ id: true, updatedAt: true }).extend({
+  slug: z.string().min(1).regex(/^[a-z0-9-]+$/, "Только строчные латинские буквы, цифры и дефис"),
+  titleRu: z.string().min(1),
+  titleEn: z.string().min(1),
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -475,6 +496,8 @@ export type Hotel = typeof hotels.$inferSelect;
 export type InsertHotel = z.infer<typeof insertHotelSchema>;
 export type Vehicle = typeof vehicles.$inferSelect;
 export type InsertVehicle = z.infer<typeof insertVehicleSchema>;
+export type SiteDocument = typeof documents.$inferSelect;
+export type InsertSiteDocument = z.infer<typeof insertDocumentSchema>;
 export type TransferInquiry = typeof transferInquiries.$inferSelect;
 export type InsertTransferInquiry = z.infer<typeof insertTransferInquirySchema>;
 

@@ -1,8 +1,13 @@
 import { Link } from "wouter";
 import { Phone, Mail, MapPin, Clock, Send, Instagram } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
+import { useQuery } from "@tanstack/react-query";
+import { useI18n } from "@/lib/i18n";
+import type { SiteDocument } from "@shared/schema";
 
 export default function Footer() {
+  const { lang } = useI18n();
+  const { data: documents = [] } = useQuery<SiteDocument[]>({ queryKey: ["/api/documents"] });
   return (
     <footer className="relative mt-12 sm:mt-24 overflow-hidden bg-black/20 backdrop-blur-xl border-t border-white/10">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
@@ -81,22 +86,33 @@ export default function Footer() {
           <div>
             <h4 className="text-white text-sm font-semibold uppercase tracking-widest mb-5">Информация</h4>
             <ul className="flex flex-col gap-3">
-              {[
-                { href: "/offer", label: "Договор-оферта" },
-                { href: "/privacy", label: "Конфиденциальность" },
-                { href: "/terms", label: "Условия" },
-                { href: "/profile", label: "Личный кабинет" },
-              ].map(({ href, label }) => (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    className="text-white/75 hover:text-white text-sm transition-colors duration-150 flex items-center gap-2 group"
-                  >
-                    <span className="w-1 h-1 rounded-full bg-blue-400/60 group-hover:bg-blue-400 transition-colors" />
-                    {label}
-                  </Link>
-                </li>
-              ))}
+              {documents.filter((doc) => doc.fileUrl || doc.isSystem).map((doc) => {
+                const label = lang === "ru" ? doc.titleRu : doc.titleEn;
+                const dot = <span className="w-1 h-1 rounded-full bg-blue-400/60 group-hover:bg-blue-400 transition-colors" />;
+                const cls = "text-white/75 hover:text-white text-sm transition-colors duration-150 flex items-center gap-2 group";
+                return (
+                  <li key={doc.id}>
+                    {doc.fileUrl ? (
+                      <a href={doc.fileUrl} target="_blank" rel="noreferrer" className={cls}>
+                        {dot}{label}
+                      </a>
+                    ) : (
+                      <Link href={`/${doc.slug}`} className={cls}>
+                        {dot}{label}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
+              <li>
+                <Link
+                  href="/profile"
+                  className="text-white/75 hover:text-white text-sm transition-colors duration-150 flex items-center gap-2 group"
+                >
+                  <span className="w-1 h-1 rounded-full bg-blue-400/60 group-hover:bg-blue-400 transition-colors" />
+                  {lang === "ru" ? "Личный кабинет" : "Personal Account"}
+                </Link>
+              </li>
             </ul>
           </div>
 

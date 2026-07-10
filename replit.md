@@ -43,6 +43,13 @@ Vehicles are managed in `/admin/vehicles` (CRUD: name RU/EN, photo, passenger ca
 - Table: `vehicles`. `transfer_inquiries.vehicleId` references it with `onDelete: set null`; `vehicleName` keeps a text snapshot so deleting a vehicle never loses the record.
 - API: `GET /api/vehicles` (public, optional `?countryId=&cityId=` filters), `GET/POST /api/vehicles/:id`, `PUT/DELETE /api/vehicles/:id` (admin).
 
+### Документы / Documents (юридические файлы)
+Admins manage downloadable site documents in `/admin/documents` (CRUD: title RU/EN, description RU/EN, slug, uploaded file, active flag, sort order). Built-in system documents `offer`, `privacy`, `terms` are auto-seeded on startup (idempotent, in `server/seedDocuments.ts`) and cannot be deleted or have their slug changed — admins can only replace the file, edit titles, hide them, or reorder. Admins can also add brand-new documents.
+
+- Where documents appear on the site: the footer "Информация" column and the About page "Правовые документы" section render the active documents dynamically from `/api/documents`. Each link opens the uploaded file (new tab) when present, otherwise falls back to the internal page.
+- The `/offer`, `/privacy`, `/terms` pages use `client/src/components/DocumentPage.tsx`: if a file is uploaded for that slug it shows a viewer + download button; if not, it renders the original hardcoded legal text as a fallback so the site is never broken.
+- Table: `documents`. API: `GET /api/documents` (public, active only; admins can pass `?includeInactive=1`), `GET /api/documents/:slug` (public), `POST/PUT/DELETE /api/documents/:id` (admin). File names/URLs are stored on the record; uploads go through `POST /api/upload` (now also accepts PDF/Word/Excel, not just images/video).
+
 The app is a monorepo with a React frontend, an Express backend, and a shared schema. Everything runs in a single Node.js process in development.
 
 ---

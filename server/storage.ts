@@ -5,7 +5,7 @@ import {
   priceComponents, tourPriceComponents, tourOptions, tourItinerary, itineraryStops,
   banners, tourFeeds, tourFeedItems, reviews, bookings, news,
   favorites, introScreen, heroSlides, passwordResetTokens, currencies, settings,
-  alifPayments, inquiries, hotels, tourHotels, tourCountries, tourCities, transferInquiries, vehicles,
+  alifPayments, inquiries, hotels, tourHotels, tourCountries, tourCities, transferInquiries, vehicles, documents,
   type User, type InsertUser, type Country, type InsertCountry,
   type City, type InsertCity, type Category, type InsertCategory,
   type Tour, type InsertTour, type TourDate, type InsertTourDate,
@@ -21,6 +21,7 @@ import {
   type Hotel, type InsertHotel,
   type TransferInquiry, type InsertTransferInquiry,
   type Vehicle, type InsertVehicle,
+  type SiteDocument, type InsertSiteDocument,
   type AnalyticsData, type LoyaltySettings,
 } from "@shared/schema";
 import bcrypt from "bcryptjs";
@@ -229,6 +230,14 @@ export interface IStorage {
   createVehicle(data: InsertVehicle): Promise<Vehicle>;
   updateVehicle(id: string, data: Partial<Vehicle>): Promise<Vehicle | undefined>;
   deleteVehicle(id: string): Promise<void>;
+
+  // Documents
+  getDocuments(): Promise<SiteDocument[]>;
+  getDocument(id: string): Promise<SiteDocument | undefined>;
+  getDocumentBySlug(slug: string): Promise<SiteDocument | undefined>;
+  createDocument(data: InsertSiteDocument): Promise<SiteDocument>;
+  updateDocument(id: string, data: Partial<SiteDocument>): Promise<SiteDocument | undefined>;
+  deleteDocument(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1335,6 +1344,34 @@ export class DatabaseStorage implements IStorage {
 
   async deleteVehicle(id: string): Promise<void> {
     await db.delete(vehicles).where(eq(vehicles.id, id));
+  }
+
+  async getDocuments(): Promise<SiteDocument[]> {
+    return db.select().from(documents).orderBy(asc(documents.sortOrder), asc(documents.titleRu));
+  }
+
+  async getDocument(id: string): Promise<SiteDocument | undefined> {
+    const [d] = await db.select().from(documents).where(eq(documents.id, id));
+    return d;
+  }
+
+  async getDocumentBySlug(slug: string): Promise<SiteDocument | undefined> {
+    const [d] = await db.select().from(documents).where(eq(documents.slug, slug));
+    return d;
+  }
+
+  async createDocument(data: InsertSiteDocument): Promise<SiteDocument> {
+    const [d] = await db.insert(documents).values(data as any).returning();
+    return d;
+  }
+
+  async updateDocument(id: string, data: Partial<SiteDocument>): Promise<SiteDocument | undefined> {
+    const [d] = await db.update(documents).set({ ...data, updatedAt: new Date() } as any).where(eq(documents.id, id)).returning();
+    return d;
+  }
+
+  async deleteDocument(id: string): Promise<void> {
+    await db.delete(documents).where(eq(documents.id, id));
   }
 }
 

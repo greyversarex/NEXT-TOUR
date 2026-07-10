@@ -1,10 +1,12 @@
 import { useI18n } from "@/lib/i18n";
 import { FileText } from "lucide-react";
+import { DocumentPage } from "@/components/DocumentPage";
 
 export default function Offer() {
   const { t } = useI18n();
 
   return (
+    <DocumentPage slug="offer">
     <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-12 sm:py-16">
       <div className="bg-white/95 dark:bg-card/98 backdrop-blur-xl rounded-2xl sm:rounded-3xl px-6 sm:px-10 py-10 sm:py-12 shadow-xl border border-white/30">
       <div className="flex items-center gap-3 mb-2">
@@ -246,5 +248,6 @@ export default function Offer() {
       </div>
       </div>
     </div>
+    </DocumentPage>
   );
 }

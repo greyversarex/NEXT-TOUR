@@ -20,7 +20,7 @@ import {
   insertBannerSchema, insertTourFeedSchema,
   insertReviewSchema, insertBookingSchema,
   insertNewsSchema, insertCountrySchema, insertCitySchema, insertCategorySchema,
-  insertHotelSchema, insertTransferInquirySchema, insertVehicleSchema,
+  insertHotelSchema, insertTransferInquirySchema, insertVehicleSchema, insertDocumentSchema,
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -903,6 +903,52 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json({ success: true });
   });
 
+  // Documents (legal/informational files shown across the site)
+  app.get("/api/documents", ah(async (req, res) => {
+    let list = await storage.getDocuments();
+    const user = req.user as any;
+    const isAdmin = user && user.role === "admin";
+    const includeInactive = req.query.includeInactive === "1" || req.query.includeInactive === "true";
+    if (!(isAdmin && includeInactive)) list = list.filter(d => d.isActive);
+    res.json(list);
+  }));
+  app.get("/api/documents/:slug", ah(async (req, res) => {
+    const doc = await storage.getDocumentBySlug(req.params.slug);
+    if (!doc || !doc.isActive) return res.status(404).json({ message: "Document not found" });
+    res.json(doc);
+  }));
+  app.post("/api/documents", requireAdmin, async (req, res) => {
+    try {
+      const data = insertDocumentSchema.parse(req.body);
+      const existing = await storage.getDocumentBySlug(data.slug);
+      if (existing) return res.status(400).json({ message: "Документ с таким идентификатором (slug) уже существует" });
+      res.json(await storage.createDocument(data));
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
+  });
+  app.put("/api/documents/:id", requireAdmin, async (req, res) => {
+    try {
+      const existing = await storage.getDocument(req.params.id);
+      if (!existing) return res.status(404).json({ message: "Document not found" });
+      const data = insertDocumentSchema.partial().parse(req.body);
+      // The slug of a built-in document is referenced by site pages — never let it change.
+      if (existing.isSystem && data.slug && data.slug !== existing.slug) {
+        return res.status(400).json({ message: "Нельзя изменить идентификатор системного документа" });
+      }
+      res.json(await storage.updateDocument(req.params.id, data as any));
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
+  });
+  app.delete("/api/documents/:id", requireAdmin, async (req, res) => {
+    const existing = await storage.getDocument(req.params.id);
+    if (!existing) return res.status(404).json({ message: "Document not found" });
+    if (existing.isSystem) return res.status(400).json({ message: "Системный документ нельзя удалить — можно только скрыть или заменить файл" });
+    await storage.deleteDocument(req.params.id);
+    res.json({ success: true });
+  });
+
   // Tour Hotels (selection per tour)
   app.get("/api/tours/:id/hotels", ah(async (req, res) => {
     res.json(await storage.getTourHotels(req.params.id));
@@ -1068,9 +1114,22 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         cb(null, `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`);
       },
     }),
-    fileFilter: (_req, file, cb) => {
-      if (file.mimetype.startsWith("image/") || ["video/mp4", "video/quicktime", "video/webm"].includes(file.mimetype)) {
+    fileFilter: (req, file, cb) => {
+      const docTypes = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      ];
+      const isImageOrVideo = file.mimetype.startsWith("image/") || ["video/mp4", "video/quicktime", "video/webm"].includes(file.mimetype);
+      const isDoc = docTypes.includes(file.mimetype);
+      if (isImageOrVideo) {
         cb(null, true);
+      } else if (isDoc) {
+        // Office/PDF documents can only be uploaded by admins (documents section).
+        if ((req.user as any)?.role === "admin") cb(null, true);
+        else cb(new Error("Загрузка документов доступна только администраторам"));
       } else {
         cb(new Error(`Неподдерживаемый тип файла: ${file.mimetype}`));
       }
@@ -1082,7 +1141,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     upload.single("file")(req, res, (err) => {
       if (err) return res.status(400).json({ message: err.message || "Upload error" });
       if (!req.file) return res.status(400).json({ message: "Файл не загружен или неподдерживаемый тип" });
-      res.json({ url: `/uploads/${req.file.filename}` });
+      res.json({ url: `/uploads/${req.file.filename}`, name: req.file.originalname });
     });
   });
 

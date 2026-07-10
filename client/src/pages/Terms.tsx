@@ -1,9 +1,11 @@
 import { useI18n } from "@/lib/i18n";
+import { DocumentPage } from "@/components/DocumentPage";
 
 export default function Terms() {
   const { t } = useI18n();
 
   return (
+    <DocumentPage slug="terms">
     <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-12 sm:py-16">
       <div className="bg-white/95 dark:bg-card/98 backdrop-blur-xl rounded-2xl sm:rounded-3xl px-6 sm:px-10 py-10 sm:py-12 shadow-xl border border-white/30">
       <h1 className="text-3xl font-bold mb-2">{t("Условия использования", "Terms of Service")}</h1>
@@ -107,5 +109,6 @@ export default function Terms() {
       </div>
       </div>
     </div>
+    </DocumentPage>
   );
 }

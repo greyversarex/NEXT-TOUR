@@ -18,6 +18,7 @@ const navItems = [
   { href: "/admin/countries", label: "Countries & Cities", labelRu: "Страны и города", icon: Map },
   { href: "/admin/hotels", label: "Hotels", labelRu: "Гостиницы", icon: Hotel },
   { href: "/admin/vehicles", label: "Vehicle Fleet", labelRu: "Автопарк", icon: Car },
+  { href: "/admin/documents", label: "Documents", labelRu: "Документы", icon: FileText },
   { href: "/admin/categories", label: "Categories", labelRu: "Категории", icon: Tag },
   { href: "/admin/banners", label: "Banners", labelRu: "Баннеры", icon: Image },
   { href: "/admin/feeds", label: "Tour Feeds", labelRu: "Ленты", icon: Layers },
