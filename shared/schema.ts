@@ -346,6 +346,20 @@ export const settings = pgTable("settings", {
   value: jsonb("value").notNull(),
 });
 
+export const vehicles = pgTable("vehicles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  nameRu: text("name_ru").notNull(),
+  nameEn: text("name_en").notNull(),
+  image: text("image"),
+  capacity: integer("capacity").notNull().default(1),
+  pricePerDay: decimal("price_per_day", { precision: 12, scale: 2 }).notNull().default("0"),
+  countryId: varchar("country_id").references(() => countries.id),
+  cityId: varchar("city_id").references(() => cities.id),
+  isActive: boolean("is_active").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const transferInquiries = pgTable("transfer_inquiries", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
@@ -359,6 +373,8 @@ export const transferInquiries = pgTable("transfer_inquiries", {
   endDate: text("end_date"),
   pickupTime: text("pickup_time"),
   passengers: integer("passengers").notNull().default(1),
+  vehicleId: varchar("vehicle_id").references(() => vehicles.id, { onDelete: "set null" }),
+  vehicleName: text("vehicle_name"),
   notes: text("notes"),
   status: inquiryStatusEnum("status").notNull().default("new"),
   adminNotes: text("admin_notes"),
@@ -401,6 +417,12 @@ export const insertTourCategorySchema = createInsertSchema(tourCategories);
 export const insertHotelSchema = createInsertSchema(hotels).omit({ id: true, createdAt: true });
 export const insertTourCountrySchema = createInsertSchema(tourCountries);
 export const insertTourCitySchema = createInsertSchema(tourCities);
+export const insertVehicleSchema = createInsertSchema(vehicles).omit({ id: true, createdAt: true }).extend({
+  nameRu: z.string().min(1),
+  nameEn: z.string().min(1),
+  capacity: z.coerce.number().int().min(1),
+  pricePerDay: z.coerce.number().min(0).transform((v) => String(v)),
+});
 export const insertTransferInquirySchema = createInsertSchema(transferInquiries).omit({ id: true, createdAt: true, status: true, adminNotes: true }).extend({
   name: z.string().min(1),
   email: z.string().email().optional().or(z.literal("")).nullable(),
@@ -451,6 +473,8 @@ export type InsertCurrency = z.infer<typeof insertCurrencySchema>;
 export type Settings = typeof settings.$inferSelect;
 export type Hotel = typeof hotels.$inferSelect;
 export type InsertHotel = z.infer<typeof insertHotelSchema>;
+export type Vehicle = typeof vehicles.$inferSelect;
+export type InsertVehicle = z.infer<typeof insertVehicleSchema>;
 export type TransferInquiry = typeof transferInquiries.$inferSelect;
 export type InsertTransferInquiry = z.infer<typeof insertTransferInquirySchema>;
 

@@ -20,7 +20,7 @@ import {
   insertBannerSchema, insertTourFeedSchema,
   insertReviewSchema, insertBookingSchema,
   insertNewsSchema, insertCountrySchema, insertCitySchema, insertCategorySchema,
-  insertHotelSchema, insertTransferInquirySchema,
+  insertHotelSchema, insertTransferInquirySchema, insertVehicleSchema,
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -864,6 +864,45 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json({ success: true });
   });
 
+  // Vehicles (Автопарк)
+  app.get("/api/vehicles", ah(async (req, res) => {
+    const filters: { countryId?: string; cityId?: string } = {};
+    if (req.query.countryId) filters.countryId = req.query.countryId as string;
+    if (req.query.cityId) filters.cityId = req.query.cityId as string;
+    let list = await storage.getVehicles(filters);
+    const user = req.user as any;
+    const isAdmin = user && user.role === "admin";
+    const includeInactive = req.query.includeInactive === "1" || req.query.includeInactive === "true";
+    // Inactive (hidden) vehicles are only visible to admins that explicitly ask for them.
+    if (!(isAdmin && includeInactive)) list = list.filter(v => v.isActive);
+    res.json(list);
+  }));
+  app.get("/api/vehicles/:id", ah(async (req, res) => {
+    const vehicle = await storage.getVehicle(req.params.id);
+    if (!vehicle) return res.status(404).json({ message: "Vehicle not found" });
+    res.json(vehicle);
+  }));
+  app.post("/api/vehicles", requireAdmin, async (req, res) => {
+    try {
+      const data = insertVehicleSchema.parse(req.body);
+      res.json(await storage.createVehicle(data));
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
+  });
+  app.put("/api/vehicles/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = insertVehicleSchema.partial().parse(req.body);
+      res.json(await storage.updateVehicle(req.params.id, data as any));
+    } catch (e: any) {
+      res.status(400).json({ message: e.message });
+    }
+  });
+  app.delete("/api/vehicles/:id", requireAdmin, async (req, res) => {
+    await storage.deleteVehicle(req.params.id);
+    res.json({ success: true });
+  });
+
   // Tour Hotels (selection per tour)
   app.get("/api/tours/:id/hotels", ah(async (req, res) => {
     res.json(await storage.getTourHotels(req.params.id));
@@ -1468,7 +1507,18 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   app.post("/api/transfer-inquiries", ah(async (req, res) => {
     const parsed = insertTransferInquirySchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: "Validation error", errors: parsed.error.errors });
-    const row = await storage.createTransferInquiry(parsed.data);
+    // Never trust the client-supplied vehicle name; derive it server-side and
+    // gracefully drop the reference if the vehicle is missing or hidden.
+    const data: any = { ...parsed.data, vehicleName: null };
+    if (data.vehicleId) {
+      const vehicle = await storage.getVehicle(data.vehicleId);
+      if (vehicle && vehicle.isActive) {
+        data.vehicleName = `${vehicle.nameRu} / ${vehicle.nameEn}`;
+      } else {
+        data.vehicleId = null;
+      }
+    }
+    const row = await storage.createTransferInquiry(data);
     if (row.email?.trim()) {
       sendTransferConfirmationEmail({
         toEmail: row.email,
@@ -1481,6 +1531,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         endDate: row.endDate,
         pickupTime: row.pickupTime,
         passengers: row.passengers,
+        vehicleName: row.vehicleName,
       }).catch((err) => console.error("[transfer] confirmation email failed:", err));
     }
     res.status(201).json(row);

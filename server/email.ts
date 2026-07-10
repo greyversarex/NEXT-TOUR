@@ -210,8 +210,9 @@ export async function sendTransferConfirmationEmail(opts: {
   endDate?: string | null;
   pickupTime?: string | null;
   passengers?: number | null;
+  vehicleName?: string | null;
 }): Promise<boolean> {
-  const { toEmail, name, inquiryId, departureCity, pickupLocation, dropoffLocation, startDate, endDate, pickupTime, passengers } = opts;
+  const { toEmail, name, inquiryId, departureCity, pickupLocation, dropoffLocation, startDate, endDate, pickupTime, passengers, vehicleName } = opts;
 
   const row = (label: string, value?: string | number | null) =>
     value || value === 0
@@ -234,6 +235,7 @@ export async function sendTransferConfirmationEmail(opts: {
           ${row("Дата", dateRange)}
           ${row("Время подачи", pickupTime)}
           ${row("Пассажиров", passengers)}
+          ${row("Автомобиль", vehicleName)}
           <tr style="border-top:1px solid #e2e8f0;">
             <td style="color:#64748b;padding:10px 0 6px;font-weight:600;">Номер заявки</td>
             <td style="font-weight:700;padding:10px 0 6px;font-family:monospace;color:${accentColor};">#${inquiryId.slice(0, 8).toUpperCase()}</td>

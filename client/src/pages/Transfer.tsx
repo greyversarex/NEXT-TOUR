@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/lib/currency";
+import type { Vehicle, Country, City } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,18 +38,32 @@ const COUNTRY_CODES = [
 ];
 
 export default function TransferPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { toast } = useToast();
+  const { formatPrice } = useCurrency();
   const [submitted, setSubmitted] = useState(false);
   const [selectedShort, setSelectedShort] = useState("TJ");
   const dialCode = COUNTRY_CODES.find(c => c.short === selectedShort)?.code ?? "+992";
+
+  const [countryId, setCountryId] = useState("");
+  const [cityId, setCityId] = useState("");
+  const [selectedVehicleId, setSelectedVehicleId] = useState("");
+
+  const { data: countries = [] } = useQuery<Country[]>({ queryKey: ["/api/countries"] });
+  const { data: cities = [] } = useQuery<City[]>({ queryKey: ["/api/cities"] });
+  const { data: vehicles = [] } = useQuery<Vehicle[]>({ queryKey: ["/api/vehicles"] });
+
+  const availableVehicles = vehicles.filter(v => {
+    if (v.isActive === false) return false;
+    if (countryId && v.countryId !== countryId) return false;
+    if (cityId && v.cityId !== cityId) return false;
+    return true;
+  });
 
   const [form, setForm] = useState({
     name: "",
     email: "",
     phone: "",
-    country: "",
-    departureCity: "",
     pickupLocation: "",
     dropoffLocation: "",
     startDate: "",
@@ -58,12 +74,20 @@ export default function TransferPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: (data: typeof form) =>
-      apiRequest("POST", "/api/transfer-inquiries", {
+    mutationFn: (data: typeof form) => {
+      const country = countries.find(c => c.id === countryId);
+      const city = cities.find(c => c.id === cityId);
+      const vehicle = vehicles.find(v => v.id === selectedVehicleId);
+      return apiRequest("POST", "/api/transfer-inquiries", {
         ...data,
         phone: data.phone ? `${dialCode} ${data.phone}` : undefined,
         passengers: Number(data.passengers),
-      }),
+        country: country ? (lang === "ru" ? country.nameRu : country.nameEn) : undefined,
+        departureCity: city ? (lang === "ru" ? city.nameRu : city.nameEn) : undefined,
+        vehicleId: vehicle?.id ?? undefined,
+        vehicleName: vehicle ? `${vehicle.nameRu} / ${vehicle.nameEn}` : undefined,
+      });
+    },
     onSuccess: () => {
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -91,8 +115,11 @@ export default function TransferPage() {
 
   const resetForm = () => {
     setSubmitted(false);
+    setCountryId("");
+    setCityId("");
+    setSelectedVehicleId("");
     setForm({
-      name: "", email: "", phone: "", country: "", departureCity: "",
+      name: "", email: "", phone: "",
       pickupLocation: "", dropoffLocation: "", startDate: "", endDate: "",
       pickupTime: "", passengers: 1, notes: "",
     });
@@ -293,28 +320,36 @@ export default function TransferPage() {
                     <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
                     {t("Страна", "Country")}
                   </Label>
-                  <Input
+                  <select
                     id="country"
-                    data-testid="input-transfer-country"
-                    className="h-11"
-                    placeholder={t("Таджикистан, Россия...", "Tajikistan, Russia...")}
-                    value={form.country}
-                    onChange={(e) => set("country", e.target.value)}
-                  />
+                    data-testid="select-transfer-country"
+                    className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm"
+                    value={countryId}
+                    onChange={(e) => { setCountryId(e.target.value); setCityId(""); setSelectedVehicleId(""); }}
+                  >
+                    <option value="">{t("Выберите страну", "Select country")}</option>
+                    {countries.map(c => (
+                      <option key={c.id} value={c.id}>{lang === "ru" ? c.nameRu : c.nameEn}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="departureCity" className="flex items-center gap-1.5 text-sm font-medium">
                     <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
                     {t("Город отправления", "Departure city")}
                   </Label>
-                  <Input
+                  <select
                     id="departureCity"
-                    data-testid="input-transfer-departure-city"
-                    className="h-11"
-                    placeholder={t("Душанбе, Москва...", "Dushanbe, Moscow...")}
-                    value={form.departureCity}
-                    onChange={(e) => set("departureCity", e.target.value)}
-                  />
+                    data-testid="select-transfer-departure-city"
+                    className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm"
+                    value={cityId}
+                    onChange={(e) => { setCityId(e.target.value); setSelectedVehicleId(""); }}
+                  >
+                    <option value="">{t("Выберите город", "Select city")}</option>
+                    {cities.filter(c => !countryId || c.countryId === countryId).map(c => (
+                      <option key={c.id} value={c.id}>{lang === "ru" ? c.nameRu : c.nameEn}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="space-y-2">
@@ -350,6 +385,77 @@ export default function TransferPage() {
                   />
                 </div>
               </div>
+            </div>
+
+            <div className="border-t border-border/50" />
+
+            {/* ── Section: Выбор автомобиля ── */}
+            <div>
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-4">
+                {t("Доступные автомобили", "Available vehicles")}
+              </h3>
+              {!countryId && !cityId ? (
+                <p className="text-sm text-muted-foreground">
+                  {t(
+                    "Выберите страну и город отправления, чтобы увидеть доступные автомобили.",
+                    "Select a departure country and city to see available vehicles."
+                  )}
+                </p>
+              ) : availableVehicles.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  {t(
+                    "Для выбранного направления пока нет автомобилей — оставьте заявку, и мы подберём транспорт.",
+                    "No vehicles for the selected route yet — submit a request and we'll arrange one."
+                  )}
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {availableVehicles.map((v) => {
+                    const isSelected = selectedVehicleId === v.id;
+                    return (
+                      <button
+                        type="button"
+                        key={v.id}
+                        onClick={() => setSelectedVehicleId(isSelected ? "" : v.id)}
+                        data-testid={`card-transfer-vehicle-${v.id}`}
+                        className={`text-left rounded-2xl border overflow-hidden transition-all ${
+                          isSelected
+                            ? "border-blue-500 ring-2 ring-blue-500/30 shadow-md"
+                            : "border-border/70 hover:border-blue-300 hover:shadow-sm"
+                        }`}
+                      >
+                        <div className="aspect-video bg-muted relative">
+                          {v.image ? (
+                            <img src={v.image} alt={lang === "ru" ? v.nameRu : v.nameEn} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Car className="h-8 w-8 text-muted-foreground/40" />
+                            </div>
+                          )}
+                          {isSelected && (
+                            <div className="absolute top-2 right-2 bg-blue-500 text-white rounded-full p-1">
+                              <CheckCircle2 className="h-4 w-4" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-3">
+                          <p className="font-semibold text-sm leading-tight">
+                            {lang === "ru" ? v.nameRu : v.nameEn}
+                          </p>
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
+                            <Users className="h-3.5 w-3.5" />
+                            {v.capacity} {t("пасс.", "pax")}
+                          </div>
+                          <p className="text-sm font-bold text-foreground mt-1.5">
+                            {formatPrice(v.pricePerDay)}
+                            <span className="text-xs font-normal text-muted-foreground"> / {t("сутки", "day")}</span>
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <div className="border-t border-border/50" />

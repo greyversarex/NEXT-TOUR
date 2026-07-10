@@ -5,7 +5,7 @@ import {
   priceComponents, tourPriceComponents, tourOptions, tourItinerary, itineraryStops,
   banners, tourFeeds, tourFeedItems, reviews, bookings, news,
   favorites, introScreen, heroSlides, passwordResetTokens, currencies, settings,
-  alifPayments, inquiries, hotels, tourHotels, tourCountries, tourCities, transferInquiries,
+  alifPayments, inquiries, hotels, tourHotels, tourCountries, tourCities, transferInquiries, vehicles,
   type User, type InsertUser, type Country, type InsertCountry,
   type City, type InsertCity, type Category, type InsertCategory,
   type Tour, type InsertTour, type TourDate, type InsertTourDate,
@@ -20,6 +20,7 @@ import {
   type Inquiry, type InsertInquiry,
   type Hotel, type InsertHotel,
   type TransferInquiry, type InsertTransferInquiry,
+  type Vehicle, type InsertVehicle,
   type AnalyticsData, type LoyaltySettings,
 } from "@shared/schema";
 import bcrypt from "bcryptjs";
@@ -221,6 +222,13 @@ export interface IStorage {
   createTransferInquiry(data: InsertTransferInquiry): Promise<TransferInquiry>;
   updateTransferInquiry(id: string, data: Partial<TransferInquiry>): Promise<TransferInquiry | undefined>;
   deleteTransferInquiry(id: string): Promise<void>;
+
+  // Vehicles
+  getVehicles(filters?: { countryId?: string; cityId?: string }): Promise<Vehicle[]>;
+  getVehicle(id: string): Promise<Vehicle | undefined>;
+  createVehicle(data: InsertVehicle): Promise<Vehicle>;
+  updateVehicle(id: string, data: Partial<Vehicle>): Promise<Vehicle | undefined>;
+  deleteVehicle(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1300,6 +1308,33 @@ export class DatabaseStorage implements IStorage {
 
   async deleteTransferInquiry(id: string): Promise<void> {
     await db.delete(transferInquiries).where(eq(transferInquiries.id, id));
+  }
+
+  async getVehicles(filters?: { countryId?: string; cityId?: string }): Promise<Vehicle[]> {
+    const conds = [];
+    if (filters?.countryId) conds.push(eq(vehicles.countryId, filters.countryId));
+    if (filters?.cityId) conds.push(eq(vehicles.cityId, filters.cityId));
+    const whereClause = conds.length ? and(...conds) : undefined;
+    return db.select().from(vehicles).where(whereClause).orderBy(asc(vehicles.sortOrder), asc(vehicles.nameRu));
+  }
+
+  async getVehicle(id: string): Promise<Vehicle | undefined> {
+    const [v] = await db.select().from(vehicles).where(eq(vehicles.id, id));
+    return v;
+  }
+
+  async createVehicle(data: InsertVehicle): Promise<Vehicle> {
+    const [v] = await db.insert(vehicles).values(data as any).returning();
+    return v;
+  }
+
+  async updateVehicle(id: string, data: Partial<Vehicle>): Promise<Vehicle | undefined> {
+    const [v] = await db.update(vehicles).set(data as any).where(eq(vehicles.id, id)).returning();
+    return v;
+  }
+
+  async deleteVehicle(id: string): Promise<void> {
+    await db.delete(vehicles).where(eq(vehicles.id, id));
   }
 }
 

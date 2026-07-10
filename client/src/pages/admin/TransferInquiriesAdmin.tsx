@@ -171,6 +171,7 @@ export default function TransferInquiriesAdmin() {
                         <InfoRow icon={MapPin} label={t("Страна", "Country")} value={item.country} />
                         <InfoRow icon={MapPin} label={t("Город отправления", "Departure city")} value={item.departureCity} />
                         <InfoRow icon={Users} label={t("Пассажиров", "Passengers")} value={item.passengers} />
+                        <InfoRow icon={Car} label={t("Автомобиль", "Vehicle")} value={item.vehicleName} />
                         <InfoRow icon={MapPin} label={t("Место приёма", "Pickup")} value={item.pickupLocation} />
                         <InfoRow icon={MapPin} label={t("Место высадки", "Dropoff")} value={item.dropoffLocation} />
                         <InfoRow icon={Calendar} label={t("Дата начала", "Start date")} value={item.startDate} />

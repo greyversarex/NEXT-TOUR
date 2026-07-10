@@ -37,6 +37,12 @@ Hotels are managed in `/admin/hotels` (CRUD: name RU/EN, description RU/EN, coun
 - Tables: `hotels`, `tour_hotels` (join, cascade delete on both sides).
 - API: `GET/POST /api/hotels`, `GET/PUT/DELETE /api/hotels/:id`, `GET/PUT /api/tours/:id/hotels`. Tour POST/PUT accepts `hotelIds`. Tour `/full` endpoint returns linked `hotels`.
 
+### Автопарк / Vehicle Fleet (трансфер)
+Vehicles are managed in `/admin/vehicles` (CRUD: name RU/EN, photo, passenger capacity, price per day in TJS, country, city, active flag, sort order). On the public `/transfer` form the client picks a departure country and city (dropdowns from the DB), and the "Доступные автомобили" section shows only active vehicles matching that country/city. The chosen vehicle is stored on the transfer inquiry (`vehicleId` + `vehicleName` snapshot), shown in `/admin/transfer-inquiries`, and included in the confirmation email.
+
+- Table: `vehicles`. `transfer_inquiries.vehicleId` references it with `onDelete: set null`; `vehicleName` keeps a text snapshot so deleting a vehicle never loses the record.
+- API: `GET /api/vehicles` (public, optional `?countryId=&cityId=` filters), `GET/POST /api/vehicles/:id`, `PUT/DELETE /api/vehicles/:id` (admin).
+
 The app is a monorepo with a React frontend, an Express backend, and a shared schema. Everything runs in a single Node.js process in development.
 
 ---

@@ -176,7 +176,10 @@ export default function About() {
                 </div>
                 <div>
                   <p className="font-medium text-sm sm:text-base">{t("Телефон", "Phone")}</p>
-                  <a href="tel:+992885260101" className="text-muted-foreground text-xs sm:text-sm hover:text-primary transition-colors">+992 885 260 101</a>
+                  <div className="flex flex-col">
+                    <a href="tel:+992885260101" className="text-muted-foreground text-xs sm:text-sm hover:text-primary transition-colors">+992 885 260 101</a>
+                    <a href="tel:+992550505133" className="text-muted-foreground text-xs sm:text-sm hover:text-primary transition-colors">+992 550 505 133</a>
+                  </div>
                 </div>
               </div>
               <div className="flex items-start gap-3">

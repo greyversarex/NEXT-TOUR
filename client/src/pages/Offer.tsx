@@ -215,7 +215,7 @@ export default function Offer() {
             <div>
               <p className="font-semibold text-foreground">{t("ООО «Ояндаи Соф»", "LLC «Oyandai Sof»")}</p>
               <p>{t("Республика Таджикистан, г. Душанбе, улица Валаматзаде, 8", "Republic of Tajikistan, Dushanbe, Valamatzade street, 8")}</p>
-              <p>{t("Тел:", "Tel:")} +992 885 260 101; +992 988 988 087</p>
+              <p>{t("Тел:", "Tel:")} +992 885 260 101; +992 988 988 087; +992 550 505 133</p>
               <p>Email: <a href="mailto:nexttour23@gmail.com" className="text-primary hover:underline">nexttour23@gmail.com</a></p>
               <p>ИНН: 010106136</p>
             </div>

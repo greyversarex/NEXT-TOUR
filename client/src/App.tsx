@@ -77,6 +77,7 @@ const InquiriesAdmin     = lazy(() => import("@/pages/admin/InquiriesAdmin"));
 const TrashAdmin         = lazy(() => import("@/pages/admin/TrashAdmin"));
 const SiteSettingsAdmin  = lazy(() => import("@/pages/admin/SiteSettingsAdmin"));
 const HotelsAdmin              = lazy(() => import("@/pages/admin/HotelsAdmin"));
+const VehiclesAdmin            = lazy(() => import("@/pages/admin/VehiclesAdmin"));
 const TransferInquiriesAdmin   = lazy(() => import("@/pages/admin/TransferInquiriesAdmin"));
 
 function AdminFallback() {
@@ -129,6 +130,9 @@ function Router() {
       </Route>
       <Route path="/admin/hotels">
         {() => <Suspense fallback={<AdminFallback />}><HotelsAdmin /></Suspense>}
+      </Route>
+      <Route path="/admin/vehicles">
+        {() => <Suspense fallback={<AdminFallback />}><VehiclesAdmin /></Suspense>}
       </Route>
       <Route path="/admin/categories">
         {() => <Suspense fallback={<AdminFallback />}><CategoriesAdmin /></Suspense>}
