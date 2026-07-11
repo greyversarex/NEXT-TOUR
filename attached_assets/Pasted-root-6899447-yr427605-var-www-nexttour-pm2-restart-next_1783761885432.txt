@@ -1,0 +1,55 @@
+root@6899447-yr427605:/var/www/nexttour# pm2 restart nexttour --update-env
+curl -s http://localhost:3000/api/documents
+[PM2] Applying action restartProcessId on app [nexttour](ids: [ 0 ])
+[PM2] [nexttour](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ nexttour           │ fork     │ 1    │ online    │ 0%       │ 39.5mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+root@6899447-yr427605:/var/www/nexttour# curl -s http://localhost:3000/api/documents
+[{"id":"279908f2-721d-4bf4-8b47-4a151975d98a","slug":"offer","titleRu":"Договор-оферта","titleEn":"Public Offer Agreement","descriptionRu":"Публичный договор на оказание туристических услуг","descriptionEn":"Public agreement for tourist services","fileUrl":null,"fileName":null,"isSystem":true,"isActive":true,"sortOrder":0,"updatedAt":"2026-07-11T09:23:13.323Z"},{"id":"a5c8135c-b324-4978-9c14-ca684fbf0640","slug":"privacy","titleRu":"Политика конфиденциальности","titleEn":"Privacy Policy","descriptionRu":"Как мы обрабатываем и защищаем ваши данные","descriptionEn":"How we process and protect your data","fileUrl":null,"fileName":null,"isSystem":true,"isActive":true,"sortOrder":1,"updatedAt":"2026-07-11T09:23:13.373Z"},{"id":"2dcb57aa-ddd5-4b95-a979-3fc97b76c6b4","slug":"terms","titleRu":"Условия использования","titleEn":"Terms of Service","descriptionRu":"Правила пользования сервисом NEXT TOUR","descriptionEn":"Rules for using the NEXT TOUR service","fileUrl":null,"fileName":null,"isSystem":true,"isActive":true,"sortOrder":2,"updatedAt":"2026-07-11T09:23:13.389Z"}]ropm2 logs nexttour --lines 30 --nostream
+[TAILING] Tailing last 30 lines for [nexttour] process (change the value with --lines option)
+/root/.pm2/logs/nexttour-error.log last 30 lines:
+0|nexttour |     at Array.map (<anonymous>)
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:41:21278
+0|nexttour |     at Array.<anonymous> (/var/www/nexttour/dist/index.cjs:41:21455)
+0|nexttour |     at ha.match (/var/www/nexttour/dist/index.cjs:45:1816)
+0|nexttour |     at j5 (/var/www/nexttour/dist/index.cjs:45:7741)
+0|nexttour |     at g (/var/www/nexttour/dist/index.cjs:45:5723)
+0|nexttour |     at Ye.<anonymous> (/var/www/nexttour/dist/index.cjs:59:10086)
+0|nexttour |     at Ye.emit (node:events:524:28)
+0|nexttour | URIError: Failed to decode param '..%c0%af..%c0%afhome'
+0|nexttour |     at decodeURIComponent (<anonymous>)
+0|nexttour |     at Z_ (/var/www/nexttour/dist/index.cjs:45:2021)
+0|nexttour |     at Array.map (<anonymous>)
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:41:21278
+0|nexttour |     at Array.<anonymous> (/var/www/nexttour/dist/index.cjs:41:21455)
+0|nexttour |     at ha.match (/var/www/nexttour/dist/index.cjs:45:1816)
+0|nexttour |     at j5 (/var/www/nexttour/dist/index.cjs:45:7741)
+0|nexttour |     at g (/var/www/nexttour/dist/index.cjs:45:5723)
+0|nexttour |     at Ye.<anonymous> (/var/www/nexttour/dist/index.cjs:59:10086)
+0|nexttour |     at Ye.emit (node:events:524:28)
+0|nexttour | URIError: Failed to decode param '%c0'
+0|nexttour |     at decodeURIComponent (<anonymous>)
+0|nexttour |     at Z_ (/var/www/nexttour/dist/index.cjs:45:2021)
+0|nexttour |     at Array.map (<anonymous>)
+0|nexttour |     at /var/www/nexttour/dist/index.cjs:41:21278
+0|nexttour |     at Array.<anonymous> (/var/www/nexttour/dist/index.cjs:41:21455)
+0|nexttour |     at ha.match (/var/www/nexttour/dist/index.cjs:45:1816)
+0|nexttour |     at j5 (/var/www/nexttour/dist/index.cjs:45:7741)
+0|nexttour |     at g (/var/www/nexttour/dist/index.cjs:45:5723)
+0|nexttour |     at Ye.<anonymous> (/var/www/nexttour/dist/index.cjs:59:10086)
+0|nexttour |     at Ye.emit (node:events:524:28)
+
+/root/.pm2/logs/nexttour-out.log last 30 lines:
+0|nexttour | � резиденцией бухарских наместников и военной базой. И представите, как протекала здесь жизнь много веков назад.\nЭтот тур подойдёт семейным парам, а также любителям истории и древности. Он будет интересен тем, кто хочет глубже познакомиться с культурой, традициями и историческим наследием региона, а также провести время в спокойной и приятной атмосфере на фоне живописной природы.","descriptionEn":"A trip to Hisor is an encounter with history spanning over 2,500 years. You will stroll through the ancient fortress, where a bustling bazaar once thronged and trade caravans stopped. You'll learn how the citadel served as the residence of Bukhara's governors and a military base. And you will imagine what life was like here many centuries ago.\nThis tour is suitable for families, couples, and history and antiquity enthusiasts. It will appeal to those who want to gain a deeper understanding of the region's culture, traditions, and historical heritage, as well as spend time in a tranquil and pleasant atmosphere amidst picturesque natural beauty.","cityId":"573f6d64-c5e1-4b78-8cba-fdd603766e19","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","categoryId":"cfb172d7-6613-4076-82ea-7e8556f455f3","duration":1,"basePrice":"2050.00","discountPercent":0,"mainImage":"/uploads/1776495790981-69cz7mntkpn.jpg","mainImagePosition":"59% 49%","images":["/uploads/1776348518775-72x1u0dce0m.jpg","/uploads/1776348615175-mk6fbib931s.jpg","/uploads/1776495835508-6y3sy9t8q1.jpg","/uploads/1776495848445-pta4evzdejg.jpg","/uploads/1776495877656-p70yp4ga5yq.jpg","/uploads/1776495893989-fawvdx1sod.jpg","/uploads/1776506110862-39mwhze5r1j.jpg"],"imagesMeta":[{"scale":1,"position":"50% 50%"},{"scale":1,"position":"50% 50%"},{"scale":1,"position":"50% 48%"},{"scale":1,"position":"50% 50%"},{"scale":1,"position":"52% 35%"},{"scale":1,"position":"52% 29%"}],"isHot":false,"isFeatured":false,"isActive":true,"deletedAt":null,"includedRu":"Транспорт\nГид\nВходные билеты\nОбед\nВерховая езда на лошади","includedEn":"Transportation\nGuide\nEntrance fees\nLunch\nHorseback riding","notIncludedRu":"Мед страховка \nЛичные расходы","notIncludedEn":"Health insurance\nPersonal expenses","mapUrl":"","customDatesTextRu":"На любые даты","customDatesTextEn":"Any dates are avalible","createdAt":"2026-04-16T14:10:20.437Z"}]
+0|nexttour | 9:16:28 AM [express] GET /api/cities 200 in 2ms :: [{"id":"a8b28ef2-e98c-440d-b422-9296cb49ebaf","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Айни","nameEn":"Ayni","imageUrl":null},{"id":"75b7b0b8-a1c3-4700-add2-4cafe2b065ea","countryId":"25c3e2ee-8d66-4139-9be9-19c6b7aab0ae","nameRu":"Бухара","nameEn":"Bukhara","imageUrl":null},{"id":"0e0ea82e-0cd1-43a0-a073-88a336732dd8","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Дарвоз","nameEn":"Darvoz","imageUrl":null},{"id":"573f6d64-c5e1-4b78-8cba-fdd603766e19","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Душанбе","nameEn":"Dushanbe","imageUrl":null},{"id":"4759e9f3-c942-4716-8d66-898034d08816","countryId":"25c3e2ee-8d66-4139-9be9-19c6b7aab0ae","nameRu":"Хива","nameEn":"Khiva","imageUrl":null},{"id":"a9fedd0c-b80c-4f89-aeaf-b81a8b2e78bb","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Хорог","nameEn":"Khorog","imageUrl":null},{"id":"d2b2b8c9-a7ac-4b50-bdb2-1297ff6d2ead","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Ховалинг","nameEn":"Khovaling","imageUrl":null},{"id":"5bf720c6-4ff7-493b-9a9e-c87ac9bb5ff5","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Худжанд","nameEn":"Khujand","imageUrl":null},{"id":"81e7b283-7d0c-49e2-82b4-a6746a7b8516","countryId":"a37c83fe-f73a-42f7-8002-d63e6a46303c","nameRu":"Пенджикент","nameEn":"Panjakent","imageUrl":null},{"id":"05f5f43c-3b27-45d5-8710-730423899a2e","countryId":"25c3e2ee-8d66-4139-9be9-19c6b7aab0ae","nameRu":"Самарканд","nameEn":"Samarkand","imageUrl":null},{"id":"539dace4-0f05-4b42-b76f-3a2b4a1446ff","countryId":"25c3e2ee-8d66-4139-9be9-19c6b7aab0ae","nameRu":"Ташкент","nameEn":"Tashkent","imageUrl":null}]
+0|nexttour | [seed] Database already seeded, skipping.
+0|nexttour | [seed] Created system document 'offer'
+0|nexttour | [seed] Created system document 'privacy'
+0|nexttour | [seed] Created system document 'terms'
+0|nexttour | 9:23:13 AM [express] serving on port 3000
+0|nexttour | 9:24:19 AM [express] GET /api/documents 200 in 18ms :: [{"id":"279908f2-721d-4bf4-8b47-4a151975d98a","slug":"offer","titleRu":"Договор-оферта","titleEn":"Public Offer Agreement","descriptionRu":"Публичный договор на оказание туристических услуг","descriptionEn":"Public agreement for tourist services","fileUrl":null,"fileName":null,"isSystem":true,"isActive":true,"sortOrder":0,"updatedAt":"2026-07-11T09:23:13.323Z"},{"id":"a5c8135c-b324-4978-9c14-ca684fbf0640","slug":"privacy","titleRu":"Политика конфиденциальности","titleEn":"Privacy Policy","descriptionRu":"Как мы обрабатываем и защищаем ваши данные","descriptionEn":"How we process and protect your data","fileUrl":null,"fileName":null,"isSystem":true,"isActive":true,"sortOrder":1,"updatedAt":"2026-07-11T09:23:13.373Z"},{"id":"2dcb57aa-ddd5-4b95-a979-3fc97b76c6b4","slug":"terms","titleRu":"Условия использования","titleEn":"Terms of Service","descriptionRu":"Правила пользования сервисом NEXT TOUR","descriptionEn":"Rules for using the NEXT TOUR service","fileUrl":null,"fileName":null,"isSystem":true,"isActive":true,"sortOrder":2,"updatedAt":"2026-07-11T09:23:13.389Z"}]
+
+root@6899447-yr427605:/var/www/nexttour#
