@@ -1,0 +1,60 @@
+root@6899447-yr427605:/var/www/nexttour# git pull                 # обновить код (вы это сделали)
+npm install              # на случай новых зависимостей
+npm run db:push          # создать таблицу documents в боевой БД
+npm run build            # ПЕРЕСОБРАТЬ фронтенд и сервер (главный шаг)
+Already up to date.
+
+up to date, audited 576 packages in 4s
+
+114 packages are looking for funding
+  run `npm fund` for details
+
+22 vulnerabilities (2 low, 8 moderate, 12 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> rest-express@1.0.0 db:push
+> drizzle-kit push
+
+No config path provided, using default 'drizzle.config.ts'
+Reading config file '/var/www/nexttour/drizzle.config.ts'
+Using 'pg' driver for database querying
+[✓] Pulling schema from database...
+[✓] Changes applied
+
+> rest-express@1.0.0 build
+> tsx script/build.ts
+
+building client...
+vite v7.3.1 building client environment for production...
+transforming (8) src/lib/i18n.tsx
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+
+<--- Last few GCs --->
+
+[35079:0x455a8630]    36570 ms: Mark-Compact (reduce) 478.2 (489.3) -> 477.3 (489.6) MB, 833.79 / 0.00 ms  (average mu = 0.108, current mu = 0.053) allocation failure; scavenge might not succeed
+[35079:0x455a8630]    37442 ms: Mark-Compact (reduce) 478.4 (489.6) -> 477.6 (489.8) MB, 828.51 / 0.00 ms  (average mu = 0.079, current mu = 0.050) allocation failure; scavenge might not succeed
+
+
+<--- JS stacktrace --->
+
+FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0xb78db1 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [/usr/bin/node]
+ 2: 0xee82f0 v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/usr/bin/node]
+ 3: 0xee85d7 v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/usr/bin/node]
+ 4: 0x10fa275  [/usr/bin/node]
+ 5: 0x11120f8 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/usr/bin/node]
+ 6: 0x10e8211 v8::internal::HeapAllocator::AllocateRawWithLightRetrySlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/usr/bin/node]
+ 7: 0x10e93a5 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/usr/bin/node]
+ 8: 0x10c69f6 v8::internal::Factory::NewFillerObject(int, v8::internal::AllocationAlignment, v8::internal::AllocationType, v8::internal::AllocationOrigin) [/usr/bin/node]
+ 9: 0x1522276 v8::internal::Runtime_AllocateInYoungGeneration(int, unsigned long*, v8::internal::Isolate*) [/usr/bin/node]
+10: 0x195bef6  [/usr/bin/node]
+root@6899447-yr427605:/var/www/nexttour#
