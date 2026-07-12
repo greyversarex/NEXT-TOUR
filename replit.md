@@ -20,6 +20,14 @@
 - Код должен быть чистым, предсказуемым и поддерживаемым.
 - **Переменные окружения на Timeweb нужно настраивать отдельно** — они не синхронизируются с Replit автоматически.
 
+### Запуск на Replit (development)
+
+- Workflow **Start application** запускает `npm run dev` (tsx server/index.ts + Vite), сервер слушает порт 5000.
+- При первом импорте/пустой БД: выполнить `npm run db:push` (drizzle-kit push), затем перезапустить workflow — сервер сам засеет демо-данные (туры, документы, валюты) при старте, если таблицы пустые.
+- Тестовые аккаунты после сидинга: `admin@travelpro.ru / admin123` (админ), `user@travelpro.ru / user123` (пользователь).
+- Опциональные секреты (не заданы по умолчанию, фичи с ними работают в degraded-режиме без крашей): `ALIF_TERMINAL_ID` / `ALIF_TERMINAL_PASSWORD` (оплата Alif), `RESEND_API_KEY` (email), `GOOGLE_CLIENT_ID/SECRET`, `FACEBOOK_APP_ID/SECRET`, `MAILRU_APP_ID/SECRET` (social login).
+- `SESSION_SECRET` и `DATABASE_URL` уже настроены как Replit secrets/встроенная Postgres-БД.
+
 ---
 
 ## Overview
