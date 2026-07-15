@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -80,14 +79,14 @@ function BookingDetailModal({ booking, onClose, onStatusChange }: { booking: any
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] p-0 flex flex-col" data-testid="dialog-booking-detail">
-        <DialogHeader className="px-6 pt-6 pb-2">
-          <DialogTitle className="flex items-center gap-2">
-            <Info className="h-5 w-5" />
+      <DialogContent className="max-w-2xl w-[calc(100%-2rem)] max-h-[90svh] p-0 flex flex-col gap-0 overflow-hidden" data-testid="dialog-booking-detail">
+        <DialogHeader className="px-6 pt-5 pb-4 border-b shrink-0">
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <Info className="h-5 w-5 text-primary shrink-0" />
             {t("Детали бронирования", "Booking Details")}
           </DialogTitle>
         </DialogHeader>
-        <ScrollArea className="flex-1 px-6 pb-6">
+        <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5">
           <div className="space-y-5">
             {/* Status + meta */}
             <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -241,7 +240,7 @@ function BookingDetailModal({ booking, onClose, onStatusChange }: { booking: any
               </>
             )}
           </div>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );
