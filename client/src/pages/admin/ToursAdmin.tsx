@@ -18,7 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { ImagePositionPicker } from "@/components/ui/image-position-picker";
-import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route, ChevronDown, ChevronRight, MapPin, Clock, DollarSign, X, Upload, Loader2, Copy, Hotel as HotelIcon } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, CalendarDays, ListChecks, Route, ChevronDown, ChevronRight, MapPin, Clock, DollarSign, X, Upload, Loader2, Copy, Hotel as HotelIcon, Search } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import type { Tour, Country, Category } from "@shared/schema";
@@ -64,20 +64,95 @@ export default function ToursAdmin() {
     },
   });
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCountry, setFilterCountry] = useState("all");
+  const [filterCity, setFilterCity] = useState("all");
+
+  const availableCities = filterCountry === "all"
+    ? cities
+    : cities.filter((c: any) => c.countryId === filterCountry);
+
+  const filteredTours = tours.filter(tour => {
+    const title = lang === "ru" ? tour.titleRu : tour.titleEn;
+    const matchesSearch = !searchQuery || title.toLowerCase().includes(searchQuery.toLowerCase())
+      || tour.titleRu.toLowerCase().includes(searchQuery.toLowerCase())
+      || tour.titleEn.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCountry = filterCountry === "all" || tour.countryId === filterCountry;
+    const matchesCity = filterCity === "all" || tour.cityId === filterCity;
+    return matchesSearch && matchesCountry && matchesCity;
+  });
+
+  const hasFilters = searchQuery || filterCountry !== "all" || filterCity !== "all";
+
+  const clearFilters = () => { setSearchQuery(""); setFilterCountry("all"); setFilterCity("all"); };
+
   const openNew = () => { setEditTour({}); setShowForm(true); };
   const openEdit = (tour: Tour) => { setEditTour(tour); setShowForm(true); };
 
   return (
     <AdminLayout title={t("Управление турами", "Tours Management")}>
-      <div className="flex justify-between items-center mb-6">
-        <p className="text-sm text-muted-foreground">{t("Всего туров:", "Total tours:")} {tours.length}</p>
+      <div className="flex justify-between items-center mb-4">
+        <p className="text-sm text-muted-foreground">
+          {hasFilters
+            ? t(`Показано: ${filteredTours.length} из ${tours.length}`, `Showing: ${filteredTours.length} of ${tours.length}`)
+            : t(`Всего туров: ${tours.length}`, `Total tours: ${tours.length}`)
+          }
+        </p>
         <Button onClick={openNew} className="gap-2" data-testid="button-new-tour">
           <Plus className="h-4 w-4" /> {t("Добавить тур", "Add Tour")}
         </Button>
       </div>
 
+      {/* Search & Filters */}
+      <div className="flex flex-wrap gap-2 mb-5">
+        <div className="relative flex-1 min-w-48">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Input
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder={t("Поиск по названию...", "Search by title...")}
+            className="pl-8 h-9"
+          />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+        <Select value={filterCountry} onValueChange={v => { setFilterCountry(v); setFilterCity("all"); }}>
+          <SelectTrigger className="w-44 h-9 text-sm">
+            <SelectValue placeholder={t("Страна", "Country")} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t("Все страны", "All countries")}</SelectItem>
+            {countries.map((c: any) => (
+              <SelectItem key={c.id} value={c.id}>{lang === "ru" ? c.nameRu : c.nameEn}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={filterCity} onValueChange={setFilterCity} disabled={availableCities.length === 0}>
+          <SelectTrigger className="w-44 h-9 text-sm">
+            <SelectValue placeholder={t("Город", "City")} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t("Все города", "All cities")}</SelectItem>
+            {availableCities.map((c: any) => (
+              <SelectItem key={c.id} value={c.id}>{lang === "ru" ? c.nameRu : c.nameEn}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {hasFilters && (
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="h-9 gap-1.5 text-muted-foreground">
+            <X className="h-3.5 w-3.5" />{t("Сбросить", "Clear")}
+          </Button>
+        )}
+      </div>
+
       <div className="space-y-3">
-        {tours.map(tour => (
+        {filteredTours.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center py-8">{t("Туры не найдены", "No tours found")}</p>
+        )}
+        {filteredTours.map(tour => (
           <Card key={tour.id} data-testid={`card-admin-tour-${tour.id}`}>
             <CardContent className="pt-4">
               <div className="flex items-center justify-between gap-4">
