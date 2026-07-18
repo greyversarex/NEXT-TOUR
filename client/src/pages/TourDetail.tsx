@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -911,6 +912,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
   const [guestEmail, setGuestEmail] = useState("");
   const [phoneCode, setPhoneCode] = useState("+992");
   const [phoneLocal, setPhoneLocal] = useState("");
+  const [notes, setNotes] = useState("");
   const guestPhone = phoneLocal ? `${phoneCode}${phoneLocal}` : "";
 
   const totalPeople = adults + children;
@@ -969,6 +971,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
     addField("selectedOptions", JSON.stringify(selectedOptions));
     addField("totalPrice", totalPrice.toFixed(2));
     addField("paymentType", paymentType);
+    if (notes.trim()) addField("notes", notes.trim());
     if (!user) {
       addField("guestName", guestName || "");
       addField("guestEmail", guestEmail || "");
@@ -1250,6 +1253,21 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div>
+              <Label htmlFor="booking-notes" className="text-sm font-semibold mb-2 block">
+                {t("Комментарий к бронированию", "Booking comment")}
+              </Label>
+              <Textarea
+                id="booking-notes"
+                data-testid="input-booking-notes"
+                placeholder={t("Пожелания, вопросы, особые условия…", "Wishes, questions, special requests…")}
+                value={notes}
+                onChange={e => setNotes(e.target.value.slice(0, 2000))}
+                rows={3}
+                className="resize-none"
+              />
             </div>
           </div>
 

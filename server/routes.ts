@@ -1365,7 +1365,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       createPaymentArgs.bookingId = bookingId;
     } else {
       // Deferred path: no booking is created until the payment succeeds
-      const { tourId, tourDateId, adults, children, selectedOptions, totalPrice, paymentType, guestName, guestEmail, guestPhone } = req.body;
+      const { tourId, tourDateId, adults, children, selectedOptions, totalPrice, paymentType, guestName, guestEmail, guestPhone, notes } = req.body;
       if (!tourId || totalPrice == null || !paymentType) {
         return res.status(400).json({ message: "Недостаточно данных для оплаты" });
       }
@@ -1394,6 +1394,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         selectedOptions: parsedOptions,
         totalPrice: String(totalPrice),
         paymentType,
+        notes: typeof notes === "string" && notes.trim() ? notes.trim().slice(0, 2000) : null,
       };
 
       const total = Number(totalPrice);
