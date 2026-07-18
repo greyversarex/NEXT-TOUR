@@ -565,17 +565,7 @@ export default function TourDetail() {
               </div>
 
               <div className="bg-card p-4 md:p-5">
-                {(tour.customDatesTextRu || tour.customDatesTextEn) ? (
-                  <div className="mb-3 md:mb-5">
-                    <p className="text-sm font-semibold flex items-center gap-1.5 mb-2">
-                      <CalendarIcon className="h-4 w-4 text-primary" />
-                      {t("Доступные даты:", "Available dates:")}
-                    </p>
-                    <p className="text-sm text-foreground/80 p-3 bg-muted/40 rounded-xl whitespace-pre-line">
-                      {lang === "ru" ? (tour.customDatesTextRu || tour.customDatesTextEn) : (tour.customDatesTextEn || tour.customDatesTextRu)}
-                    </p>
-                  </div>
-                ) : dates.length > 0 ? (
+                {dates.length > 0 ? (
                   <div className="mb-3 md:mb-5">
                     <p className="text-sm font-semibold flex items-center gap-1.5 mb-2">
                       <CalendarIcon className="h-4 w-4 text-primary" />
@@ -595,7 +585,9 @@ export default function TourDetail() {
                           cur.setDate(cur.getDate() + 1);
                         }
                       });
-                      const isDisabled = (day: Date) => !enabledDates.has(day.toDateString());
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      const isDisabled = (day: Date) => day < today || !enabledDates.has(day.toDateString());
                       const matchingPeriod = selectedCalendarDate
                         ? dates.find((d: any) => {
                             const s = new Date(d.startDate); s.setHours(0,0,0,0);
@@ -651,6 +643,16 @@ export default function TourDetail() {
                         </Popover>
                       );
                     })()}
+                  </div>
+                ) : (tour.customDatesTextRu || tour.customDatesTextEn) ? (
+                  <div className="mb-3 md:mb-5">
+                    <p className="text-sm font-semibold flex items-center gap-1.5 mb-2">
+                      <CalendarIcon className="h-4 w-4 text-primary" />
+                      {t("Доступные даты:", "Available dates:")}
+                    </p>
+                    <p className="text-sm text-foreground/80 p-3 bg-muted/40 rounded-xl whitespace-pre-line">
+                      {lang === "ru" ? (tour.customDatesTextRu || tour.customDatesTextEn) : (tour.customDatesTextEn || tour.customDatesTextRu)}
+                    </p>
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground mb-3 md:mb-5 p-3 bg-muted/40 rounded-xl">
