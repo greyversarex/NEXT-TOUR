@@ -325,7 +325,7 @@ body {
   background-image:
     linear-gradient(rgba(0,0,0,0.22), rgba(0,0,0,0.22)),
     linear-gradient(rgba(180,210,255,0.10), rgba(220,240,255,0.06)),
-    url('/images/bg-nature.jpg');
+    url('/images/bg-nature.webp');
   background-size: cover;
   background-attachment: fixed;
   background-position: center top;
@@ -335,7 +335,7 @@ body {
 .dark body {
   background-image:
     linear-gradient(rgba(10,20,40,0.72), rgba(10,20,40,0.72)),
-    url('/images/bg-nature.jpg');
+    url('/images/bg-nature.webp');
 }
 
 /* Floating content panel — solid white card over nature background */

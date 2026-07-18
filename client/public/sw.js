@@ -1,4 +1,4 @@
-const CACHE_NAME = "nexttour-v3";
+const CACHE_NAME = "nexttour-v4";
 const STATIC_ASSETS = [
   "/",
   "/tours",
@@ -9,6 +9,7 @@ const STATIC_ASSETS = [
   "/favicon.svg",
   "/images/nexttour-logo-color.png",
   "/images/hero-banner.png",
+  "/images/bg-nature.webp",
 ];
 
 self.addEventListener("install", (event) => {

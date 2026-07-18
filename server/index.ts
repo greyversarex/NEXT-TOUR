@@ -22,7 +22,9 @@ app.set("trust proxy", 1);
 // Persistent uploads directory — outside of dist/ so files survive npm run build
 const uploadsDir = path.join(process.cwd(), "uploads");
 fs.mkdirSync(uploadsDir, { recursive: true });
-app.use("/uploads", express.static(uploadsDir));
+app.use("/uploads", express.static(uploadsDir, {
+  maxAge: "30d", // uploaded filenames are timestamped — safe to cache long-term
+}));
 
 declare module "http" {
   interface IncomingMessage {
