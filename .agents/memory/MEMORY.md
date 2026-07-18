@@ -3,4 +3,5 @@
 - [Alif payment gates](alif-payment-gates.md) — `gate` selects card brand (vsa=Visa, mcr=Mastercard, km=Korti Milli); all use the same /v2/ endpoint, backend just forwards it.
 - [Production deployment](production-deploy.md) — production is on Timeweb server, not Replit. Replit is dev-only; changes go GitHub → Timeweb via git pull.
 - [Work quality mandate](work-quality-mandate.md) — this is a live production site; every task must be done thoroughly and responsibly, never superficially.
+- [Upload image compression](upload-image-compression.md) — uploads auto-compressed to WebP via sharp, SVG rejected, /uploads cached 30d with nosniff+sandbox headers.
 - [Site documents](site-documents.md) — admin-managed downloadable legal docs; system docs (offer/privacy/terms) fall back to hardcoded text, hidden docs 404, doc uploads admin-only.

@@ -10,6 +10,7 @@ import { Pool } from "pg";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import path from "path";
+import fs from "fs";
 import { sendPasswordResetEmail, sendWelcomeEmail, sendBookingConfirmationEmail, sendBulkEmail, sendVerificationEmail, sendTransferConfirmationEmail } from "./email";
 import { initiateAlifPayment, checkAlifTransaction, verifyCallbackToken, normalizeAlifStatus } from "./payment";
 import multer from "multer";
@@ -1122,7 +1123,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         "application/vnd.ms-excel",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       ];
-      const isImageOrVideo = file.mimetype.startsWith("image/") || ["video/mp4", "video/quicktime", "video/webm"].includes(file.mimetype);
+      // SVG is rejected: it can carry embedded scripts (stored XSS) when served same-origin.
+      const isImageOrVideo = (file.mimetype.startsWith("image/") && file.mimetype !== "image/svg+xml") || ["video/mp4", "video/quicktime", "video/webm"].includes(file.mimetype);
       const isDoc = docTypes.includes(file.mimetype);
       if (isImageOrVideo) {
         cb(null, true);
@@ -1138,9 +1140,35 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   app.post("/api/upload", requireAuth, (req, res, next) => {
-    upload.single("file")(req, res, (err) => {
+    upload.single("file")(req, res, async (err) => {
       if (err) return res.status(400).json({ message: err.message || "Upload error" });
       if (!req.file) return res.status(400).json({ message: "Файл не загружен или неподдерживаемый тип" });
+
+      // Auto-compress raster images (except GIF — keep animation): resize to max
+      // 1920px and convert to WebP so multi-MB photos never reach visitors.
+      const isCompressible = req.file.mimetype.startsWith("image/") && req.file.mimetype !== "image/gif" && req.file.mimetype !== "image/svg+xml";
+      if (isCompressible) {
+        try {
+          const sharp = (await import("sharp")).default;
+          const srcPath = path.join(uploadsDir, req.file.filename);
+          const outName = req.file.filename.replace(/\.[^.]*$/, "") + ".webp";
+          const outPath = path.join(uploadsDir, outName);
+          await sharp(srcPath)
+            .rotate() // respect EXIF orientation
+            .resize(1920, 1920, { fit: "inside", withoutEnlargement: true })
+            .webp({ quality: 78 })
+            .toFile(outPath);
+          const { size: outSize } = fs.statSync(outPath);
+          // Keep the compressed version only if it's actually smaller
+          if (outSize < req.file.size) {
+            fs.unlinkSync(srcPath);
+            return res.json({ url: `/uploads/${outName}`, name: req.file.originalname });
+          }
+          fs.unlinkSync(outPath);
+        } catch (e) {
+          console.error("Image compression failed, serving original:", e);
+        }
+      }
       res.json({ url: `/uploads/${req.file.filename}`, name: req.file.originalname });
     });
   });

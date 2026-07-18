@@ -24,6 +24,11 @@ const uploadsDir = path.join(process.cwd(), "uploads");
 fs.mkdirSync(uploadsDir, { recursive: true });
 app.use("/uploads", express.static(uploadsDir, {
   maxAge: "30d", // uploaded filenames are timestamped — safe to cache long-term
+  setHeaders(res) {
+    // Uploaded content must never execute in page context
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Content-Security-Policy", "sandbox");
+  },
 }));
 
 declare module "http" {
