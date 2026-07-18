@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { useI18n } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
 import { useAuth } from "@/lib/auth";
@@ -18,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Clock, MapPin, Star, Heart, Users, CheckCircle,
-  XCircle, ChevronLeft, ChevronRight, Calendar, Tag, Loader2, ChevronDown, Send, Hotel as HotelIcon
+  XCircle, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Tag, Loader2, ChevronDown, Send, Hotel as HotelIcon
 } from "lucide-react";
 import AuthModal from "@/components/AuthModal";
 import TourCard from "@/components/TourCard";
@@ -121,6 +123,9 @@ export default function TourDetail() {
   const [inquiryOpen, setInquiryOpen] = useState(false);
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const [datesOpen, setDatesOpen] = useState(!isMobile);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | undefined>(undefined);
+  const [preselectedDateId, setPreselectedDateId] = useState<string>("");
 
   const { data, isLoading, isError, error } = useQuery<any>({
     queryKey: [`/api/tours/${id}/full`],
@@ -563,7 +568,7 @@ export default function TourDetail() {
                 {(tour.customDatesTextRu || tour.customDatesTextEn) ? (
                   <div className="mb-3 md:mb-5">
                     <p className="text-sm font-semibold flex items-center gap-1.5 mb-2">
-                      <Calendar className="h-4 w-4 text-primary" />
+                      <CalendarIcon className="h-4 w-4 text-primary" />
                       {t("Доступные даты:", "Available dates:")}
                     </p>
                     <p className="text-sm text-foreground/80 p-3 bg-muted/40 rounded-xl whitespace-pre-line">
@@ -572,28 +577,80 @@ export default function TourDetail() {
                   </div>
                 ) : dates.length > 0 ? (
                   <div className="mb-3 md:mb-5">
-                    <button
-                      type="button"
-                      className="text-sm font-semibold flex items-center gap-1.5 mb-3 w-full md:cursor-default"
-                      onClick={() => setDatesOpen(p => !p)}
-                      data-testid="toggle-dates"
-                    >
-                      <Calendar className="h-4 w-4 text-primary" />
+                    <p className="text-sm font-semibold flex items-center gap-1.5 mb-2">
+                      <CalendarIcon className="h-4 w-4 text-primary" />
                       {t("Доступные даты:", "Available dates:")}
-                      <ChevronDown className={`h-4 w-4 ml-auto md:hidden transition-transform ${datesOpen ? "rotate-180" : ""}`} />
-                    </button>
-                    <div className={`space-y-2 ${datesOpen ? "" : "hidden md:block"}`}>
-                      {dates.slice(0, 3).map((d: any) => (
-                        <div key={d.id} className="flex justify-between items-center text-sm bg-muted/60 rounded-xl px-3.5 py-2 md:py-2.5 border border-border/40">
-                          <span className="flex items-center gap-1.5 text-foreground/80">
-                            {format(new Date(d.startDate), "dd MMM")} – {format(new Date(d.endDate), "dd MMM yyyy")}
-                          </span>
-                          <Badge variant="secondary" className="text-xs rounded-full">
-                            {d.maxPeople - d.bookedCount} {t("мест", "spots")}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
+                    </p>
+                    {(() => {
+                      // Build a set of enabled dates from all admin periods
+                      const enabledDates = new Set<string>();
+                      dates.forEach((d: any) => {
+                        const start = new Date(d.startDate);
+                        const end = new Date(d.endDate);
+                        start.setHours(0, 0, 0, 0);
+                        end.setHours(0, 0, 0, 0);
+                        const cur = new Date(start);
+                        while (cur <= end) {
+                          enabledDates.add(cur.toDateString());
+                          cur.setDate(cur.getDate() + 1);
+                        }
+                      });
+                      const isDisabled = (day: Date) => !enabledDates.has(day.toDateString());
+                      const matchingPeriod = selectedCalendarDate
+                        ? dates.find((d: any) => {
+                            const s = new Date(d.startDate); s.setHours(0,0,0,0);
+                            const e = new Date(d.endDate);   e.setHours(0,0,0,0);
+                            const sel = new Date(selectedCalendarDate); sel.setHours(0,0,0,0);
+                            return sel >= s && sel <= e;
+                          })
+                        : null;
+                      return (
+                        <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                          <PopoverTrigger asChild>
+                            <button
+                              type="button"
+                              className="w-full flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-border/60 bg-muted/40 hover:bg-muted/70 transition-colors text-sm text-left"
+                            >
+                              <CalendarIcon className="h-4 w-4 text-primary shrink-0" />
+                              {selectedCalendarDate ? (
+                                <span className="flex-1 text-foreground">
+                                  {format(selectedCalendarDate, "dd.MM.yyyy")}
+                                  {matchingPeriod && (
+                                    <span className="ml-2 text-xs text-muted-foreground">
+                                      ({matchingPeriod.maxPeople - matchingPeriod.bookedCount} {t("мест", "spots")})
+                                    </span>
+                                  )}
+                                </span>
+                              ) : (
+                                <span className="flex-1 text-muted-foreground">{t("Выберите дату", "Select date")}</span>
+                              )}
+                              <ChevronDown className="h-4 w-4 text-muted-foreground ml-auto" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={selectedCalendarDate}
+                              onSelect={(day) => {
+                                setSelectedCalendarDate(day);
+                                if (day) {
+                                  const period = dates.find((d: any) => {
+                                    const s = new Date(d.startDate); s.setHours(0,0,0,0);
+                                    const e = new Date(d.endDate);   e.setHours(0,0,0,0);
+                                    const sel = new Date(day); sel.setHours(0,0,0,0);
+                                    return sel >= s && sel <= e;
+                                  });
+                                  setPreselectedDateId(period?.id || "");
+                                }
+                                setCalendarOpen(false);
+                              }}
+                              disabled={isDisabled}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      );
+                    })()}
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground mb-3 md:mb-5 p-3 bg-muted/40 rounded-xl">
@@ -639,6 +696,7 @@ export default function TourDetail() {
           dates={dates}
           options={options}
           priceTiers={priceTiers}
+          preselectedDateId={preselectedDateId}
           onClose={() => setBookingOpen(false)}
           onOpenAuth={() => { setBookingOpen(false); setAuthOpen(true); }}
         />
@@ -834,14 +892,14 @@ function CounterField({ label, subLabel, value, min, max, onChange }: { label: s
   );
 }
 
-function BookingModal({ tour, dates, options, priceTiers = [], preselectedOptions = [], initialAdults = 1, initialChildren = 0, onClose, onOpenAuth }: any) {
+function BookingModal({ tour, dates, options, priceTiers = [], preselectedOptions = [], preselectedDateId = "", initialAdults = 1, initialChildren = 0, onClose, onOpenAuth }: any) {
   const { t, lang } = useI18n();
   const { formatPrice, convertPrice, currentSymbol } = useCurrency();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const [selectedDateId, setSelectedDateId] = useState(dates[0]?.id || "");
+  const [selectedDateId, setSelectedDateId] = useState(preselectedDateId || dates[0]?.id || "");
   const [adults, setAdults] = useState(initialAdults);
   const [children, setChildren] = useState(initialChildren);
   const [selectedOptions, setSelectedOptions] = useState<string[]>(preselectedOptions);
@@ -1020,7 +1078,7 @@ function BookingModal({ tour, dates, options, priceTiers = [], preselectedOption
             {dates.length > 0 && (
               <div>
                 <p className="text-sm font-semibold mb-2 flex items-center gap-1.5">
-                  <Calendar className="h-4 w-4 text-primary" />
+                  <CalendarIcon className="h-4 w-4 text-primary" />
                   {t("Выберите дату", "Select Date")}
                 </p>
                 <Select value={selectedDateId} onValueChange={setSelectedDateId}>
