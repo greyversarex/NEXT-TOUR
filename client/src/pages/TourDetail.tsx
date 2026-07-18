@@ -24,6 +24,89 @@ import AuthModal from "@/components/AuthModal";
 import TourCard from "@/components/TourCard";
 import { format } from "date-fns";
 
+function ItineraryList({ itinerary, lang, t }: { itinerary: any[]; lang: string; t: (ru: string, en: string) => string }) {
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+  const toggle = (id: number) =>
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+
+  return (
+    <div className="space-y-4">
+      {itinerary.map((item: any) => {
+        const isOpen = expandedIds.has(item.id);
+        const hasDetails =
+          (lang === "ru" ? item.descriptionRu : item.descriptionEn) ||
+          item.durationHours ||
+          (item.stops && item.stops.length > 0);
+        return (
+          <div key={item.id} className="border rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => hasDetails && toggle(item.id)}
+              className={`w-full flex items-center gap-4 px-4 py-3 text-left transition-colors ${hasDetails ? "hover:bg-muted/50 cursor-pointer" : "cursor-default"}`}
+            >
+              <div className="shrink-0 w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                {item.dayNumber}
+              </div>
+              <span className="flex-1 font-semibold text-sm">{lang === "ru" ? item.titleRu : item.titleEn}</span>
+              {hasDetails && (
+                <span className="flex items-center gap-1 text-xs text-primary shrink-0">
+                  {isOpen ? t("Скрыть", "Hide") : t("Подробнее", "Details")}
+                  <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                </span>
+              )}
+            </button>
+
+            {isOpen && hasDetails && (
+              <div className="px-4 pb-4 pt-1 border-t bg-muted/20">
+                <div className="ml-[52px]">
+                  {(lang === "ru" ? item.descriptionRu : item.descriptionEn) && (() => {
+                    const desc = lang === "ru" ? item.descriptionRu : item.descriptionEn;
+                    return /<[a-z][\s\S]*>/i.test(desc)
+                      ? <div className="text-sm text-muted-foreground prose prose-sm max-w-none [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_p]:mb-1 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4" dangerouslySetInnerHTML={{ __html: desc }} />
+                      : <p className="text-sm text-muted-foreground">{desc}</p>;
+                  })()}
+                  {item.durationHours && (
+                    <span className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                      <Clock className="h-3 w-3" /> {item.durationHours} {t("ч.", "hrs.")}
+                    </span>
+                  )}
+                  {item.stops && item.stops.length > 0 && (
+                    <div className="mt-3 ml-1 border-l-2 border-primary/20 pl-4 space-y-3">
+                      {item.stops.map((stop: any, idx: number) => (
+                        <div key={stop.id} className="relative">
+                          <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-primary/40 border-2 border-background" />
+                          <div>
+                            <p className="text-sm font-medium">{idx + 1}. {lang === "ru" ? stop.titleRu : stop.titleEn}</p>
+                            {(lang === "ru" ? stop.descriptionRu : stop.descriptionEn) && (() => {
+                              const stopDesc = lang === "ru" ? stop.descriptionRu : stop.descriptionEn;
+                              return /<[a-z][\s\S]*>/i.test(stopDesc)
+                                ? <div className="text-xs text-muted-foreground mt-0.5 prose prose-sm max-w-none [&_p]:mb-0.5 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4" dangerouslySetInnerHTML={{ __html: stopDesc }} />
+                                : <p className="text-xs text-muted-foreground mt-0.5">{stopDesc}</p>;
+                            })()}
+                            {stop.durationMinutes && (
+                              <span className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                                <Clock className="h-3 w-3" /> {stop.durationMinutes} {t("мин.", "min.")}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function TourDetail() {
   const [, params] = useRoute("/tours/:id");
   const id = params?.id || "";
@@ -298,54 +381,7 @@ export default function TourDetail() {
               {itinerary.length === 0 ? (
                 <p className="text-muted-foreground">{t("Программа не добавлена", "No itinerary available")}</p>
               ) : (
-                <div className="space-y-6">
-                  {itinerary.map((item: any) => (
-                    <div key={item.id} className="relative">
-                      <div className="flex gap-4">
-                        <div className="shrink-0 w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
-                          {item.dayNumber}
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-semibold">{lang === "ru" ? item.titleRu : item.titleEn}</h4>
-                          {(lang === "ru" ? item.descriptionRu : item.descriptionEn) && (() => {
-                            const desc = lang === "ru" ? item.descriptionRu : item.descriptionEn;
-                            return /<[a-z][\s\S]*>/i.test(desc)
-                              ? <div className="text-sm text-muted-foreground mt-1 prose prose-sm max-w-none [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_p]:mb-1 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4" dangerouslySetInnerHTML={{ __html: desc }} />
-                              : <p className="text-sm text-muted-foreground mt-1">{desc}</p>;
-                          })()}
-                          {item.durationHours && (
-                            <span className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                              <Clock className="h-3 w-3" /> {item.durationHours} {t("ч.", "hrs.")}
-                            </span>
-                          )}
-                          {item.stops && item.stops.length > 0 && (
-                            <div className="mt-3 ml-1 border-l-2 border-primary/20 pl-4 space-y-3">
-                              {item.stops.map((stop: any, idx: number) => (
-                                <div key={stop.id} className="relative">
-                                  <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-primary/40 border-2 border-background" />
-                                  <div>
-                                    <p className="text-sm font-medium">{idx + 1}. {lang === "ru" ? stop.titleRu : stop.titleEn}</p>
-                                    {(lang === "ru" ? stop.descriptionRu : stop.descriptionEn) && (() => {
-                                      const stopDesc = lang === "ru" ? stop.descriptionRu : stop.descriptionEn;
-                                      return /<[a-z][\s\S]*>/i.test(stopDesc)
-                                        ? <div className="text-xs text-muted-foreground mt-0.5 prose prose-sm max-w-none [&_p]:mb-0.5 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4" dangerouslySetInnerHTML={{ __html: stopDesc }} />
-                                        : <p className="text-xs text-muted-foreground mt-0.5">{stopDesc}</p>;
-                                    })()}
-                                    {stop.durationMinutes && (
-                                      <span className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                                        <Clock className="h-3 w-3" /> {stop.durationMinutes} {t("мин.", "min.")}
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <ItineraryList itinerary={itinerary} lang={lang} t={t} />
               )}
             </TabsContent>
 
