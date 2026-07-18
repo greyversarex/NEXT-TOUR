@@ -20,6 +20,10 @@ import {
   Car, MapPin, Calendar, Clock, Users, CheckCircle2,
   Phone, Mail, User, ArrowRight, Shield, Zap, HeadphonesIcon, Navigation
 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarPicker } from "@/components/ui/calendar";
+import { format, parse } from "date-fns";
+import { ru as ruLocale, enUS } from "date-fns/locale";
 
 const COUNTRY_CODES = [
   { code: "+992", flag: "🇹🇯", name: "Таджикистан",  short: "TJ" },
@@ -36,6 +40,47 @@ const COUNTRY_CODES = [
   { code: "+33",  flag: "🇫🇷", name: "Франция",       short: "FR" },
   { code: "+86",  flag: "🇨🇳", name: "Китай",         short: "CN" },
 ];
+
+function DateField({ id, testId, value, onChange }: { id: string; testId: string; value: string; onChange: (v: string) => void }) {
+  const { t, lang } = useI18n();
+  const [open, setOpen] = useState(false);
+  const selected = value ? parse(value, "yyyy-MM-dd", new Date()) : undefined;
+  const locale = lang === "ru" ? ruLocale : enUS;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          id={id}
+          data-testid={testId}
+          className="h-11 w-full flex items-center gap-2 rounded-md border border-input bg-background px-3 text-sm text-left hover:bg-muted/50 transition-colors"
+        >
+          <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+          {selected ? (
+            <span className="text-foreground">{format(selected, "dd.MM.yyyy", { locale })}</span>
+          ) : (
+            <span className="text-muted-foreground">{t("Выберите дату", "Select date")}</span>
+          )}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <CalendarPicker
+          mode="single"
+          locale={locale}
+          selected={selected}
+          onSelect={(day) => {
+            onChange(day ? format(day, "yyyy-MM-dd") : "");
+            setOpen(false);
+          }}
+          disabled={(day) => day < today}
+          initialFocus
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 export default function TransferPage() {
   const { t, lang } = useI18n();
@@ -471,13 +516,11 @@ export default function TransferPage() {
                     <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                     {t("Дата начала", "Start date")}
                   </Label>
-                  <Input
+                  <DateField
                     id="startDate"
-                    type="date"
-                    data-testid="input-transfer-start-date"
-                    className="h-11"
+                    testId="input-transfer-start-date"
                     value={form.startDate}
-                    onChange={(e) => set("startDate", e.target.value)}
+                    onChange={(v) => set("startDate", v)}
                   />
                 </div>
                 <div className="space-y-2">
@@ -485,13 +528,11 @@ export default function TransferPage() {
                     <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                     {t("Дата окончания", "End date")}
                   </Label>
-                  <Input
+                  <DateField
                     id="endDate"
-                    type="date"
-                    data-testid="input-transfer-end-date"
-                    className="h-11"
+                    testId="input-transfer-end-date"
                     value={form.endDate}
-                    onChange={(e) => set("endDate", e.target.value)}
+                    onChange={(v) => set("endDate", v)}
                   />
                 </div>
                 <div className="space-y-2">

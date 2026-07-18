@@ -26,6 +26,7 @@ import {
 import AuthModal from "@/components/AuthModal";
 import TourCard from "@/components/TourCard";
 import { format } from "date-fns";
+import { ru as ruLocale, enUS } from "date-fns/locale";
 
 function ItineraryList({ itinerary, lang, t }: { itinerary: any[]; lang: string; t: (ru: string, en: string) => string }) {
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
@@ -623,6 +624,7 @@ export default function TourDetail() {
                           <PopoverContent className="w-auto p-0" align="start">
                             <Calendar
                               mode="single"
+                              locale={lang === "ru" ? ruLocale : enUS}
                               selected={selectedCalendarDate}
                               onSelect={(day) => {
                                 setSelectedCalendarDate(day);
