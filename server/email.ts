@@ -53,7 +53,7 @@ async function send(to: string, subject: string, html: string): Promise<boolean>
 }
 
 function header(subtitle: string) {
-  const logoUrl = `${APP_URL}/images/nexttour-logo-trimmed.png`;
+  const logoUrl = `${APP_URL}/images/nexttour-logo-color.png`;
   return `
     <div style="background:linear-gradient(135deg,${brandColor} 0%,#1e3a5f 100%);padding:28px 32px;border-radius:8px 8px 0 0;">
       <table role="presentation" style="width:100%;border-collapse:collapse;">
@@ -62,8 +62,14 @@ function header(subtitle: string) {
             <table role="presentation" style="margin:0 auto;border-collapse:collapse;">
               <tr>
                 <td style="vertical-align:middle;padding-right:14px;">
-                  <img src="${logoUrl}" alt="NEXT TOUR" width="52" height="52"
-                       style="display:block;width:52px;height:52px;object-fit:contain;" />
+                  <table role="presentation" style="border-collapse:separate;">
+                    <tr>
+                      <td style="width:56px;height:56px;background:#ffffff;border-radius:50%;text-align:center;vertical-align:middle;">
+                        <img src="${logoUrl}" alt="NEXT TOUR" width="42"
+                             style="display:inline-block;width:42px;height:auto;vertical-align:middle;" />
+                      </td>
+                    </tr>
+                  </table>
                 </td>
                 <td style="vertical-align:middle;text-align:left;">
                   <div style="color:#fff;font-size:26px;font-weight:700;letter-spacing:.08em;line-height:1;">NEXT TOUR</div>
