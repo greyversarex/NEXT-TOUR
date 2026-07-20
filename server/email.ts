@@ -53,10 +53,27 @@ async function send(to: string, subject: string, html: string): Promise<boolean>
 }
 
 function header(subtitle: string) {
+  const logoUrl = `${APP_URL}/images/nexttour-logo-trimmed.png`;
   return `
-    <div style="background:linear-gradient(135deg,${brandColor} 0%,#1e3a5f 100%);padding:36px 32px;text-align:center;border-radius:8px 8px 0 0;">
-      <h1 style="color:#fff;margin:0;font-size:26px;letter-spacing:.08em;">NEXT TOUR</h1>
-      <p style="color:rgba(255,255,255,.7);margin:6px 0 0;font-size:13px;">${subtitle}</p>
+    <div style="background:linear-gradient(135deg,${brandColor} 0%,#1e3a5f 100%);padding:28px 32px;border-radius:8px 8px 0 0;">
+      <table role="presentation" style="width:100%;border-collapse:collapse;">
+        <tr>
+          <td style="text-align:center;vertical-align:middle;">
+            <table role="presentation" style="margin:0 auto;border-collapse:collapse;">
+              <tr>
+                <td style="vertical-align:middle;padding-right:14px;">
+                  <img src="${logoUrl}" alt="NEXT TOUR" width="52" height="52"
+                       style="display:block;width:52px;height:52px;object-fit:contain;" />
+                </td>
+                <td style="vertical-align:middle;text-align:left;">
+                  <div style="color:#fff;font-size:26px;font-weight:700;letter-spacing:.08em;line-height:1;">NEXT TOUR</div>
+                  <div style="color:rgba(255,255,255,.7);font-size:13px;margin-top:5px;">${subtitle}</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
     </div>`;
 }
 
