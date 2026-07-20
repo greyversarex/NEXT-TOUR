@@ -1156,7 +1156,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
           await sharp(srcPath)
             .rotate() // respect EXIF orientation
             .resize(1920, 1920, { fit: "inside", withoutEnlargement: true })
-            .webp({ quality: 78, effort: 5 })
+            .webp({ quality: 85, effort: 5 })
             .toFile(outPath);
           const { size: outSize } = fs.statSync(outPath);
           // Keep the compressed version only if it's actually smaller
