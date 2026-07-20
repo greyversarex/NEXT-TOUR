@@ -11,7 +11,7 @@ import { apiRequest } from "@/lib/queryClient";
 import {
   Calendar, DollarSign, Users, Table as TableIcon, Calendar as CalendarIcon,
   ChevronLeft, ChevronRight, Phone, Mail, MapPin, Info, User as UserIcon,
-  CreditCard, FileText, Hash, Clock, CheckCircle2, XCircle, PackagePlus,
+  CreditCard, FileText, Hash, Clock, CheckCircle2, XCircle, PackagePlus, Trash2,
 } from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
@@ -280,6 +280,18 @@ export default function BookingsAdmin() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/bookings/${id}`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
+      setDetailBookingId(null);
+      toast({ title: t("Бронирование удалено", "Booking deleted") });
+    },
+    onError: (err: any) => {
+      toast({ title: t("Ошибка удаления", "Delete error"), description: err?.message, variant: "destructive" });
+    },
+  });
+
   const locale = lang === "ru" ? ru : enUS;
 
   const calendarDays = useMemo(() => {
@@ -531,6 +543,24 @@ export default function BookingsAdmin() {
                           ))}
                         </SelectContent>
                       </Select>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1.5 h-8 text-xs text-destructive hover:text-destructive"
+                        onClick={() => {
+                          if (confirm(t(
+                            "Удалить запись о бронировании? Это действие необратимо.",
+                            "Delete this booking record? This cannot be undone."
+                          ))) {
+                            deleteMutation.mutate(booking.id);
+                          }
+                        }}
+                        disabled={deleteMutation.isPending}
+                        data-testid={`button-delete-${booking.id}`}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        {t("Удалить", "Delete")}
+                      </Button>
                     </div>
                   </div>
                 </CardContent>

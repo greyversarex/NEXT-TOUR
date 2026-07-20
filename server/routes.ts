@@ -837,6 +837,16 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json(await storage.updateBooking(req.params.id, req.body));
   });
 
+  app.delete("/api/bookings/:id", requireAdmin, async (req, res) => {
+    try {
+      const deleted = await storage.deleteBooking(req.params.id);
+      if (!deleted) return res.status(404).json({ message: "Not found" });
+      res.json({ success: true });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
   // Hotels
   app.get("/api/hotels", ah(async (req, res) => {
     const filters: { countryId?: string; cityId?: string } = {};

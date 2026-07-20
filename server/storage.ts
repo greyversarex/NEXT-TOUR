@@ -145,6 +145,7 @@ export interface IStorage {
   createBooking(data: InsertBooking): Promise<Booking>;
   createBookingForPayment(paymentId: string, bookingData: InsertBooking, bookingStatus: "paid" | "prepaid", paidAmount: string): Promise<Booking | null>;
   updateBooking(id: string, data: Partial<Booking>): Promise<Booking | undefined>;
+  deleteBooking(id: string): Promise<boolean>;
 
   // News
   getNews(publishedOnly?: boolean): Promise<News[]>;
@@ -918,6 +919,17 @@ export class DatabaseStorage implements IStorage {
       await this.updateUserLoyalty(b.userId);
     }
     return b;
+  }
+
+  async deleteBooking(id: string): Promise<boolean> {
+    return await db.transaction(async (tx) => {
+      const [b] = await tx.select().from(bookings).where(eq(bookings.id, id));
+      if (!b) return false;
+      // Keep payment records but detach them from the deleted booking
+      await tx.update(alifPayments).set({ bookingId: null, updatedAt: new Date() }).where(eq(alifPayments.bookingId, id));
+      await tx.delete(bookings).where(eq(bookings.id, id));
+      return true;
+    });
   }
 
   private async updateUserLoyalty(userId: string) {
