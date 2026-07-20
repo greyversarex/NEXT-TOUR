@@ -55,6 +55,40 @@ export default function IntroScreen() {
     },
   });
 
+  const [mediaReady, setMediaReady] = useState(false);
+
+  // Preload the intro image fully (download + decode) before the intro starts,
+  // so it never appears partially loaded. Falls back after 2.5s so the intro
+  // is never blocked by a slow network.
+  useEffect(() => {
+    if (!isSuccess || !intro?.isActive) return;
+    const url: string | undefined = intro?.videoUrl || undefined;
+    const isImage = !!url && !/\.(mp4|webm|mov)(\?|$)/i.test(url);
+    if (!url || !isImage) {
+      setMediaReady(true);
+      return;
+    }
+    let cancelled = false;
+    setMediaReady(false);
+    const finish = () => {
+      if (!cancelled) setMediaReady(true);
+    };
+    const img = new Image();
+    img.onload = finish;
+    img.onerror = finish;
+    img.src = url;
+    if (img.decode) {
+      img.decode().then(finish).catch(finish);
+    }
+    const fallback = setTimeout(finish, 2500);
+    return () => {
+      cancelled = true;
+      img.onload = null;
+      img.onerror = null;
+      clearTimeout(fallback);
+    };
+  }, [isSuccess, intro?.isActive, intro?.videoUrl]);
+
   useEffect(() => {
     if (!isSuccess) return;
 
@@ -64,6 +98,7 @@ export default function IntroScreen() {
       return () => clearTimeout(t);
     }
 
+    if (!mediaReady) return;
     if (animStarted.current) return;
     animStarted.current = true;
     setStatus("active");
@@ -85,7 +120,7 @@ export default function IntroScreen() {
       clearTimeout(t1); clearTimeout(t2); clearTimeout(t3);
       clearTimeout(hide); cancelAnimationFrame(raf);
     };
-  }, [isSuccess, intro]);
+  }, [isSuccess, intro, mediaReady]);
 
   const isHiding = status === "hiding";
   const isActive = status === "active";
