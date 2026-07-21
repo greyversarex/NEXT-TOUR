@@ -54,36 +54,12 @@ export default function Header() {
           <div className="flex items-center justify-between h-[68px]">
             {/* Logo */}
             <Link href="/">
-              <span className="flex items-center gap-2.5 cursor-pointer" data-testid="link-logo">
-                <div style={{
-                  width: 44, height: 44, borderRadius: "50%",
-                  background: "#ffffff",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  overflow: "hidden",
-                  boxShadow: "0 0 12px rgba(59,130,246,0.45)",
-                  flexShrink: 0,
-                }}>
-                  <img
-                    src="/images/nexttour-logo-color.png"
-                    alt="Next Tour"
-                    style={{ width: 34, height: "auto" }}
-                  />
-                </div>
-                <span style={{
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontWeight: 800,
-                  fontSize: "1.15rem",
-                  letterSpacing: "0.12em",
-                  background: "linear-gradient(135deg, #ffffff 0%, #93c5fd 60%, #60a5fa 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  textTransform: "uppercase",
-                  lineHeight: 1,
-                  userSelect: "none",
-                }}>
-                  NEXT TOUR
-                </span>
+              <span className="flex items-center cursor-pointer" data-testid="link-logo">
+                <img
+                  src="/images/nexttour-logo-lockup-light.png"
+                  alt="NEXT TOUR — Explore Tajikistan"
+                  style={{ height: 42, width: "auto", display: "block", flexShrink: 0 }}
+                />
               </span>
             </Link>
 

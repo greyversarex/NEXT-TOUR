@@ -215,30 +215,23 @@ export default function IntroScreen() {
               transition: "opacity 0.8s cubic-bezier(0.34,1.56,0.64,1), transform 0.8s cubic-bezier(0.34,1.56,0.64,1)",
             }}
           >
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative", padding: "18px 26px" }}>
+              <img
+                src="/images/nexttour-logo-lockup-light.png"
+                alt="NEXT TOUR — Explore Tajikistan"
+                style={{
+                  width: "min(300px, 66vw)", height: "auto", display: "block",
+                  filter: "drop-shadow(0 0 40px rgba(59,130,246,0.45))",
+                }}
+              />
               <div style={{
-                width: 130, height: 130, borderRadius: "50%",
-                background: "#ffffff",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 0 40px rgba(59,130,246,0.5), 0 0 80px rgba(59,130,246,0.2)",
-                overflow: "hidden",
-              }}>
-                <img
-                  src="/images/nexttour-logo-color.png"
-                  alt="Next Tour"
-                  style={{
-                    width: 100, height: "auto",
-                  }}
-                />
-              </div>
-              <div style={{
-                position: "absolute", inset: -8, borderRadius: "50%",
-                border: "1.5px solid rgba(96,165,250,0.4)",
+                position: "absolute", inset: 0, borderRadius: 24,
+                border: "1.5px solid rgba(96,165,250,0.35)",
                 animation: "ring-pulse 2s ease-in-out infinite",
               }} />
               <div style={{
-                position: "absolute", inset: -18, borderRadius: "50%",
-                border: "1px solid rgba(96,165,250,0.2)",
+                position: "absolute", inset: -12, borderRadius: 32,
+                border: "1px solid rgba(96,165,250,0.18)",
                 animation: "ring-pulse 2s 0.5s ease-in-out infinite",
               }} />
             </div>

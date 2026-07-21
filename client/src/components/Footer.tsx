@@ -20,8 +20,12 @@ export default function Footer() {
           {/* Brand column */}
           <div className="lg:col-span-1 flex flex-col gap-5">
             <div>
-              <span className="text-white text-2xl font-bold tracking-wide">NEXT <span className="text-blue-400">TOUR</span></span>
-              <p className="mt-3 text-white/80 text-sm leading-relaxed">
+              <img
+                src="/images/nexttour-logo-lockup-light.png"
+                alt="NEXT TOUR — Explore Tajikistan"
+                style={{ height: 56, width: "auto", display: "block" }}
+              />
+              <p className="mt-4 text-white/80 text-sm leading-relaxed">
                 Ваш надёжный партнёр в мире путешествий. Лучшие туры по всему миру по доступным ценам.
               </p>
             </div>

@@ -1,4 +1,4 @@
-const CACHE_NAME = "nexttour-v4";
+const CACHE_NAME = "nexttour-v6";
 const STATIC_ASSETS = [
   "/",
   "/tours",
@@ -7,7 +7,7 @@ const STATIC_ASSETS = [
   "/pwa-icon-512.png",
   "/apple-touch-icon.png",
   "/favicon.svg",
-  "/images/nexttour-logo-color.png",
+  "/images/nexttour-logo-lockup-light.png",
   "/images/hero-banner.png",
   "/images/bg-nature.webp",
 ];

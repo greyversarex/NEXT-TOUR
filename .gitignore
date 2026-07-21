@@ -5,3 +5,6 @@ vite.config.ts.*
 *.tar.gz
 uploads/
 client/public/uploads/
+.env
+*.log
+server.log

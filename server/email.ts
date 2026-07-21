@@ -53,33 +53,12 @@ async function send(to: string, subject: string, html: string): Promise<boolean>
 }
 
 function header(subtitle: string) {
-  const logoUrl = `${APP_URL}/images/nexttour-logo-color.png`;
+  const logoUrl = `${APP_URL}/images/nexttour-logo-lockup-light.png`;
   return `
-    <div style="background:linear-gradient(135deg,${brandColor} 0%,#1e3a5f 100%);padding:28px 32px;border-radius:8px 8px 0 0;">
-      <table role="presentation" style="width:100%;border-collapse:collapse;">
-        <tr>
-          <td style="text-align:center;vertical-align:middle;">
-            <table role="presentation" style="margin:0 auto;border-collapse:collapse;">
-              <tr>
-                <td style="vertical-align:middle;padding-right:14px;">
-                  <table role="presentation" style="border-collapse:separate;">
-                    <tr>
-                      <td style="width:56px;height:56px;background:#ffffff;border-radius:50%;text-align:center;vertical-align:middle;">
-                        <img src="${logoUrl}" alt="NEXT TOUR" width="42"
-                             style="display:inline-block;width:42px;height:auto;vertical-align:middle;" />
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-                <td style="vertical-align:middle;text-align:left;">
-                  <div style="color:#fff;font-size:26px;font-weight:700;letter-spacing:.08em;line-height:1;">NEXT TOUR</div>
-                  <div style="color:rgba(255,255,255,.7);font-size:13px;margin-top:5px;">${subtitle}</div>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
+    <div style="background:linear-gradient(135deg,${brandColor} 0%,#1e3a5f 100%);padding:28px 32px;border-radius:8px 8px 0 0;text-align:center;">
+      <img src="${logoUrl}" alt="NEXT TOUR — Explore Tajikistan" width="210"
+           style="display:inline-block;width:210px;max-width:100%;height:auto;" />
+      <div style="color:rgba(255,255,255,.85);font-size:13px;margin-top:14px;">${subtitle}</div>
     </div>`;
 }
 
